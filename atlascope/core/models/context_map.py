@@ -1,7 +1,7 @@
-from django.db import models
-from django.contrib import admin
-
 from uuid import uuid4
+
+from django.contrib import admin
+from django.db import models
 
 
 class ContextMap(models.Model):

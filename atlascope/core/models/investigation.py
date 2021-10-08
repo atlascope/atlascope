@@ -1,9 +1,9 @@
-from django.db import models
+from uuid import uuid4
+
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.db import models
 from django_extensions.db.models import TimeStampedModel
-
-from uuid import uuid4
 
 from atlascope.core.models import ConnectionsMap, ContextMap
 
