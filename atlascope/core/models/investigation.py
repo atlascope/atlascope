@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
+from rest_framework import serializers
+
 from atlascope.core.models import ConnectionsMap, ContextMap
 
 
@@ -29,6 +31,20 @@ class Investigation(TimeStampedModel, models.Model):
             new_connections_map.save()
             self.connections_map = new_connections_map
         super().save(*args, **kwargs)
+
+
+class InvestigationSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail')
+    collaborators = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name='user-detail'
+    )
+    observers = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name='user-detail'
+    )
+
+    class Meta:
+        model = Investigation
+        exclude = ('context_map', 'connections_map')
 
 
 @admin.register(Investigation)
