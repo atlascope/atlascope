@@ -2,9 +2,7 @@ from uuid import uuid4
 
 from django.contrib import admin
 from django.db import models
-
 from rest_framework import serializers
-
 
 PIN_COLORS = [
     ('red', 'red'),

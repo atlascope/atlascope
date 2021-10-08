@@ -1,6 +1,6 @@
 from django.urls import path
-from atlascope.core.rest import views
 
+from atlascope.core.rest import views
 
 urlpatterns = [
     path('investigations/', views.InvestigationList.as_view(), name='investigation-list'),
