@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.contrib import admin
 from django.db import models
+from rest_framework import serializers
 
 PIN_COLORS = [
     ('red', 'red'),
@@ -21,6 +22,14 @@ class Pin(models.Model):
     )
     # pin_location
     note = models.TextField(max_length=1000, blank=True)
+
+
+class PinSerializer(serializers.HyperlinkedModelSerializer):
+    dataset = serializers.HyperlinkedRelatedField(read_only=True, view_name='dataset-detail')
+
+    class Meta:
+        model = Pin
+        fields = '__all__'
 
 
 @admin.register(Pin)
