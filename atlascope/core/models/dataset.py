@@ -10,6 +10,7 @@ class Dataset(models.Model):
     source_uri = models.CharField(max_length=3000, null=False, blank=False)
     # import_function
     # scale
+    # applicable_heuristics
 
 
 class DatasetSerializer(serializers.HyperlinkedModelSerializer):
