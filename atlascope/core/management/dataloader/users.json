@@ -1,0 +1,47 @@
+[
+    {
+        "username": "anne.haley@kitware.com",
+        "email": "anne.haley@kitware.com",
+        "first_name": "Anne",
+        "last_name": "Haley",
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true
+    },
+    {
+        "username": "mary.salvi@kitware.com",
+        "email": "mary.salvi@kitware.com",
+        "first_name": "Mary",
+        "last_name": "Salvi",
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true
+    },
+    {
+        "username": "roni.choudhury@kitware.com",
+        "email": "roni.choudhury@kitware.com",
+        "first_name": "Roni",
+        "last_name": "Choudhury",
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true
+    },
+    {
+        "username": "matt.covalt@kitware.com",
+        "email": "matt.covalt@kitware.com",
+        "first_name": "Matt",
+        "last_name": "Covalt",
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true
+    },
+    {
+        "username": "mike.nagler@kitware.com",
+        "email": "mike.nagler@kitware.com",
+        "first_name": "Mike",
+        "last_name": "Nagler",
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true
+    }
+]

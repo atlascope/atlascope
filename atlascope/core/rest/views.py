@@ -1,7 +1,6 @@
+from django.contrib.auth.models import User
 from rest_framework import generics
 
-from django.contrib.auth.models import User
-from atlascope.core.rest.additional_serializers import UserSerializer
 from atlascope.core.models import (
     ConnectionsMap,
     ConnectionsMapSerializer,
@@ -14,6 +13,7 @@ from atlascope.core.models import (
     Pin,
     PinSerializer,
 )
+from atlascope.core.rest.additional_serializers import UserSerializer
 
 
 class InvestigationList(generics.ListCreateAPIView):

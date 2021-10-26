@@ -14,11 +14,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='investigation',
             name='connections_map',
-            field=models.OneToOneField(editable=False, on_delete=django.db.models.deletion.PROTECT, to='core.connectionsmap'),
+            field=models.OneToOneField(
+                editable=False,
+                on_delete=django.db.models.deletion.PROTECT,
+                to='core.connectionsmap',
+            ),
         ),
         migrations.AlterField(
             model_name='investigation',
             name='context_map',
-            field=models.OneToOneField(editable=False, on_delete=django.db.models.deletion.PROTECT, to='core.contextmap'),
+            field=models.OneToOneField(
+                editable=False, on_delete=django.db.models.deletion.PROTECT, to='core.contextmap'
+            ),
         ),
     ]
