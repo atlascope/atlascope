@@ -1,7 +1,7 @@
 from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
 
+from django.contrib.auth.models import User
+from atlascope.core.rest.additional_serializers import UserSerializer
 from atlascope.core.models import (
     ConnectionsMap,
     ConnectionsMapSerializer,
@@ -16,22 +16,6 @@ from atlascope.core.models import (
 )
 
 
-# browsable API
-class ApiRoot(generics.GenericAPIView):
-    name = 'api-root'
-
-    def get(self, request, *args, **kwargs):
-        return Response(
-            {
-                'investigations': reverse(InvestigationList.name, request=request),
-                'context-maps': reverse(ContextMapList.name, request=request),
-                'connections-maps': reverse(ConnectionsMapList.name, request=request),
-                'datasets': reverse(DatasetList.name, request=request),
-                'pins': reverse(PinList.name, request=request),
-            }
-        )
-
-
 class InvestigationList(generics.ListCreateAPIView):
     queryset = Investigation.objects.all()
     serializer_class = InvestigationSerializer
@@ -44,25 +28,13 @@ class InvestigationDetail(generics.RetrieveUpdateDestroyAPIView):
     name = 'investigation-detail'
 
 
-class ContextMapList(generics.ListCreateAPIView):
-    queryset = ContextMap.objects.all()
-    serializer_class = ContextMapSerializer
-    name = 'context-map-list'
-
-
-class ContextMapDetail(generics.RetrieveUpdateDestroyAPIView):
+class ContextMapDetail(generics.RetrieveUpdateAPIView):
     queryset = ContextMap.objects.all()
     serializer_class = ContextMapSerializer
     name = 'context-map-detail'
 
 
-class ConnectionsMapList(generics.ListCreateAPIView):
-    queryset = ConnectionsMap.objects.all()
-    serializer_class = ConnectionsMapSerializer
-    name = 'connections-map-list'
-
-
-class ConnectionsMapDetail(generics.RetrieveUpdateDestroyAPIView):
+class ConnectionsMapDetail(generics.RetrieveUpdateAPIView):
     queryset = ConnectionsMap.objects.all()
     serializer_class = ConnectionsMapSerializer
     name = 'connections-map-detail'
@@ -90,3 +62,15 @@ class PinDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Pin.objects.all()
     serializer_class = PinSerializer
     name = 'pin-detail'
+
+
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-list'
+
+
+class UserDetail(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-detail'
