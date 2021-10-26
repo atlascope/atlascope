@@ -1,19 +1,18 @@
-import djclick as click
 import json
 
 from django.contrib.auth.models import User
-from atlascope.core.models import (
-    Investigation,
-)
+import djclick as click
 
-DATALOADER_DIR = "atlascope/core/management/dataloader/"
+from atlascope.core.models import Investigation
+
+DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
 MODEL_JSON_MAPPING = [
     (User, 'users.json'),
     (Investigation, 'investigations.json'),
 ]
 
-DEFAULT_PASSWORD = "123"
+DEFAULT_PASSWORD = '123'
 
 
 def expand_references(obj, model):
@@ -21,7 +20,7 @@ def expand_references(obj, model):
     for field_name, value in obj.items():
         found_field = [field for field in model._meta.fields if field.name == field_name]
         found_field = found_field[0] if len(found_field) > 0 else None
-        if hasattr(found_field, 'remote_field') and hasattr(found_field.remote_field, "model"):
+        if hasattr(found_field, 'remote_field') and hasattr(found_field.remote_field, 'model'):
             obj[field_name] = found_field.remote_field.model.objects.get(email=value)
         else:
             found_many_to_many = [
