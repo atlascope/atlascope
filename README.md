@@ -2,10 +2,10 @@
 
 This project serves as the front-end to the Girder 4-based [atlascope-api](https://github.com/atlascope/atlascope-api). The following features are included:
 
-* `vuetify` installation and configuration
-* `axios` installation and configuration
-* `vue-router` installation and skeleton boilerplate
-* Girder 4 OAuth client library installation and configuration
+* [`vuetify`](https://vuetifyjs.com/en/getting-started/installation/) installation and configuration
+* [`axios`](https://axios-http.com/docs/intro) installation and configuration
+* [`vue-router`](https://router.vuejs.org/installation.html) installation and skeleton boilerplate
+* [Girder 4 OAuth client library](https://github.com/girder/girder-oauth-client) installation and configuration
 * A home page containing a working OAuth login / logout button
 * Sentry integration (if no DSN is provided, this will be inactive)
 * Vue composition API shims
