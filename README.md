@@ -39,3 +39,7 @@ yarn run test:unit
 ```shell
 yarn run lint
 ```
+
+### Configuration
+
+This project is configured via environment variables. Reference the `.env` file for the available variables. The `.env.production` file contains additional variables relevant to production deployments.
