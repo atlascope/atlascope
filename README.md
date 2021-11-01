@@ -1,7 +1,6 @@
-# Vue Project Template
+# atlascope
 
-This is a project boilerplate template designed for building SPAs that will serve as
-front-ends to Girder 4-based servers. The following features are included:
+This project serves as the front-end to the Girder 4-based [atlascope-api](https://github.com/atlascope/atlascope-api). The following features are included:
 
 * `vuetify` installation and configuration
 * `axios` installation and configuration
@@ -14,15 +13,29 @@ front-ends to Girder 4-based servers. The following features are included:
 * Best-practice eslint configuration
 * GitHub Actions CI that runs tests, lint, and build
 
-## How to use this template
+## Project setup
+Install [yarn](https://yarnpkg.com/getting-started/install).
 
-1. Click the button in GitHub that says `Use this template`.
+```shell
+yarn install
+```
 
-> If you don't want to use GitHub, you can instead clone the repository,
-  `rm -rf .git/` in it, and `git init` the copy.
+### Compiles and hot-reloads for development
+```shell
+yarn run serve
+```
 
-2. After you have your copy, replace occurrences of `CHANGEME` in the codebase.
+### Compiles and minifies for production
+```shell
+yarn run build
+```
 
-```bash
-git grep CHANGEME
+### Run your tests
+```shell
+yarn run test:unit
+```
+
+### Lints and fixes files
+```shell
+yarn run lint
 ```
