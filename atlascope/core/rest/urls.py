@@ -19,4 +19,5 @@ urlpatterns = [
     path('pin/<int:pk>/', views.PinDetail.as_view(), name='pin-detail'),
     path('users/', views.UserList.as_view(), name='user-list'),
     path('user/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
+    path('', views.APIRoot.as_view(), name='api-root'),
 ]

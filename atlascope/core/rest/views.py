@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from atlascope.core.models import (
     ConnectionsMap,
@@ -14,6 +16,23 @@ from atlascope.core.models import (
     PinSerializer,
 )
 from atlascope.core.rest.additional_serializers import UserSerializer
+
+
+class APIRoot(generics.GenericAPIView):
+    name = 'api-root'
+
+    def get(self, request, *args, **kwargs):
+        return Response(
+            {
+                endpoint.name: reverse(endpoint.name, request=request)
+                for endpoint in [
+                    InvestigationList,
+                    DatasetList,
+                    PinList,
+                    UserList,
+                ]
+            }
+        )
 
 
 class InvestigationList(generics.ListCreateAPIView):
