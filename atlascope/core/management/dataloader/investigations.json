@@ -2,7 +2,7 @@
     {
         "name": "Whole Team Investigation",
         "owner": "roni.choudhury@kitware.com",
-        "collaborators": [
+        "investigators": [
             "anne.haley@kitware.com",
             "mary.salvi@kitware.com",
             "matt.covalt@kitware.com",
@@ -13,7 +13,7 @@
     {
         "name": "Backend Investigation",
         "owner": "anne.haley@kitware.com",
-        "collaborators": [
+        "investigators": [
             "roni.choudhury@kitware.com",
             "mary.salvi@kitware.com"
         ],
@@ -25,7 +25,7 @@
     {
         "name": "Frontend Investigation",
         "owner": "matt.covalt@kitware.com",
-        "collaborators": [
+        "investigators": [
             "roni.choudhury@kitware.com",
             "mike.nagler@kitware.com"
         ],
