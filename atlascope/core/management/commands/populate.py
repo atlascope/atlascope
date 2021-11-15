@@ -1,8 +1,8 @@
 import json
 
 from django.contrib.auth.models import User
-from guardian.shortcuts import assign_perm
 import djclick as click
+from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 
 from atlascope.core.models import Investigation

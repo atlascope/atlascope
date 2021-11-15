@@ -5,8 +5,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import (
     Investigation,
-    InvestigationSerializer,
     InvestigationDetailSerializer,
+    InvestigationSerializer,
 )
 
 
