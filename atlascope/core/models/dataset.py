@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.contrib import admin
 from django.db import models
+from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 
 
@@ -12,6 +13,12 @@ class Dataset(models.Model):
     # scale
     # applicable_heuristics
 
+    def get_read_permission_groups():
+        return ['view_dataset', 'change_dataset']
+
+    def get_write_permission_groups():
+        return ['change_dataset']
+
 
 class DatasetSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -20,5 +27,5 @@ class DatasetSerializer(serializers.HyperlinkedModelSerializer):
 
 
 @admin.register(Dataset)
-class DatasetAdmin(admin.ModelAdmin):
+class DatasetAdmin(GuardedModelAdmin):
     list_display = ('id', 'source_uri')
