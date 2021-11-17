@@ -78,7 +78,6 @@ def command(password):
                 [assign_perm(perm, user, db_obj) for user in user_list]
             if model == User:
                 db_obj.set_password(password or DEFAULT_PASSWORD)
-                print(f'Password set to "{password or DEFAULT_PASSWORD}".')
             db_obj.save()
     print('-----')
     print('Dataload complete.')

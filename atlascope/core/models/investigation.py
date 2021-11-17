@@ -2,41 +2,23 @@ from uuid import uuid4
 
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from guardian.admin import GuardedModelAdmin
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
 from rest_framework import serializers
 
-from atlascope.core.models import ConnectionsMap, ContextMap
-
 
 class Investigation(TimeStampedModel, models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
+    description = models.TextField(max_length=5000, blank=True)
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
-    context_map = models.OneToOneField('ContextMap', on_delete=models.PROTECT, editable=False)
-    connections_map = models.OneToOneField(
-        'ConnectionsMap', on_delete=models.PROTECT, editable=False
-    )
-
-    def save(self, *args, **kwargs):
-        # enforce creation of maps for this investigation
-        try:
-            self.context_map
-        except ObjectDoesNotExist:
-            new_context_map = ContextMap()
-            new_context_map.save()
-            self.context_map = new_context_map
-        try:
-            self.connections_map
-        except ObjectDoesNotExist:
-            new_connections_map = ConnectionsMap()
-            new_connections_map.save()
-            self.connections_map = new_connections_map
-        super().save(*args, **kwargs)
+    datasets = models.ManyToManyField('Dataset', related_name='context_datasets')
+    pins = models.ManyToManyField('Pin', related_name='connection_pins')
+    # connections
+    notes = models.TextField(max_length=5000, blank=True)
 
     def get_read_permission_groups():
         return ['view_investigation', 'change_investigation']
@@ -64,13 +46,17 @@ class InvestigationSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Investigation
-        exclude = ('context_map', 'connections_map')
+        fields = ('id', 'name', 'description', 'owner')
 
 
 class InvestigationDetailSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail')
     investigators = serializers.SerializerMethodField('get_investigators')
     observers = serializers.SerializerMethodField('get_observers')
+    datasets = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name='dataset-detail'
+    )
+    pins = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='pin-detail')
 
     def get_investigators(self, obj):
         return [
@@ -85,7 +71,7 @@ class InvestigationDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Investigation
-        exclude = ('context_map', 'connections_map')
+        fields = '__all__'
 
 
 @admin.register(Investigation)

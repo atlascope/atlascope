@@ -1,23 +1,13 @@
+from guardian.shortcuts import assign_perm
 import pytest
 from pytest_factoryboy import register
 from rest_framework.test import APIClient
-from guardian.shortcuts import assign_perm
 
 from atlascope.core.models import Investigation
-
-from .factories import (
-    UserFactory,
-    InvestigationFactory,
-    ContextMapFactory,
-    ConnectionsMapFactory,
-    DatasetFactory,
-    PinFactory,
-)
+from atlascope.tests.factories import DatasetFactory, InvestigationFactory, PinFactory, UserFactory
 
 register(UserFactory)
 register(InvestigationFactory)
-register(ContextMapFactory)
-register(ConnectionsMapFactory)
 register(DatasetFactory)
 register(PinFactory)
 
