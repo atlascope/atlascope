@@ -14,7 +14,7 @@ class UserViewSet(
     GenericViewSet,
 ):
     model = User
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('username')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 

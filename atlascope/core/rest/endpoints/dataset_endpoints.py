@@ -16,9 +16,11 @@ class DatasetViewSet(
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        datasets = get_objects_for_user(
+        visible_datasets = get_objects_for_user(
             self.request.user,
             [f'core.{perm}' for perm in Dataset.get_read_permission_groups()],
             any_perm=True,
         )
-        return datasets.all()
+        public_datasets = Dataset.objects.filter(public=True)
+        datasets = visible_datasets | public_datasets
+        return datasets.all().order_by('name')

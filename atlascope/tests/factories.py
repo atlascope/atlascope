@@ -19,7 +19,10 @@ class DatasetFactory(factory.django.DjangoModelFactory):
         model = Dataset
 
     id = factory.Faker('uuid4')
+    name = factory.Faker('word')
+    description = factory.Faker('sentence')
     source_uri = factory.Faker('file_path')
+    public = factory.Faker('boolean')
 
 
 class PinFactory(factory.django.DjangoModelFactory):

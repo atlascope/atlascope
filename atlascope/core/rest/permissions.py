@@ -6,30 +6,22 @@ from rest_framework import status
 from django.utils.functional import wraps
 
 
-def has_edit_perm(user, investigation):
-    user_perms_on_investigation = get_perms(user, investigation)
-    return (
-        any(
-            perm in user_perms_on_investigation
-            for perm in Investigation.get_write_permission_groups()
-        )
-        or user == investigation.owner
+def has_edit_perm(user, obj):
+    user_perms_on_obj = get_perms(user, obj)
+    return any(perm in user_perms_on_obj for perm in type(obj).get_write_permission_groups()) or (
+        hasattr(obj, 'owner') and user == obj.owner
     )
 
 
-def has_read_perm(user, investigation):
-    user_perms_on_investigation = get_perms(user, investigation)
-    return (
-        any(
-            perm in user_perms_on_investigation
-            for perm in Investigation.get_read_permission_groups()
-        )
-        or user == investigation.owner
+def has_read_perm(user, obj):
+    user_perms_on_obj = get_perms(user, obj)
+    return any(perm in user_perms_on_obj for perm in type(obj).get_read_permission_groups()) or (
+        hasattr(obj, 'owner') and user == obj.owner
     )
 
 
-def investigation_permission_required(
-    edit_access=False, superuser_access=False, **decorator_kwargs
+def object_permission_required(
+    model=Investigation, edit_access=False, superuser_access=False, **decorator_kwargs
 ):
     def decorator(view_func):
         def _wrapped_view(viewset, *args, **wrapped_view_kwargs):
@@ -39,11 +31,11 @@ def investigation_permission_required(
                 }
             else:
                 lookup_dict = {'pk': wrapped_view_kwargs['pk']}
-            investigation = get_object_or_404(Investigation, **lookup_dict)
+            obj = get_object_or_404(model, **lookup_dict)
 
             user = viewset.request.user
-            edit_perm = has_edit_perm(user, investigation)
-            read_perm = has_read_perm(user, investigation)
+            edit_perm = has_edit_perm(user, obj)
+            read_perm = has_read_perm(user, obj)
             error_response = Response(status=status.HTTP_401_UNAUTHORIZED)
 
             if (

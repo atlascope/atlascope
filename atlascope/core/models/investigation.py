@@ -65,13 +65,14 @@ class InvestigationDetailSerializer(serializers.ModelSerializer):
     def get_investigators(self, obj):
         return [
             user.username
-            for user in get_users_with_perms(
-                obj, only_with_perms_in=Investigation.get_write_permission_groups()
-            )
+            for user in get_users_with_perms(obj, only_with_perms_in=['change_investigation'])
         ]
 
     def get_observers(self, obj):
-        return [user.username for user in get_users_with_perms(obj)]
+        return [
+            user.username
+            for user in get_users_with_perms(obj, only_with_perms_in=['view_investigation'])
+        ]
 
     def get_datasets(self, obj):
         return []

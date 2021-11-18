@@ -14,7 +14,7 @@ from atlascope.core.models import (
     InvestigationDetailSerializer,
     InvestigationSerializer,
 )
-from atlascope.core.rest.permissions import investigation_permission_required
+from atlascope.core.rest.permissions import object_permission_required
 
 
 class InvestigationViewSet(
@@ -32,12 +32,14 @@ class InvestigationViewSet(
             return InvestigationSerializer
 
     def get_queryset(self):
-        investigations = get_objects_for_user(
+        visible_investigations = get_objects_for_user(
             self.request.user,
             [f'core.{perm}' for perm in Investigation.get_read_permission_groups()],
             any_perm=True,
         )
-        return investigations.all()
+        owned_investigations = Investigation.objects.filter(owner=self.request.user)
+        investigations = visible_investigations | owned_investigations
+        return investigations.all().order_by('name')
 
     @swagger_auto_schema(
         method='post',
@@ -64,13 +66,12 @@ class InvestigationViewSet(
         ),
         responses={200: InvestigationDetailSerializer()},
     )
-    @investigation_permission_required(edit_access=True)
+    @object_permission_required(edit_access=True)
     @action(detail=True, methods=['POST'])
     def permissions(self, request, pk=None):
         """Update the lists of users that have permissions on this Investigation."""
         investigation: Investigation = self.get_object()
         data = request.data
-        print(data)
         try:
             if 'owner' in data:
                 investigation.owner = User.objects.get(username=data['owner'])
@@ -78,7 +79,7 @@ class InvestigationViewSet(
             if 'observers' in data:
                 investigation.update_group('view_investigation', data['observers'])
             if 'investigators' in data:
-                investigation.update_group('change_investigation', data['observers'])
+                investigation.update_group('change_investigation', data['investigators'])
         except User.DoesNotExist:
             return Response(
                 'Failed to save. Username not found.', status=status.HTTP_400_BAD_REQUEST
@@ -87,4 +88,5 @@ class InvestigationViewSet(
             return Response('Failed to save.', status=status.HTTP_400_BAD_REQUEST)
 
         payload = InvestigationDetailSerializer(investigation).data
+        payload = {k: v for k, v in payload.items() if k in ['owner', 'investigators', 'observers']}
         return Response(payload, status=status.HTTP_200_OK)

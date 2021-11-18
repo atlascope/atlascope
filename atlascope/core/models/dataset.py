@@ -10,6 +10,7 @@ class Dataset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
+    public = models.BooleanField(default=True)
     source_uri = models.CharField(max_length=3000, null=False, blank=False)
     # import_function
     # scale
