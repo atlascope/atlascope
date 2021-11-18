@@ -1,13 +1,12 @@
+from django.contrib.auth.models import User
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
-from django.contrib.auth.models import User
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
 
 from atlascope.core.models import (
     Investigation,

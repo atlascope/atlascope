@@ -1,9 +1,10 @@
-from atlascope.core.models import Investigation
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
+from django.utils.functional import wraps
 from guardian.shortcuts import get_perms
 from rest_framework import status
-from django.utils.functional import wraps
+from rest_framework.response import Response
+
+from atlascope.core.models import Investigation
 
 
 def has_edit_perm(user, obj):

@@ -1,4 +1,5 @@
 import pytest
+
 from atlascope.core.rest.permissions import has_read_perm
 
 # ------------------------------------------------------------------
