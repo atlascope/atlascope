@@ -24,8 +24,11 @@ class Pin(models.Model):
     note = models.TextField(max_length=1000, blank=True)
 
 
-class PinSerializer(serializers.HyperlinkedModelSerializer):
-    dataset = serializers.HyperlinkedRelatedField(read_only=True, view_name='dataset-detail')
+class PinSerializer(serializers.ModelSerializer):
+    dataset = serializers.SerializerMethodField('get_dataset')
+
+    def get_dataset(self, obj):
+        return None
 
     class Meta:
         model = Pin

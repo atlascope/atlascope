@@ -41,22 +41,26 @@ class Investigation(TimeStampedModel, models.Model):
                 assign_perm(group_name, new_permitted_user, self)
 
 
-class InvestigationSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail')
+class InvestigationSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField('get_owner')
+
+    def get_owner(self, obj):
+        return obj.owner.username or None
 
     class Meta:
         model = Investigation
         fields = ('id', 'name', 'description', 'owner')
 
 
-class InvestigationDetailSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.HyperlinkedRelatedField(read_only=True, view_name='user-detail')
+class InvestigationDetailSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField('get_owner')
     investigators = serializers.SerializerMethodField('get_investigators')
     observers = serializers.SerializerMethodField('get_observers')
-    datasets = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name='dataset-detail'
-    )
-    pins = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='pin-detail')
+    datasets = serializers.SerializerMethodField('get_datasets')
+    pins = serializers.SerializerMethodField('get_pins')
+
+    def get_owner(self, obj):
+        return obj.owner.username or None
 
     def get_investigators(self, obj):
         return [
@@ -68,6 +72,12 @@ class InvestigationDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_observers(self, obj):
         return [user.username for user in get_users_with_perms(obj)]
+
+    def get_datasets(self, obj):
+        return []
+
+    def get_pins(self, obj):
+        return []
 
     class Meta:
         model = Investigation

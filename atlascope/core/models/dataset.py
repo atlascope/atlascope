@@ -22,7 +22,7 @@ class Dataset(models.Model):
         return ['change_dataset']
 
 
-class DatasetSerializer(serializers.HyperlinkedModelSerializer):
+class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dataset
         fields = '__all__'
