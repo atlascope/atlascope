@@ -28,7 +28,15 @@ class AtlascopeMixin(ConfigMixin):
         # Install additional apps
         configuration.INSTALLED_APPS += [
             's3_file_field',
+            'guardian',
         ]
+        # guardian's authentication backend
+        configuration.AUTHENTICATION_BACKENDS += [
+            'guardian.backends.ObjectPermissionBackend',
+        ]
+
+        # disable guardian anonymous user
+        configuration.ANONYMOUS_USER_NAME = None
 
 
 class DevelopmentConfiguration(AtlascopeMixin, DevelopmentBaseConfiguration):
