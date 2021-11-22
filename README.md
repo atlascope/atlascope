@@ -5,13 +5,15 @@ This is the simplest configuration for developers to start with.
 
 ### Initial Setup
 1. Run `docker-compose run --rm django ./manage.py migrate`
-2. Run `docker-compose run --rm django ./manage.py createsuperuser`
+2. Populate the database with sample data using `docker-compose run --rm django ./manage.py populate --password=[USERS_PASSWORD]`. If you do not specify a password, the default password for all created users will be "123".
+3. OR run `docker-compose run --rm django ./manage.py createsuperuser`
    and follow the prompts to create your own user
 
 ### Run Application
 1. Run `docker-compose up`
 2. Access the site, starting at http://localhost:8000/admin/
-3. When finished, use `Ctrl+C`
+3. Access the browseable API, starting at http://localhost:8000/api/v1/
+4. When finished, use `Ctrl+C`
 
 ### Application Maintenance
 Occasionally, new package dependencies or schema changes will necessitate
@@ -74,6 +76,8 @@ When running the "Develop with Docker" configuration, all tox commands must be r
 `docker-compose run --rm django tox`; extra arguments may also be appended to this form.
 
 ### Running Tests
+You will need to set certain environment variables to run tests. For development, run `source dev/export-env.sh` to prepare the shell for testing.
+
 Run `tox` to launch the full test suite.
 
 Individual test environments may be selectively run.

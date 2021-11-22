@@ -1,6 +1,8 @@
 version: '3'
 services:
   postgres:
+    logging:
+      driver: none
     image: postgres:latest
     environment:
       POSTGRES_DB: django
@@ -9,11 +11,15 @@ services:
       - ${DOCKER_POSTGRES_PORT-5432}:5432
 
   rabbitmq:
+    logging:
+        driver: none
     image: rabbitmq:management
     ports:
       - ${DOCKER_RABBITMQ_PORT-5672}:5672
 
   minio:
+    logging:
+      driver: none
     image: minio/minio:latest
     # When run with a TTY, minio prints credentials on startup
     tty: true
