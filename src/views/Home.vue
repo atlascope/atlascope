@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, inject } from '@vue/composition-api';
 import OAuthClient from '@girder/oauth-client';
+import useGeoJS from '../utilities/useGeoJS';
 
 export default defineComponent({
   setup() {
@@ -8,7 +9,7 @@ export default defineComponent({
     if (oauthClient === undefined) {
       throw new Error('Must provide "oauthClient" into component.');
     }
-
+    useGeoJS();
     return { oauthClient };
   },
   computed: {
@@ -27,15 +28,4 @@ export default defineComponent({
   },
 });
 </script>
-
-<template>
-  <v-app-bar app>
-    <v-spacer />
-    <v-btn
-      text
-      @click="logInOrOut"
-    >
-      {{ loginText }}
-    </v-btn>
-  </v-app-bar>
-</template>
+<template />
