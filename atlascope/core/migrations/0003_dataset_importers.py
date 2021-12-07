@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dataset',
             name='importer',
-            field=models.CharField(choices=[('vandy', 'vandy')], max_length=100, null=True),
+            field=models.CharField(choices=[], max_length=100, null=True),
         ),
     ]
