@@ -18,3 +18,6 @@ RUN pip install --editable /opt/django-project[dev]
 
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
+
+COPY atlascope_plugins /opt/atlascope-plugins/
+RUN pip install --editable /opt/atlascope-plugins/*
