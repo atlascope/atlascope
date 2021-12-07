@@ -5,6 +5,10 @@ from django.db import models
 from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 
+from .importer import importers
+
+available_importer_choices = [(importer_name, importer_name) for importer_name in importers]
+
 
 class Dataset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -12,7 +16,7 @@ class Dataset(models.Model):
     description = models.TextField(max_length=5000, blank=True)
     public = models.BooleanField(default=True)
     source_uri = models.CharField(max_length=3000, null=False, blank=False)
-    # import_function
+    importer = models.CharField(max_length=100, null=True, choices=available_importer_choices)
     # scale
     # applicable_heuristics
 
@@ -21,6 +25,10 @@ class Dataset(models.Model):
 
     def get_write_permission_groups():
         return ['change_dataset']
+
+    def perform_import(self):
+        importer = importers[self.importer]
+        importer(self.source_uri)
 
 
 class DatasetSerializer(serializers.ModelSerializer):
