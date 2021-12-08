@@ -34,4 +34,8 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
       zoomLevel.value = level;
     }
   };
+
+  return {
+    map, center, zoom, zoomLevel, xCoord, yCoord,
+  };
 }
