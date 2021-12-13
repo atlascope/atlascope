@@ -11,8 +11,11 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const yCoord = ref(0);
 
   onMounted(() => {
-    // should always be HTMLElement in onMounted if passed a valid div
-    // TODO: handle case when passed invalid div
+    // `element.value` should always be an `HTMLElement` (not `null`)
+    // by the time `onMounted` is called. However, it will be `null`
+    // before that since the DOM isn't available at call time.
+
+    // check if valid DOM element is passed.
     if (element.value !== null) {
       map.value = geo.map({ node: element.value });
       map.value.createLayer('osm');
