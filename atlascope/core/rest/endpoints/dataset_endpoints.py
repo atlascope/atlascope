@@ -2,6 +2,7 @@ from drf_yasg.utils import no_body, swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -41,5 +42,9 @@ class DatasetViewSet(
     )
     def perform_import(self, request, **kwargs):
         dataset: Dataset = self.get_object()
-        dataset.perform_import()
+        try:
+            dataset.perform_import()
+        except Exception as e:
+            raise APIException(str(e))
+
         return Response(status=status.HTTP_204_NO_CONTENT)

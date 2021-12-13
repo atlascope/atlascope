@@ -23,6 +23,7 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     description = factory.Faker('sentence')
     source_uri = factory.Faker('file_path')
     public = factory.Faker('boolean')
+    importer = factory.Faker('word')
 
 
 class PinFactory(factory.django.DjangoModelFactory):
