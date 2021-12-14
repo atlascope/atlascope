@@ -13,6 +13,7 @@
     "@sentry/vue": "^6.2.0",
     "@vue/composition-api": "^1.0.0-rc.2",
     "axios": "^0.21.1",
+    "geojs": "^1.4.3",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0"
@@ -72,5 +73,11 @@
   ],
   "jest": {
     "preset": "@vue/cli-plugin-unit-jest/presets/typescript"
+  },
+  "peerDependencies": {
+    "shader-loader": "^1.3.1",
+    "webpack": "^4.36.0",
+    "worker-loader": "^2.0.0",
+    "wslink": "^0.1.8"
   }
 }
