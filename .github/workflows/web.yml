@@ -1,15 +1,22 @@
-name: CI
+name: Web
 on:
   pull_request:
     branches:
       - main
+    paths:
+      - "web/**"
   push:
     branches:
       - main
+    paths:
+      - "web/**"
 jobs:
   build-and-test:
     name: Build and test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
       - uses: actions/checkout@master
 
