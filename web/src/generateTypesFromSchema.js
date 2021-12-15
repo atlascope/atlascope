@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { generateApi } = require('swagger-typescript-api');
 const axios = require('axios');
 const path = require('path');
@@ -13,7 +14,7 @@ async function generateTypes(schemaUrl) {
   }
 
   // validate the provided schema is for Atlascope
-  if (!schema['info'] || schema['info']['title'] !== 'Atlascope') {
+  if (!schema.info || schema.info.title !== 'Atlascope') {
     console.error('OpenAPI schema at the given URL is not for Atlascope.');
     process.exit(1);
   }
@@ -26,7 +27,7 @@ async function generateTypes(schemaUrl) {
     extractRequestBody: true,
     generateResponses: true,
     generateRouteTypes: true,
-    generateClient: false
+    generateClient: false,
   });
 }
 
