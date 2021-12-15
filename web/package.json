@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "generateTypes": "node src/generateTypesFromSchema.js"
   },
   "dependencies": {
     "@girder/oauth-client": "^0.7.6",
