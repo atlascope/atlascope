@@ -37,7 +37,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'celery',
-        'django>=3.2',
+        'django>=3.2,<4.0',
         'django-allauth',
         'django-configurations[database,email]',
         'django-extensions',
@@ -47,6 +47,7 @@ setup(
         'drf-yasg',
         'django-click',
         'django-guardian',
+        'importlib_metadata',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'django-s3-file-field[boto3]',

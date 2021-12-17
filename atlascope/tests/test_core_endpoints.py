@@ -140,6 +140,7 @@ def test_list_datasets(user_api_client, user, dataset_factory):
             'description': d.description,
             'source_uri': d.source_uri,
             'public': d.public,
+            'importer': d.importer,
         }
         for d in datasets
         if (d.public or user.is_superuser or (has_read_perm(user, d)))
@@ -170,6 +171,7 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
         'description': dataset_public.description,
         'source_uri': dataset_public.source_uri,
         'public': dataset_public.public,
+        'importer': dataset_public.importer,
     }
 
     resp_private = user_api_client(dataset=dataset_private).get(
@@ -183,6 +185,7 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
             'description': dataset_private.description,
             'source_uri': dataset_private.source_uri,
             'public': dataset_private.public,
+            'importer': dataset_private.importer,
         }
     else:
         assert resp_private.status_code == 404
