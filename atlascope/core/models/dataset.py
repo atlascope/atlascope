@@ -1,13 +1,23 @@
 from uuid import uuid4
 
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.db import models
 from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 
 from .importer import importers
 
-available_importer_choices = [(importer_name, importer_name) for importer_name in importers]
+
+def validate_importer(value):
+    if value in importers:
+        return value
+    else:
+        raise ValidationError(
+            f'Importer value must be'
+            f'one of the following installed importers'
+            f': {str(list(importers.keys()))}'
+        )
 
 
 class Dataset(models.Model):
@@ -16,7 +26,7 @@ class Dataset(models.Model):
     description = models.TextField(max_length=5000, blank=True)
     public = models.BooleanField(default=True)
     source_uri = models.CharField(max_length=3000, null=False, blank=False)
-    importer = models.CharField(max_length=100, null=True, choices=available_importer_choices)
+    importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
     # scale
     # applicable_heuristics
 
