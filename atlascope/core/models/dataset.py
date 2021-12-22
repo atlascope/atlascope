@@ -48,6 +48,7 @@ class Dataset(models.Model):
     derived_datasets = models.ManyToManyField('Dataset', blank=True)
     # scale
     # applicable_heuristics
+    meta = models.JSONField()
 
     def get_read_permission_groups():
         return ['view_dataset', 'change_dataset']
