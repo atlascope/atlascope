@@ -27,6 +27,9 @@ export interface Dataset {
 
   /** Source uri */
   source_uri: string;
+
+  /** Importer */
+  importer?: string | null;
 }
 
 export interface Investigation {
@@ -177,6 +180,20 @@ export namespace Datasets {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsPerformImport
+   * @request POST:/datasets/{id}/import
+   * @response `204` `void` Import successful.
+   */
+  export namespace DatasetsPerformImport {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
   }
 }
 
