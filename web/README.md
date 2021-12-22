@@ -42,7 +42,7 @@ yarn run lint
 
 ### Generate Typescript Types
 
-If you make changes to the API for Atlascope, you can run the following command to regenerate types to be compatible with your changes.
+If you make changes to the API for Atlascope, make sure to run the following command to regenerate types to be compatible with your changes.
 ```shell
 yarn run generateTypes <Swagger schema URL>
 ```
