@@ -40,6 +40,14 @@ yarn run test:unit
 yarn run lint
 ```
 
+### Generate Typescript Types
+
+If you make changes to the API for Atlascope, make sure to run the following command to regenerate types to be compatible with your changes.
+```shell
+yarn run generateTypes <Swagger schema URL>
+```
+If you are running the API backend locally (see the `README.md` file at the root of this project for details), you can supply the URL `http://localhost:8000/api/docs/swagger`.
+
 ### Configuration
 
 This project is configured via environment variables. Reference the `.env` file for the available variables. The `.env.production` file contains additional variables relevant to production deployments.
