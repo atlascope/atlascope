@@ -33,14 +33,16 @@ jobs:
           - 9000:9000
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
-      - name: Install tox
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install tox
+          sudo apt-get install --no-install-recommends --yes \
+          tox \
+          gcc g++ binutils libc6-dev \
+          python3-dev python3-pip \
+          libpq-dev \
+          libgdal-dev gdal-bin gdal-data \
+          libproj-dev proj-bin proj-data \
+          libgeos-dev
       - name: Run tests
         run: |
           tox
