@@ -1,13 +1,26 @@
-FROM python:3.8-slim
-# Install system libraries for Python packages:
-# * psycopg2
-RUN apt-get update && \
-    apt-get install --no-install-recommends --yes \
-        libpq-dev gcc libc6-dev && \
-    rm -rf /var/lib/apt/lists/*
+FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+
+# Install system libraries for Python packages
+RUN apt-get update \
+ && apt-get install --no-install-recommends --yes \
+        # compilers
+        gcc g++ binutils libc6-dev \
+        # python
+        python3-dev python3-pip \
+        # PostgreSQL library development files (psycopg2)
+        libpq-dev \
+        # gdal development files and binary (GeoDjango, large_image[gdal])
+        libgdal-dev gdal-bin gdal-data \
+        # proj development files and binary (GeoDjango, large_image[gdal])
+        libproj-dev proj-bin proj-data \
+        # geos library development files (GeoDjango)
+        libgeos-dev \
+ && rm -rf /var/lib/apt/lists/*
+
 
 # Only copy the setup.py, it will still force all install_requires to be installed,
 # but find_packages() will find nothing (which is fine). When Docker Compose mounts the real source
