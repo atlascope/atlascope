@@ -38,7 +38,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        responses={200: 'Image file'},
+        responses={200: 'Image file', 404: 'Image tile not found'},
         auto_schema=TileSchemaGenerator,
         manual_parameters=[
             openapi.Parameter(
