@@ -1,6 +1,7 @@
 from django.http.response import HttpResponse
 from django.urls import path
 from drf_yasg import openapi
+from drf_yasg.inspectors import SwaggerAutoSchema
 from drf_yasg.utils import swagger_auto_schema
 from large_image.exceptions import TileSourceError
 from large_image_source_gdal import GDALFileTileSource
@@ -26,6 +27,11 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
         return Response(serializer.data)
 
 
+class TileSchemaGenerator(SwaggerAutoSchema):
+    def get_produces(self):
+        return ['image/png']
+
+
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.all()
     model = Dataset
@@ -33,6 +39,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
 
     @swagger_auto_schema(
         responses={200: 'Image file'},
+        auto_schema=TileSchemaGenerator,
         manual_parameters=[
             openapi.Parameter(
                 'id',
