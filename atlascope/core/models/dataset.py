@@ -1,10 +1,12 @@
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
 from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
+from s3_file_field import S3FileField
 
 from .importer import importers
 
@@ -27,6 +29,14 @@ class Dataset(models.Model):
     public = models.BooleanField(default=True)
     source_uri = models.CharField(max_length=3000, null=False, blank=False)
     importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
+    content = S3FileField(null=True)
+    metadata = models.JSONField(null=True)
+    dataset_type = models.CharField(
+        max_length=20,
+        choices=[(choice, choice) for choice in settings.DATASET_TYPES],
+        default=settings.DATASET_TYPES[0],
+    )
+    derived_datasets = models.ManyToManyField('Dataset')
     # scale
     # applicable_heuristics
 
