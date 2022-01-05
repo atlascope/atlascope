@@ -1,6 +1,7 @@
 import pytest
 
 from atlascope.core.rest.permissions import has_read_perm
+from atlascope.core.models.dataset import DatasetSerializer
 
 # ------------------------------------------------------------------
 # USER ENDPOINT TESTS
@@ -134,14 +135,7 @@ def test_list_datasets(user_api_client, user, dataset_factory):
     datasets.sort(key=lambda d: d.name)
     user_api_client = user_api_client(dataset=datasets[0])
     expected_results = [
-        {
-            'id': d.id,
-            'name': d.name,
-            'description': d.description,
-            'source_uri': d.source_uri,
-            'public': d.public,
-            'importer': d.importer,
-        }
+        DatasetSerializer(d).data
         for d in datasets
         if (d.public or user.is_superuser or (has_read_perm(user, d)))
     ]
@@ -165,27 +159,13 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
         f'/api/v1/datasets/{dataset_public.id}'
     )
     assert resp_public.status_code == 200
-    assert resp_public.data == {
-        'id': dataset_public.id,
-        'name': dataset_public.name,
-        'description': dataset_public.description,
-        'source_uri': dataset_public.source_uri,
-        'public': dataset_public.public,
-        'importer': dataset_public.importer,
-    }
+    assert resp_public.data == DatasetSerializer(dataset_public).data
 
     resp_private = user_api_client(dataset=dataset_private).get(
         f'/api/v1/datasets/{dataset_private.id}'
     )
     if has_read_perm(user, dataset_private):
         assert resp_private.status_code == 200
-        assert resp_private.data == {
-            'id': dataset_private.id,
-            'name': dataset_private.name,
-            'description': dataset_private.description,
-            'source_uri': dataset_private.source_uri,
-            'public': dataset_private.public,
-            'importer': dataset_private.importer,
-        }
+        assert resp_private.data == DatasetSerializer(dataset_private).data
     else:
         assert resp_private.status_code == 404

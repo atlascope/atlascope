@@ -24,6 +24,20 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     source_uri = factory.Faker('file_path')
     public = factory.Faker('boolean')
     importer = factory.Faker('word')
+    content = None
+    dataset_type = 'tile_source'
+    metadata = None
+
+    @factory.post_generation
+    def derived_datasets(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            # A list of derived_datasets were passed in, use them
+            for derived_dataset in extracted:
+                self.derived_datasets.add(derived_dataset)
 
 
 class PinFactory(factory.django.DjangoModelFactory):
