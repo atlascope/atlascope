@@ -1,14 +1,13 @@
 import json
+from pathlib import Path
 
 from django.contrib.auth.models import User
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
-from pathlib import Path
 
 from atlascope.core.models import Investigation, Job
 from atlascope.core.tasks import spawn_job
-
 
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
