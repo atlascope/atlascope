@@ -1,9 +1,10 @@
-from celery import shared_task
 import imp
 import io
-from PIL import Image
 
+from PIL import Image
+from celery import shared_task
 from django.utils import timezone
+
 from atlascope.core.models import Job
 
 
