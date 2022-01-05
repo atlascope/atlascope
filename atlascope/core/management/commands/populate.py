@@ -7,6 +7,8 @@ from oauth2_provider.models import Application
 from pathlib import Path
 
 from atlascope.core.models import Investigation, Job
+from atlascope.core.tasks import spawn_job
+
 
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
@@ -90,5 +92,8 @@ def command(password):
             if model == User:
                 db_obj.set_password(password or DEFAULT_PASSWORD)
             db_obj.save()
+            if model == Job:
+                spawn_job.delay(str(db_obj.id))
+                print('Successfully spawned job!')
     print('-----')
     print('Dataload complete.')

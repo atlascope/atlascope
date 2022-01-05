@@ -16,9 +16,6 @@ class Job(models.Model):
     last_run = models.DateTimeField(null=True)
     preview_visual = S3FileField(null=True)
 
-    def run_job(self):
-        print("spawn celery job!")
-
 
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
