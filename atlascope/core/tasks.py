@@ -1,8 +1,8 @@
 import imp
 import io
+
 from PIL import Image
 from celery import shared_task
-
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
 
