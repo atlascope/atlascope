@@ -1,12 +1,10 @@
 [
     {
-        "name": "Average color",
-        "script_contents": "average_color.py",
+        "script": "Average color",
         "input_image": "green_cell_dataset_selection.png"
     },
     {
-        "name": "Brightest N Pixels (N=5)",
-        "script_contents": "brightest_n_pixels.py",
+        "script": "Brightest N Pixels (N=5)",
         "input_image": "green_cell_dataset_selection.png",
         "other_inputs": {
             "n": 5

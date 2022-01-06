@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Average color",
+        "script_contents": "average_color.py"
+    },
+    {
+        "name": "Brightest N Pixels (N=5)",
+        "script_contents": "brightest_n_pixels.py"
+    }
+]
