@@ -1,6 +1,8 @@
 from .dataset import Dataset, DatasetSerializer
 from .investigation import Investigation, InvestigationDetailSerializer, InvestigationSerializer
-from .job import Job, JobSerializer
+from .job_run import JobRun, JobRunSerializer
+from .job_run_output_image import JobRunOutputImage, JobRunOutputImageSerializer
+from .job_script import JobScript, JobScriptSerializer
 from .pin import Pin, PinSerializer
 
 __all__ = [
@@ -9,8 +11,12 @@ __all__ = [
     InvestigationDetailSerializer,
     Dataset,
     DatasetSerializer,
-    Job,
-    JobSerializer,
+    JobRun,
+    JobRunSerializer,
+    JobRunOutputImage,
+    JobRunOutputImageSerializer,
+    JobScript,
+    JobScriptSerializer,
     Pin,
     PinSerializer,
 ]
