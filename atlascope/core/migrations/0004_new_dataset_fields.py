@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dataset',
             name='derived_datasets',
-            field=models.ManyToManyField(to='core.Dataset'),
+            field=models.ManyToManyField(to='core.Dataset', blank=True),
         ),
         migrations.AddField(
             model_name='dataset',
