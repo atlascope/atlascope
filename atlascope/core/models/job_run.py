@@ -6,10 +6,9 @@ from rest_framework import serializers
 from s3_file_field import S3FileField
 
 
-class Job(models.Model):
+class JobRun(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=255)
-    script_contents = S3FileField(null=True)
+    script = models.ForeignKey('JobScript', on_delete=models.CASCADE)
     input_image = S3FileField(null=True)
     other_inputs = models.JSONField(null=True)
     outputs = models.JSONField(null=True)
@@ -17,12 +16,17 @@ class Job(models.Model):
     preview_visual = S3FileField(null=True)
 
 
-class JobSerializer(serializers.ModelSerializer):
+class JobRunSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Job
+        model = JobRun
         fields = '__all__'
 
+    output_images = serializers.SerializerMethodField('get_output_images')
 
-@admin.register(Job)
-class JobAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    def get_output_images(self, obj):
+        return [output_image.id for output_image in obj.output_images]
+
+
+@admin.register(JobRun)
+class JobRunAdmin(admin.ModelAdmin):
+    list_display = ('id', 'script', 'last_run')
