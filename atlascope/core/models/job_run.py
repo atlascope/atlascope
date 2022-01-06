@@ -24,7 +24,7 @@ class JobRunSerializer(serializers.ModelSerializer):
     output_images = serializers.SerializerMethodField('get_output_images')
 
     def get_output_images(self, obj):
-        return [output_image.id for output_image in obj.output_images]
+        return [output_image.stored_image for output_image in obj.output_images]
 
 
 @admin.register(JobRun)
