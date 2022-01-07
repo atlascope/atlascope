@@ -32,6 +32,16 @@ jobs:
         ports:
           - 9000:9000
     steps:
+      - name: Install dependencies
+        run: |
+          # Install system libraries for Python packages:
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes \
+            `# C compilers and C standard library development files` \
+            gcc libc6-dev \
+            `# PostgreSQL library development files (psycopg2)` \
+            libpq-dev
+        shell: bash
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
