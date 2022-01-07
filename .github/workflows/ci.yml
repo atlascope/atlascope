@@ -10,7 +10,7 @@ on:
     - cron: "0 0 * * *"
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     services:
       postgres:
         image: postgres:latest
@@ -36,17 +36,15 @@ jobs:
         run: |
           # Install system libraries for Python packages:
           sudo apt-get update
-          sudo apt-get install --no-install-recommends --yes \
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes \
             `# C compilers and C standard library development files` \
             gcc libc6-dev \
+            `# Python` \
+            python-is-python3 python3-dev python3-pip \
             `# PostgreSQL library development files (psycopg2)` \
             libpq-dev
         shell: bash
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
       - name: Install tox
         run: |
           pip install --upgrade pip
