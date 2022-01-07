@@ -13,7 +13,12 @@ jobs:
     runs-on: ubuntu-20.04
     services:
       postgres:
-        image: postgres:latest
+        # Heroku uses PostGIS 2.5.5 and PostgreSQL 13.5
+        # This is technically not a valid combination
+        # according to PostGIS and is therefore not
+        # not an image they offer. We use PostgreSQL 12.x
+        # and PostGIS 2.5.x instead.
+        image: postgis/postgis:12-2.5
         env:
           POSTGRES_DB: django
           POSTGRES_PASSWORD: postgres
