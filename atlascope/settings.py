@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from configurations import values
 from composed_configuration import (
     ComposedConfiguration,
     ConfigMixin,
@@ -24,6 +25,18 @@ class AtlascopeMixin(ConfigMixin):
         'tile_overlay',
         'analytics',
     ]
+
+    # Use PostGIS
+    DATABASES = values.DatabaseURLValue(
+        environ_name='DATABASE_URL',
+        # django-configurations has environ_prefix=None by default here
+        environ_prefix='DJANGO',
+        environ_required=True,
+        # Additional kwargs to DatabaseURLValue are passed to dj-database-url,
+        # then passed through to the Django database options.
+        engine='django.contrib.gis.db.backends.postgis',
+        conn_max_age=600,
+    )
 
     @staticmethod
     def mutate_configuration(configuration: ComposedConfiguration) -> None:
@@ -59,4 +72,14 @@ class ProductionConfiguration(AtlascopeMixin, ProductionBaseConfiguration):
 
 
 class HerokuProductionConfiguration(AtlascopeMixin, HerokuProductionBaseConfiguration):
-    pass
+    # Use PostGIS
+    DATABASES = values.DatabaseURLValue(
+        environ_name='DATABASE_URL',
+        environ_prefix=None,
+        environ_required=True,
+        # Additional kwargs here.
+        engine='django.contrib.gis.db.backends.postgis',
+        conn_max_age=600,
+        # Heroku is expected to always provide SSL.
+        ssl_require=True,
+    )
