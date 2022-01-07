@@ -1,10 +1,12 @@
 FROM python:3.8-slim
 # Install system libraries for Python packages:
-# * psycopg2
-RUN apt-get update && \
-    apt-get install --no-install-recommends --yes \
-        libpq-dev gcc libc6-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get install --no-install-recommends --yes \
+        # C compilers and C standard library development files
+        gcc libc6-dev \
+        # PostgreSQL library development files (psycopg2)
+        libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
