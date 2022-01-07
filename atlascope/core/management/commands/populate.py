@@ -5,13 +5,14 @@ import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 
-from atlascope.core.models import Investigation
+from atlascope.core.models import Investigation, Dataset
 
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
 MODEL_JSON_MAPPING = [
     (User, 'users.json'),
     (Investigation, 'investigations.json'),
+    (Dataset, 'datasets.json'),
 ]
 
 DEFAULT_PASSWORD = '123'
