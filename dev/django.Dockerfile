@@ -34,8 +34,9 @@ RUN pip install \
         # constrain pyproj for use with Ubuntu Focal library version
         'pyproj~=2.0'
 
+COPY ./atlascope_plugins/atlascope-vandy-importer/setup.py /opt/atlascope-plugins/atlascope-vandy-importer/setup.py
+RUN pip install --editable /opt/atlascope-plugins/atlascope-vandy-importer
+
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
 
-COPY atlascope_plugins /opt/atlascope-plugins/
-RUN pip install --editable /opt/atlascope-plugins/*
