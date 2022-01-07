@@ -10,7 +10,7 @@ RUN apt-get update \
         # compilers
         gcc g++ binutils libc6-dev \
         # python
-        python3-dev python3-pip \
+        python-is-python3 python3-dev python3-pip \
         # PostgreSQL library development files (psycopg2)
         libpq-dev \
         # gdal development files and binary (GeoDjango, large_image[gdal])
