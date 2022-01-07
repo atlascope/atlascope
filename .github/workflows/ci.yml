@@ -57,7 +57,9 @@ jobs:
           pip install tox
       - name: Run tests
         run: |
-          tox
+          tox \
+            --force-dep gdal==3.0.4 \
+            --force-dep pyproj~=2.0
         env:
           DJANGO_DATABASE_URL: postgres://postgres:postgres@localhost:5432/django
           DJANGO_MINIO_STORAGE_ENDPOINT: localhost:9000
