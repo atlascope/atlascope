@@ -15,6 +15,8 @@ RUN apt-get update \
         libpq-dev \
         # gdal development files and binary (GeoDjango, large_image[gdal])
         libgdal-dev gdal-bin gdal-data \
+        # libcurl for GDAL streaming
+        curl libcurl4 \
         # proj development files and binary (GeoDjango, large_image[gdal])
         libproj-dev proj-bin proj-data \
         # geos library development files (GeoDjango)
