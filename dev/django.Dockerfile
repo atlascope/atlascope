@@ -7,6 +7,8 @@ ENV PYTHONUNBUFFERED 1
 # Install system libraries for Python packages
 RUN apt-get update \
  && apt-get install --no-install-recommends --yes \
+        # nginx for docker-entrypoint.sh
+        nginx \
         # compilers
         gcc g++ binutils libc6-dev \
         # python
@@ -42,3 +44,8 @@ RUN pip install --editable /opt/atlascope-plugins/atlascope-vandy-importer
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
 
+# Setup nginx to proxy localhost
+COPY ./dev/nginx.conf /etc/nginx/nginx.conf
+COPY ./dev/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
