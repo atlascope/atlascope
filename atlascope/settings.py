@@ -49,6 +49,7 @@ class AtlascopeMixin(ConfigMixin):
         configuration.INSTALLED_APPS += [
             's3_file_field',
             'guardian',
+            'django.contrib.gis',
         ]
         # guardian's authentication backend
         configuration.AUTHENTICATION_BACKENDS += [
