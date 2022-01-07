@@ -59,6 +59,12 @@ setup(
             'django-composed-configuration[dev]>=0.18',
             'django-debug-toolbar',
             'django-s3-file-field[minio]',
+            # There seems to be a bug with pip. `django-s3-file-field[minio]` is
+            # not installed because `django-s3-file-field[boto3]` is already installed?
+            # We install child dependencies manually here...
+            'django-minio-storage',
+            'minio<7',
+            # ... done installing `django-s3-file-field[minio]` child dependencies.
             'ipython',
             'tox',
         ]
