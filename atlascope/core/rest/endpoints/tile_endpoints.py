@@ -74,7 +74,10 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(f'/vsicurl/use_head=no&url={dataset.content.url}', encoding='PNG')
+        tile_source = GDALFileTileSource(
+            f'/vsicurl/use_head=no&url={dataset.content.url}',
+            encoding='PNG',
+        )
         try:
             tile = tile_source.getTile(x, y, z)
         except TileSourceError as e:
