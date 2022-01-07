@@ -16,13 +16,13 @@ from atlascope.core.rest.additional_serializers import TileMetadataSerializer
 
 
 class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
-    queryset = Dataset.objects.all()
+    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     permission_classes = [IsAuthenticated]
     serializer_class = TileMetadataSerializer
 
     def get(self, *args, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(dataset.source_uri)
+        tile_source = GDALFileTileSource(f'/vsicurl/use_head=no&url={dataset.content.url}')
         serializer = self.get_serializer(tile_source)
         return Response(serializer.data)
 
@@ -33,7 +33,7 @@ class TileSchemaGenerator(SwaggerAutoSchema):
 
 
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
-    queryset = Dataset.objects.all()
+    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     model = Dataset
     permission_classes = [IsAuthenticated]
 
@@ -74,7 +74,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(dataset.source_uri, encoding='PNG')
+        tile_source = GDALFileTileSource(f'/vsicurl/use_head=no&url={dataset.content.url}', encoding='PNG')
         try:
             tile = tile_source.getTile(x, y, z)
         except TileSourceError as e:
