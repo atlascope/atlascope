@@ -4,7 +4,7 @@
         "script_contents": "average_color.py"
     },
     {
-        "name": "Brightest N Pixels (N=5)",
+        "name": "Brightest N Pixels",
         "script_contents": "brightest_n_pixels.py"
     }
 ]
