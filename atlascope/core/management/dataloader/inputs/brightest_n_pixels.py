@@ -27,7 +27,7 @@ def main(input_image, **kwargs):
         ]
         for pixel in surrounding10:
             data[pixel[0]][pixel[1]] = 0
-        brightest.append(maxloc)
+        brightest.append([int(val) for val in maxloc])
 
     draw = ImageDraw.Draw(output_image)
     for location in brightest:
@@ -41,5 +41,5 @@ def main(input_image, **kwargs):
 
     return [
         output_image,
-        f'Brightest locations = {str(brightest)}',
+        brightest,
     ]
