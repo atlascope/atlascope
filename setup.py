@@ -52,6 +52,8 @@ setup(
         'django-composed-configuration[prod]>=0.18',
         'django-s3-file-field[boto3]',
         'gunicorn',
+        'numpy',
+        'pillow',
     ],
     extras_require={
         'dev': [

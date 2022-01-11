@@ -1,33 +1,48 @@
 import json
+from pathlib import Path
 
 from django.contrib.auth.models import User
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 
-from atlascope.core.models import Investigation
+from atlascope.core.models import Investigation, JobRun, JobScript
+from atlascope.core.tasks import spawn_job
 
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
 MODEL_JSON_MAPPING = [
     (User, 'users.json'),
     (Investigation, 'investigations.json'),
+    (JobScript, 'job_scripts.json'),
+    (JobRun, 'job_runs.json'),
 ]
 
-DEFAULT_PASSWORD = '123'
+DEFAULT_PASSWORD = 'letmein'
 
 DEFAULT_CLIENT_URI = 'http://localhost:8081/'
 
 
 def expand_references(obj, model):
     many_to_many_values = {}
+    files_to_save = {}
     permissions = {}
     for field_name, value in obj.items():
         found_field = [field for field in model._meta.fields if field.name == field_name]
         found_field = found_field[0] if len(found_field) > 0 else None
         if hasattr(found_field, 'remote_field') and hasattr(found_field.remote_field, 'model'):
-            obj[field_name] = found_field.remote_field.model.objects.get(email=value)
-        else:
+            remote_model = found_field.remote_field.model
+            if remote_model == User:
+                obj[field_name] = remote_model.objects.get(email=value)
+            else:
+                obj[field_name] = remote_model.objects.get(name=value)
+        elif hasattr(found_field, 'upload_to'):
+            target_file = open(Path(DATALOADER_DIR, 'inputs', value), 'rb')
+            files_to_save[field_name] = {
+                'name': value,
+                'contents': target_file,
+            }
+        elif found_field:
             found_many_to_many = [
                 field for field in model._meta.many_to_many if field.name == field_name
             ]
@@ -47,7 +62,7 @@ def expand_references(obj, model):
                 User.objects.get(username=username) for username in obj[field_name]
             ]
             del obj[field_name]
-    return obj, many_to_many_values, permissions
+    return obj, many_to_many_values, files_to_save, permissions
 
 
 @click.option('--password', type=click.STRING, help='password to apply to all users')
@@ -68,16 +83,24 @@ def command(password):
         print('-----')
         objects = json.load(open(DATALOADER_DIR + filename))
         for obj in objects:
-            obj, many_to_many_values, permissions = expand_references(obj, model)
+            obj, many_to_many_values, files_to_save, permissions = expand_references(obj, model)
             db_obj = model(**obj)
             db_obj.save()
-            print(f'Saved {model.__name__}: {list(obj.values())[0]}')
+            identifier = list(obj.values())[0]
+            if type(identifier) != str:
+                identifier = str(db_obj.id)
+            print(f'Saved {model.__name__}: {identifier}')
             for field_name, relations in many_to_many_values.items():
                 getattr(db_obj, field_name).set(relations)
+            for field_name, file_to_save in files_to_save.items():
+                getattr(db_obj, field_name).save(file_to_save['name'], file_to_save['contents'])
             for perm, user_list in permissions.items():
                 [assign_perm(perm, user, db_obj) for user in user_list]
             if model == User:
                 db_obj.set_password(password or DEFAULT_PASSWORD)
             db_obj.save()
+            if model == JobRun:
+                spawn_job.delay(str(db_obj.id))
+                print('Successfully spawned job run!')
     print('-----')
     print('Dataload complete.')
