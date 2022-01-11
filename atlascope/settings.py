@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from configurations import values
 from composed_configuration import (
     ComposedConfiguration,
     ConfigMixin,
@@ -11,6 +10,7 @@ from composed_configuration import (
     ProductionBaseConfiguration,
     TestingBaseConfiguration,
 )
+from configurations import values
 
 
 class AtlascopeMixin(ConfigMixin):
