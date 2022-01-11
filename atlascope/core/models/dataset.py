@@ -36,7 +36,7 @@ class Dataset(models.Model):
         choices=[(choice, choice) for choice in settings.DATASET_TYPES],
         default=settings.DATASET_TYPES[0],
     )
-    derived_datasets = models.ManyToManyField('Dataset')
+    derived_datasets = models.ManyToManyField('Dataset', blank=True)
     # scale
     # applicable_heuristics
 
