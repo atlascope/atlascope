@@ -1,7 +1,7 @@
 import pytest
 
-from atlascope.core.rest.permissions import has_read_perm
 from atlascope.core.models.dataset import DatasetSerializer
+from atlascope.core.rest.permissions import has_read_perm
 
 # ------------------------------------------------------------------
 # USER ENDPOINT TESTS
