@@ -11,6 +11,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test-type: [lint, check-migrations, test]
     services:
       postgres:
         image: postgres:latest
@@ -43,7 +47,7 @@ jobs:
           pip install tox
       - name: Run tests
         run: |
-          tox
+          tox -e ${{matrix.test-type}}
         env:
           DJANGO_DATABASE_URL: postgres://postgres:postgres@localhost:5432/django
           DJANGO_MINIO_STORAGE_ENDPOINT: localhost:9000
