@@ -1,5 +1,8 @@
 <template>
-    <div ref="map" class="map" />
+  <div
+    ref="map"
+    class="map"
+  />
 </template>
 
 <style scoped>
@@ -14,30 +17,29 @@
 
 <script lang="ts">
 import {
-    ref, defineComponent, onMounted, PropType,
+  ref, defineComponent, onMounted, PropType,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 
 export default defineComponent({
-    name: 'InvestigationDetail',
+  name: 'InvestigationDetail',
 
-    props: {
-        investigation: {
-            type: String as PropType<string>,
-            required: true,
-        },
+  props: {
+    investigation: {
+      type: String as PropType<string>,
+      required: true,
     },
+  },
 
-    setup(props) {
-        const map = ref(null);
-        const { zoom, center } = useGeoJS(map);
+  setup(props) {
+    const map = ref(null);
+    const { zoom, center } = useGeoJS(map);
 
-        onMounted(() => {
-            setTimeout(() => center(-0.1704, 51.5047), 2000);
-            setTimeout(() => zoom(14), 3000);
-            console.log(props.investigation);
-        });
-        return { map };
-    },
+    onMounted(() => {
+      setTimeout(() => center(-0.1704, 51.5047), 2000);
+      setTimeout(() => zoom(14), 3000);
+    });
+    return { map };
+  },
 });
 </script>
