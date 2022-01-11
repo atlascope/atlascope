@@ -1,0 +1,13 @@
+[
+    {
+        "script": "Average color",
+        "input_image": "green_cell_dataset_selection.png"
+    },
+    {
+        "script": "Brightest N Pixels",
+        "input_image": "green_cell_dataset_selection.png",
+        "other_inputs": {
+            "n": 5
+        }
+    }
+]

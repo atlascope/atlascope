@@ -17,11 +17,11 @@ ENV PYTHONUNBUFFERED 1
 COPY ./setup.py /opt/django-project/setup.py
 RUN pip install --editable /opt/django-project[dev]
 
+COPY ./atlascope_plugins/atlascope-vandy-importer/setup.py /opt/atlascope-plugins/atlascope-vandy-importer/setup.py
+RUN pip install --editable /opt/atlascope-plugins/atlascope-vandy-importer
+
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
-
-COPY atlascope_plugins /opt/atlascope-plugins/
-RUN pip install --editable /opt/atlascope-plugins/*
 
 # Setup nginx to proxy localhost:9000 to minio:9000
 COPY ./dev/nginx.conf /etc/nginx/nginx.conf
