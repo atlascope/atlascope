@@ -11,6 +11,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        test-type: [lint, check-migrations, test]
     services:
       postgres:
         # Heroku uses PostGIS 2.5.5 and PostgreSQL 13.5
@@ -63,6 +67,7 @@ jobs:
       - name: Run tests
         run: |
           tox \
+            -e ${{matrix.test-type}} \
             --force-dep gdal==3.0.4 \
             --force-dep pyproj~=2.0
         env:
