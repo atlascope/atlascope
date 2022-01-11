@@ -11,6 +11,7 @@ RUN apt-get update \
         libpq-dev \
         # Nginx to proxy localhost
         nginx \
+ && pip install --upgrade pip \
  && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONDONTWRITEBYTECODE 1
