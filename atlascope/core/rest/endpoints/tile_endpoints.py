@@ -28,6 +28,16 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
 
 
 class TileSchemaGenerator(SwaggerAutoSchema):
+    """A class responsible for generating the JSON Schema.
+
+    We create this subclass to override the 'Content-Type' `drf_yasg`
+    produces. It only typically returns 'application/json'. We want
+    to document the tiling endpoint via Swagger. The endpoint returns
+    tiles of type 'image/png'. A cleaner way to achieve this is welcome.
+
+    See https://github.com/atlascope/atlascope/pull/37#discussion_r782498102
+    """
+
     def get_produces(self):
         return ['image/png']
 
