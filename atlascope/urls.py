@@ -37,6 +37,7 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('api/docs/redoc/', schema_view.with_ui('redoc'), name='docs-redoc'),
     path('api/docs/swagger/', schema_view.with_ui('swagger'), name='docs-swagger'),
+    path('api/v1/', include('atlascope.core.rest.endpoints.tile_endpoints')),
 ]
 
 if settings.DEBUG:
