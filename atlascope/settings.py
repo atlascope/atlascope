@@ -10,6 +10,7 @@ from composed_configuration import (
     ProductionBaseConfiguration,
     TestingBaseConfiguration,
 )
+from configurations import values
 
 
 class AtlascopeMixin(ConfigMixin):
@@ -25,6 +26,18 @@ class AtlascopeMixin(ConfigMixin):
         'analytics',
     ]
 
+    # Use PostGIS
+    DATABASES = values.DatabaseURLValue(
+        environ_name='DATABASE_URL',
+        # django-configurations has environ_prefix=None by default here
+        environ_prefix='DJANGO',
+        environ_required=True,
+        # Additional kwargs to DatabaseURLValue are passed to dj-database-url,
+        # then passed through to the Django database options.
+        engine='django.contrib.gis.db.backends.postgis',
+        conn_max_age=600,
+    )
+
     @staticmethod
     def mutate_configuration(configuration: ComposedConfiguration) -> None:
         # Install local apps first, to ensure any overridden resources are found first
@@ -36,6 +49,7 @@ class AtlascopeMixin(ConfigMixin):
         configuration.INSTALLED_APPS += [
             's3_file_field',
             'guardian',
+            'django.contrib.gis',
         ]
         # guardian's authentication backend
         configuration.AUTHENTICATION_BACKENDS += [
@@ -59,4 +73,14 @@ class ProductionConfiguration(AtlascopeMixin, ProductionBaseConfiguration):
 
 
 class HerokuProductionConfiguration(AtlascopeMixin, HerokuProductionBaseConfiguration):
-    pass
+    # Use PostGIS
+    DATABASES = values.DatabaseURLValue(
+        environ_name='DATABASE_URL',
+        environ_prefix=None,
+        environ_required=True,
+        # Additional kwargs here.
+        engine='django.contrib.gis.db.backends.postgis',
+        conn_max_age=600,
+        # Heroku is expected to always provide SSL.
+        ssl_require=True,
+    )
