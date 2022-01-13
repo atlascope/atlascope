@@ -5,7 +5,7 @@ from drf_yasg.utils import swagger_auto_schema
 from large_image.exceptions import TileSourceError
 from large_image_source_gdal import GDALFileTileSource
 from rest_framework import mixins
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -83,7 +83,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 'y is outside layer',
             ):
                 if missing_msg in error_msg:
-                    return Response(status=404)
+                    raise NotFound()
             raise APIException(error_msg)
         return HttpResponse(tile, content_type='image/png')
 
