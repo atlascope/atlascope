@@ -21,4 +21,4 @@ def test_serializers_valid():
     for model, filename in MODEL_JSON_MAPPING:
         objects = json.load(open(DATALOADER_DIR + filename))
         for data_obj in objects:
-            model_serializers[model](data=data_obj).is_valid()
+            model_serializers[model](data=data_obj).is_valid(raise_exception=True)
