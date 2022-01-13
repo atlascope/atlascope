@@ -6,7 +6,7 @@ import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 
-from atlascope.core.models import Investigation, Dataset, JobRun, JobScript
+from atlascope.core.models import Dataset, Investigation, JobRun, JobScript
 from atlascope.core.tasks import spawn_job
 
 
