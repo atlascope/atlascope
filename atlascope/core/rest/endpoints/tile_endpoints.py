@@ -1,7 +1,6 @@
 from django.http.response import HttpResponse
 from django.urls import path
 from drf_yasg import openapi
-from drf_yasg.inspectors import SwaggerAutoSchema
 from drf_yasg.utils import swagger_auto_schema
 from large_image.exceptions import TileSourceError
 from large_image_source_gdal import GDALFileTileSource
@@ -27,19 +26,7 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
         return Response(serializer.data)
 
 
-class TileSchemaGenerator(SwaggerAutoSchema):
-    """A class responsible for generating the JSON Schema.
 
-    We create this subclass to override the 'Content-Type' `drf_yasg`
-    produces. It only typically returns 'application/json'. We want
-    to document the tiling endpoint via Swagger. The endpoint returns
-    tiles of type 'image/png'. A cleaner way to achieve this is welcome.
-
-    See https://github.com/atlascope/atlascope/pull/37#discussion_r782498102
-    """
-
-    def get_produces(self):
-        return ['image/png']
 
 
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
@@ -49,7 +36,6 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
 
     @swagger_auto_schema(
         responses={200: 'Image file', 404: 'Image tile not found'},
-        auto_schema=TileSchemaGenerator,
         manual_parameters=[
             openapi.Parameter(
                 'id',
