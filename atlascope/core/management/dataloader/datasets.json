@@ -1,0 +1,8 @@
+[
+    {
+        "name": "Vandy Dataset",
+        "description": "This is the test dataset from the VANDY Explorer",
+        "source_uri": "https://fake-api/access/for/fake/dataset",
+        "importer": "vandy"
+    }
+]
