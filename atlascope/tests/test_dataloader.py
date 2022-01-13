@@ -9,7 +9,8 @@ from atlascope.core import models as atlascope_models
 from atlascope.core.management.commands.populate import DATALOADER_DIR, MODEL_JSON_MAPPING
 from atlascope.core.rest.additional_serializers import UserSerializer
 
-def serializer_dataloader_objects() -> Iterator[Tuple[serializers.ModelSerializer,dict]]:
+
+def serializer_dataloader_objects() -> Iterator[Tuple[serializers.ModelSerializer, dict]]:
     model_serializers = {
         clas.Meta.model: clas
         for clas in atlascope_models.__all__
@@ -22,6 +23,7 @@ def serializer_dataloader_objects() -> Iterator[Tuple[serializers.ModelSerialize
             dataloader_objects = json.load(dataloader_file)
             for dataloader_object in dataloader_objects:
                 yield serializer, dataloader_object
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("serializer,data_obj", serializer_dataloader_objects())
