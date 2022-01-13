@@ -9,7 +9,6 @@ from oauth2_provider.models import Application
 from atlascope.core.models import Dataset, Investigation, JobRun, JobScript
 from atlascope.core.tasks import spawn_job
 
-
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
 MODEL_JSON_MAPPING = [
