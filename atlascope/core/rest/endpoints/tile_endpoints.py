@@ -1,4 +1,3 @@
-from django.http.response import HttpResponse
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -8,6 +7,7 @@ from rest_framework import mixins
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 
 from atlascope.core.models import Dataset
@@ -26,13 +26,19 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
         return Response(serializer.data)
 
 
+class LargeImageRenderer(BaseRenderer):
+    media_type = 'image/png'
+    format = 'png'
 
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
 
 
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     model = Dataset
     permission_classes = [IsAuthenticated]
+    renderer_classes = [LargeImageRenderer]
 
     @swagger_auto_schema(
         responses={200: 'Image file', 404: 'Image tile not found'},
@@ -85,7 +91,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 if missing_msg in error_msg:
                     raise NotFound()
             raise APIException(error_msg)
-        return HttpResponse(tile, content_type='image/png')
+        return Response(tile)
 
 
 urlpatterns = [
