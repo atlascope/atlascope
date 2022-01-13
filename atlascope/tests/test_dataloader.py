@@ -1,10 +1,11 @@
 import json
+
+from django.contrib.auth.models import User
 import pytest
 from rest_framework import serializers
-from django.contrib.auth.models import User
 
 from atlascope.core import models as atlascope_models
-from atlascope.core.management.commands.populate import MODEL_JSON_MAPPING, DATALOADER_DIR
+from atlascope.core.management.commands.populate import DATALOADER_DIR, MODEL_JSON_MAPPING
 from atlascope.core.rest.additional_serializers import UserSerializer
 
 
