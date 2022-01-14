@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
+import { AxiosInstance } from 'axios';
 import { User, Investigation } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
@@ -9,6 +10,8 @@ Vue.use(Vuex);
 export interface State {
     userInfo: User | null;
     investigations: Investigation[];
+    axiosInstance: AxiosInstance | null;
+    currentInvestigation: Investigation | null;
 }
 
 const {
@@ -21,30 +24,57 @@ const {
   state: {
     userInfo: null,
     investigations: [],
+    axiosInstance: null,
+    currentInvestigation: null,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
       state.investigations = investigations;
     },
+    setCurrentInvestigation(state, currentInvestigation: Investigation | null) {
+      state.currentInvestigation = currentInvestigation;
+    },
     setUserInfo(state, userInfo: User | null) {
       state.userInfo = userInfo;
     },
+    setAxiosInstance(state, axiosInstance: AxiosInstance | null) {
+      state.axiosInstance = axiosInstance;
+    },
   },
   actions: {
-    async fetchInvestigations(context, axiosInstance) {
+    async fetchInvestigations(context) {
       const { commit } = rootActionContext(context);
-      const investigations = (await axiosInstance.get('/investigations')).data;
-      commit.setInvestigations(investigations.results);
+      if (store.state.axiosInstance) {
+        const investigations = (await store.state.axiosInstance.get('/investigations')).data;
+        commit.setInvestigations(investigations.results);
+      } else {
+        commit.setInvestigations([]);
+      }
     },
-    async fetchUserInfo(context, axiosInstance) {
+    async fetchCurrentInvestigation(context, investigationId: string) {
       const { commit } = rootActionContext(context);
-      const userInfo = (await axiosInstance.get('/users/me')).data;
-      commit.setUserInfo(userInfo);
+      if (store.state.axiosInstance) {
+        const investigation = (await store.state.axiosInstance.get(`/investigations/${investigationId}`)).data;
+        commit.setCurrentInvestigation(investigation);
+      } else {
+        commit.setCurrentInvestigation(null);
+      }
+    },
+    async fetchUserInfo(context) {
+      const { commit } = rootActionContext(context);
+      if (store.state.axiosInstance) {
+        const userInfo = (await store.state.axiosInstance.get('/users/me')).data;
+        commit.setUserInfo(userInfo);
+      }
     },
     logout(context) {
       const { commit } = rootActionContext(context);
       commit.setUserInfo(null);
       commit.setInvestigations([]);
+    },
+    storeAxiosInstance(context, axiosInstance) {
+      const { commit } = rootActionContext(context);
+      commit.setAxiosInstance(axiosInstance);
     },
   },
 });
