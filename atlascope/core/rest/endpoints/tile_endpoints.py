@@ -1,14 +1,13 @@
-from django.http.response import HttpResponse
 from django.urls import path
 from drf_yasg import openapi
-from drf_yasg.inspectors import SwaggerAutoSchema
 from drf_yasg.utils import swagger_auto_schema
 from large_image.exceptions import TileSourceError
 from large_image_source_gdal import GDALFileTileSource
 from rest_framework import mixins
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 
 from atlascope.core.models import Dataset
@@ -27,29 +26,22 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
         return Response(serializer.data)
 
 
-class TileSchemaGenerator(SwaggerAutoSchema):
-    """A class responsible for generating the JSON Schema.
+class LargeImageRenderer(BaseRenderer):
+    media_type = 'image/png'
+    format = 'png'
 
-    We create this subclass to override the 'Content-Type' `drf_yasg`
-    produces. It only typically returns 'application/json'. We want
-    to document the tiling endpoint via Swagger. The endpoint returns
-    tiles of type 'image/png'. A cleaner way to achieve this is welcome.
-
-    See https://github.com/atlascope/atlascope/pull/37#discussion_r782498102
-    """
-
-    def get_produces(self):
-        return ['image/png']
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
 
 
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     model = Dataset
     permission_classes = [IsAuthenticated]
+    renderer_classes = [LargeImageRenderer]
 
     @swagger_auto_schema(
         responses={200: 'Image file', 404: 'Image tile not found'},
-        auto_schema=TileSchemaGenerator,
         manual_parameters=[
             openapi.Parameter(
                 'id',
@@ -97,9 +89,9 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 'y is outside layer',
             ):
                 if missing_msg in error_msg:
-                    return Response(status=404)
+                    raise NotFound()
             raise APIException(error_msg)
-        return HttpResponse(tile, content_type='image/png')
+        return Response(tile)
 
 
 urlpatterns = [
