@@ -1,12 +1,18 @@
 <template>
   <v-sheet
-    max-width="500px"
-    min-width="500px"
+    max-width="33vw"
+    min-width="33vw"
   >
     <v-expansion-panels
       accordian
       flat
     >
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          Pins
+        </v-expansion-panel-header>
+        <v-expansion-panel-content />
+      </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header>
           Metadata
@@ -45,9 +51,9 @@ export default defineComponent({
       'description',
       'notes',
     ];
-    const investigationMetadata = computed(() => {
-      JSON.stringify(store.state.currentInvestigation, metadataFields, 4);
-    });
+    const investigationMetadata = computed(
+      () => JSON.stringify(store.state.currentInvestigation, metadataFields, 4),
+    );
     return { investigationMetadata };
   },
 });
