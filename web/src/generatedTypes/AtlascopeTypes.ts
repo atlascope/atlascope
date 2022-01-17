@@ -30,6 +30,49 @@ export interface Dataset {
 
   /** Importer */
   importer?: string | null;
+
+  /**
+   * Content
+   * @format uri
+   */
+  content?: string | null;
+
+  /** Metadata */
+  metadata?: object | null;
+
+  /** Dataset type */
+  dataset_type?: "tile_source" | "tile_overlay" | "analytics";
+  derived_datasets?: string[];
+}
+
+export interface TileMetadata {
+  /**
+   * Levels
+   * Number of zoom levels in the image.
+   * @min 1
+   */
+  levels?: number;
+
+  /**
+   * Size x
+   * Image size in the X direction.
+   * @min 1
+   */
+  size_x?: number;
+
+  /**
+   * Size y
+   * Image size in the Y direction.
+   * @min 1
+   */
+  size_y?: number;
+
+  /**
+   * Tile size
+   * Size of the square tiles the image is composed of.
+   * @min 1
+   */
+  tile_size?: number;
 }
 
 export interface Investigation {
@@ -195,6 +238,35 @@ export namespace Datasets {
     export type RequestHeaders = {};
     export type ResponseBody = void;
   }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsTilesMetadataRead
+   * @request GET:/datasets/{id}/tiles/metadata
+   * @response `200` `TileMetadata`
+   */
+  export namespace DatasetsTilesMetadataRead {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = TileMetadata;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsTilesRead
+   * @request GET:/datasets/{id}/tiles/{z}/{x}/{y}.png
+   * @response `200` `void` Image file
+   * @response `404` `void` Image tile not found
+   */
+  export namespace DatasetsTilesRead {
+    export type RequestParams = { id: string; x: number; y: number; z: number };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
 }
 
 export namespace Investigations {
@@ -247,6 +319,51 @@ export namespace Investigations {
   }
 }
 
+export namespace S3Upload {
+  /**
+   * No description
+   * @tags s3-upload
+   * @name S3UploadFinalizeCreate
+   * @request POST:/s3-upload/finalize/
+   * @response `201` `void`
+   */
+  export namespace S3UploadFinalizeCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags s3-upload
+   * @name S3UploadUploadCompleteCreate
+   * @request POST:/s3-upload/upload-complete/
+   * @response `201` `void`
+   */
+  export namespace S3UploadUploadCompleteCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+  /**
+   * No description
+   * @tags s3-upload
+   * @name S3UploadUploadInitializeCreate
+   * @request POST:/s3-upload/upload-initialize/
+   * @response `201` `void`
+   */
+  export namespace S3UploadUploadInitializeCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+}
+
 export namespace Users {
   /**
    * No description
@@ -265,11 +382,11 @@ export namespace Users {
   /**
    * @description Return the currently logged in user's information.
    * @tags users
-   * @name UsersMe
+   * @name UsersMeRead
    * @request GET:/users/me
    * @response `200` `(User)[]`
    */
-  export namespace UsersMe {
+  export namespace UsersMeRead {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = never;
