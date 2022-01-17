@@ -11,7 +11,9 @@
         <v-expansion-panel-header>
           Pins
         </v-expansion-panel-header>
-        <v-expansion-panel-content />
+        <v-expansion-panel-content>
+          <pin-list />
+        </v-expansion-panel-content>
       </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header>
@@ -38,8 +40,13 @@ import {
   defineComponent, computed,
 } from '@vue/composition-api';
 import store from '../store';
+import PinList from './PinList.vue';
 
 export default defineComponent({
+  components: {
+    PinList
+  },
+
   setup() {
     const metadataFields = [
       'id',
