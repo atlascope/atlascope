@@ -44,7 +44,7 @@ import PinList from './PinList.vue';
 
 export default defineComponent({
   components: {
-    PinList
+    PinList,
   },
 
   setup() {

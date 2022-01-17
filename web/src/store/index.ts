@@ -61,7 +61,7 @@ const {
         ];
       }
       return [];
-    }
+    },
   },
   actions: {
     async fetchInvestigations(context) {
