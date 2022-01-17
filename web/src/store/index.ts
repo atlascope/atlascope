@@ -76,6 +76,10 @@ const {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
     },
+    unsetCurrentInvestigation(context) {
+      const { commit } = rootActionContext(context);
+      commit.setCurrentInvestigation(null);
+    },
   },
 });
 
