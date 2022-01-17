@@ -21,7 +21,7 @@ MODEL_JSON_MAPPING = [
 
 DEFAULT_PASSWORD = 'letmein'
 
-DEFAULT_CLIENT_URI = 'http://localhost:8081/'
+DEFAULT_CLIENT_URI = 'http://localhost:8080/'
 
 
 def expand_references(obj, model):
