@@ -27,7 +27,7 @@ class Dataset(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     public = models.BooleanField(default=True)
-    source_uri = models.CharField(max_length=3000, null=False, blank=False)
+    source_uri = models.CharField(max_length=3000, null=True, blank=True)
     importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
     content = S3FileField(null=True)
     metadata = models.JSONField(null=True)
