@@ -41,6 +41,28 @@ const {
       state.axiosInstance = axiosInstance;
     },
   },
+  getters: {
+    pins(state: State): any[] {
+      if (state.currentInvestigation !== null) {
+        // Use placeholders until GET /pins is implemented
+        return [
+          {
+            id: 'pin_1',
+            dataset: null,
+            color: 'red',
+            note: 'I am only a test pin.',
+          },
+          {
+            id: 'pin_2',
+            dataset: null,
+            color: 'green',
+            note: 'I am also just a test pin.',
+          },
+        ];
+      }
+      return [];
+    }
+  },
   actions: {
     async fetchInvestigations(context) {
       const { commit } = rootActionContext(context);
