@@ -36,24 +36,12 @@ class JobRunViewSet(
     serializer_class = JobRunSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        request_body=JobRunSpawnSerializer,
-        manual_parameters=[
-            openapi.Parameter(
-                'other_inputs',
-                in_=openapi.IN_FORM,
-                type=openapi.TYPE_OBJECT,
-            )
-        ],
-        responses={204: 'Spawn successful.'},
-    )
+    @swagger_auto_schema(request_body=JobRunSpawnSerializer)
     @action(
         detail=False,
         methods=['POST'],
-        parser_classes=(MultiPartParser,),
     )
     def spawn(self, request, **kwargs):
-        # TODO: image is unsigned when sent through Swagger
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         job_run: JobRun = serializer.save()
