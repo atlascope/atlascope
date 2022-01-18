@@ -1,13 +1,14 @@
-from s3_file_field_client import S3FileFieldClient
-from guardian.shortcuts import assign_perm
 from pathlib import Path
+
+from django.core.files import File
+from guardian.shortcuts import assign_perm
 import pytest
 from pytest_factoryboy import register
 from rest_framework.test import APIClient
-from django.core.files import File
+from s3_file_field_client import S3FileFieldClient
 
-from atlascope.tests import factories
 from atlascope.core.management.commands.populate import POPULATE_DIR
+from atlascope.tests import factories
 
 register(factories.UserFactory)
 register(factories.InvestigationFactory)

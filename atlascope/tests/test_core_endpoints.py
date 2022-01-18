@@ -1,8 +1,8 @@
 import pytest
 
 from atlascope.core import models
-from atlascope.core.rest.permissions import has_read_perm
 from atlascope.core.rest.additional_serializers import UserSerializer
+from atlascope.core.rest.permissions import has_read_perm
 
 # ------------------------------------------------------------------
 # USER ENDPOINT TESTS
