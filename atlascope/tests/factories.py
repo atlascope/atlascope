@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 import factory
 
-from atlascope.core.models import Dataset, Investigation, Pin
+from atlascope.core import models
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -16,7 +16,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class DatasetFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Dataset
+        model = models.Dataset
 
     id = factory.Faker('uuid4')
     name = factory.Faker('word')
@@ -42,7 +42,7 @@ class DatasetFactory(factory.django.DjangoModelFactory):
 
 class PinFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Pin
+        model = models.Pin
 
     id = factory.Faker('uuid4')
     note = factory.Faker('sentence')
@@ -51,7 +51,7 @@ class PinFactory(factory.django.DjangoModelFactory):
 
 class InvestigationFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Investigation
+        model = models.Investigation
 
     id = factory.Faker('uuid4')
     name = factory.Faker('word')
@@ -60,3 +60,21 @@ class InvestigationFactory(factory.django.DjangoModelFactory):
     # pins
     # connections
     notes = factory.Faker('sentence')
+
+
+class JobScriptFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobScript
+
+    id = factory.Faker('uuid4')
+    name = factory.Faker('word')
+
+
+class JobRunFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobRun
+
+    id = factory.Faker('uuid4')
+    script = factory.SubFactory(JobScriptFactory)
+    input_image = factory.django.FileField(data=factory.Faker('binary', length=100))
+    other_inputs = {}
