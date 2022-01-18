@@ -5,6 +5,8 @@ from django.db import models
 from rest_framework import serializers
 from s3_file_field import S3FileField
 
+from atlascope.core.tasks import spawn_job
+
 
 class JobRun(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -14,6 +16,9 @@ class JobRun(models.Model):
     outputs = models.JSONField(null=True)
     last_run = models.DateTimeField(null=True)
     preview_visual = S3FileField(null=True)
+
+    def spawn(self):
+        spawn_job.delay(str(self.id))
 
 
 class JobRunSerializer(serializers.ModelSerializer):
@@ -25,6 +30,12 @@ class JobRunSerializer(serializers.ModelSerializer):
 
     def get_output_images(self, obj):
         return [output_image.stored_image for output_image in obj.output_images]
+
+
+class JobRunSpawnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobRun
+        fields = ['input_image', 'other_inputs', 'script']
 
 
 @admin.register(JobRun)
