@@ -23,11 +23,20 @@ def validate_importer(value):
 
 
 class Dataset(models.Model):
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(content__isnull=False)
+                & (models.Q(source_uri__isnull=False) | models.Q(importer__isnull=False)),
+                name='has_no_source',
+            )
+        ]
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     public = models.BooleanField(default=True)
-    source_uri = models.CharField(max_length=3000, null=False, blank=False)
+    source_uri = models.CharField(max_length=3000, null=True, blank=True)
     importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
     content = S3FileField(null=True)
     metadata = models.JSONField(null=True)
