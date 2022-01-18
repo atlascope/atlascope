@@ -3,16 +3,15 @@ import io
 
 from PIL import Image
 from celery import shared_task
+from django.apps import apps
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
-
-from atlascope.core.models import JobRun, JobRunOutputImage
 
 
 @shared_task
 def spawn_job(job_run_id):
     # celery arguments must be serializable
-    job_run = JobRun.objects.get(id=job_run_id)
+    job_run = apps.get_model('core', 'JobRun').objects.get(id=job_run_id)
     script = job_run.script.script_contents.read()
     input_image = Image.open(io.BytesIO(job_run.input_image.read()))
     kwargs = job_run.other_inputs or {}
@@ -35,7 +34,7 @@ def spawn_job(job_run_id):
             None,
         )
 
-        image_output_obj = JobRunOutputImage(job_run=job_run)
+        image_output_obj = apps.get_model('core', 'JobRunOutputImage')(job_run=job_run)
         image_output_obj.stored_image.save(filename, image_file)
         image_output_obj.save()
 

@@ -7,7 +7,7 @@ from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 
 from atlascope.core.models import Dataset, Investigation, JobRun, JobScript
-from atlascope.core.tasks import spawn_job
+
 
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
@@ -101,7 +101,7 @@ def command(password):
                 db_obj.set_password(password or DEFAULT_PASSWORD)
             db_obj.save()
             if model == JobRun:
-                spawn_job.delay(str(db_obj.id))
+                db_obj.spawn()
                 print('Successfully spawned job run!')
     print('-----')
     print('Dataload complete.')
