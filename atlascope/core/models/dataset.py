@@ -40,6 +40,13 @@ class Dataset(models.Model):
     # scale
     # applicable_heuristics
 
+    def clean(self):
+        super().clean()
+        if self.content is None and (self.source_uri is None or self.importer is None):
+            raise ValidationError(
+                'A Dataset must specify content or specify a source_uri and importer.'
+            )
+
     def get_read_permission_groups():
         return ['view_dataset', 'change_dataset']
 
