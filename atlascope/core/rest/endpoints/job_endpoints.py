@@ -21,7 +21,7 @@ class JobScriptViewSet(
     GenericViewSet,
 ):
     model = JobScript
-    queryset = JobScript.objects.all()
+    queryset = JobScript.objects.all().order_by('name')
     serializer_class = JobScriptSerializer
     permission_classes = [IsAuthenticated]
 
@@ -32,7 +32,7 @@ class JobRunViewSet(
     GenericViewSet,
 ):
     model = JobRun
-    queryset = JobRun.objects.all()
+    queryset = JobRun.objects.all().order_by('id')
     serializer_class = JobRunSerializer
     permission_classes = [IsAuthenticated]
 
@@ -45,7 +45,7 @@ class JobRunViewSet(
                 type=openapi.TYPE_OBJECT,
             )
         ],
-        responses={204: 'Import successful.'},
+        responses={204: 'Spawn successful.'},
     )
     @action(
         detail=False,
@@ -63,7 +63,7 @@ class JobRunViewSet(
 
     @swagger_auto_schema(
         request_body=no_body,
-        responses={204: 'Import successful.'},
+        responses={204: 'Rerun spawned.'},
     )
     @action(detail=True, methods=['POST'])
     def rerun(self, request, **kwargs):

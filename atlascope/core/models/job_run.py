@@ -29,13 +29,15 @@ class JobRunSerializer(serializers.ModelSerializer):
     output_images = serializers.SerializerMethodField('get_output_images')
 
     def get_output_images(self, obj):
-        return [output_image.stored_image for output_image in obj.output_images]
+        return [str(output_image.stored_image) for output_image in obj.output_images.all()]
 
 
 class JobRunSpawnSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobRun
         fields = ['input_image', 'other_inputs', 'script']
+
+    input_image = serializers.CharField()
 
 
 @admin.register(JobRun)
