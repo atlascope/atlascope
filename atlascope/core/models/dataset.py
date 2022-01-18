@@ -23,6 +23,15 @@ def validate_importer(value):
 
 
 class Dataset(models.Model):
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(content__isnull=False)
+                & (models.Q(source_uri__isnull=False) | models.Q(importer__isnull=False)),
+                name='has_no_source',
+            )
+        ]
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
@@ -39,13 +48,6 @@ class Dataset(models.Model):
     derived_datasets = models.ManyToManyField('Dataset', blank=True)
     # scale
     # applicable_heuristics
-
-    def clean(self):
-        super().clean()
-        if self.content is None and (self.source_uri is None or self.importer is None):
-            raise ValidationError(
-                'A Dataset must specify content or specify a source_uri and importer.'
-            )
 
     def get_read_permission_groups():
         return ['view_dataset', 'change_dataset']
