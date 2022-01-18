@@ -8,7 +8,6 @@ from oauth2_provider.models import Application
 
 from atlascope.core.models import Dataset, Investigation, JobRun, JobScript
 
-
 DATALOADER_DIR = 'atlascope/core/management/dataloader/'
 
 MODEL_JSON_MAPPING = [

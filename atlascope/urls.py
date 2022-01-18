@@ -8,10 +8,10 @@ from rest_framework import permissions, routers
 from atlascope.core.rest.endpoints import (
     DatasetViewSet,
     InvestigationViewSet,
+    JobRunViewSet,
+    JobScriptViewSet,
     PinViewSet,
     UserViewSet,
-    JobScriptViewSet,
-    JobRunViewSet,
 )
 
 # OpenAPI generation
