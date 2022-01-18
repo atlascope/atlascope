@@ -8,7 +8,7 @@ from oauth2_provider.models import Application
 
 from atlascope.core.models import Dataset, Investigation, JobRun, JobScript
 
-DATALOADER_DIR = 'atlascope/core/management/dataloader/'
+POPULATE_DIR = 'atlascope/core/management/populate/'
 
 MODEL_JSON_MAPPING = [
     (User, 'users.json'),
@@ -37,7 +37,7 @@ def expand_references(obj, model):
             else:
                 obj[field_name] = remote_model.objects.get(name=value)
         elif hasattr(found_field, 'upload_to'):
-            target_file = open(Path(DATALOADER_DIR, 'inputs', value), 'rb')
+            target_file = open(Path(POPULATE_DIR, 'inputs', value), 'rb')
             files_to_save[field_name] = {
                 'name': value,
                 'contents': target_file,
@@ -81,7 +81,7 @@ def command(password):
         print(f'Deleted all existing {model.__name__}s.')
     for model, filename in MODEL_JSON_MAPPING:
         print('-----')
-        objects = json.load(open(DATALOADER_DIR + filename))
+        objects = json.load(open(POPULATE_DIR + filename))
         for obj in objects:
             obj, many_to_many_values, files_to_save, permissions = expand_references(obj, model)
             db_obj = model(**obj)
