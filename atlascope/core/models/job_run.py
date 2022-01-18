@@ -26,11 +26,6 @@ class JobRunSerializer(serializers.ModelSerializer):
         model = JobRun
         fields = '__all__'
 
-    output_images = serializers.SerializerMethodField('get_output_images')
-
-    def get_output_images(self, obj):
-        return [str(output_image.stored_image) for output_image in obj.output_images.all()]
-
 
 class JobRunSpawnSerializer(serializers.ModelSerializer):
     class Meta:
