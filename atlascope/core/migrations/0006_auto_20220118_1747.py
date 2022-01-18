@@ -17,6 +17,14 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='dataset',
-            constraint=models.CheckConstraint(check=models.Q(('content__isnull', False), models.Q(('source_uri__isnull', False), ('importer__isnull', False), _connector='OR')), name='has_no_source'),
+            constraint=models.CheckConstraint(
+                check=models.Q(
+                    ('content__isnull', False),
+                    models.Q(
+                        ('source_uri__isnull', False), ('importer__isnull', False), _connector='OR'
+                    ),
+                ),
+                name='has_no_source',
+            ),
         ),
     ]
