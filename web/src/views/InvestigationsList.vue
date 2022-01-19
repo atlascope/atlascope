@@ -63,8 +63,8 @@ export default Vue.extend({
     const userInfo = computed(() => store.state.userInfo);
 
     onMounted(async () => {
-      await store.dispatch.fetchInvestigations();
       store.dispatch.unsetCurrentInvestigation();
+      await store.dispatch.fetchInvestigations();
     });
 
     return {

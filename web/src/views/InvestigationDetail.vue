@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType,
+  ref, defineComponent, onMounted, PropType, computed, watch,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import store from '../store';
@@ -70,16 +70,21 @@ export default defineComponent({
     },
   },
 
-  setup(props) {
+  setup(props, context) {
     const map = ref(null);
     const sidebarCollapsed = ref(true);
     const { zoom, center } = useGeoJS(map);
     const datasets = ['Dataset 1', 'Dataset 2', 'Dataset 3'];
     const mainViews = ['context', 'connections'];
+    const lastSelectedPin = computed(() => store.state.lastSelectedPin);
+    watch(lastSelectedPin, (newVal, prevVal) => {
+      console.log({ prevVal, newVal });
+      // use newVal t move the map
+    });
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
-    }
+    };
 
     onMounted(async () => {
       setTimeout(() => center(-0.1704, 51.5047), 2000);

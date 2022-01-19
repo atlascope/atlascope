@@ -12,6 +12,7 @@ export interface State {
     investigations: Investigation[];
     axiosInstance: AxiosInstance | null;
     currentInvestigation: Investigation | null;
+    lastSelectedPin: Object | null;
 }
 
 const {
@@ -26,6 +27,7 @@ const {
     investigations: [],
     axiosInstance: null,
     currentInvestigation: null,
+    lastSelectedPin: null,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -39,6 +41,9 @@ const {
     },
     setAxiosInstance(state, axiosInstance: AxiosInstance | null) {
       state.axiosInstance = axiosInstance;
+    },
+    setLastSelectedPin(state, pin: Object | null) {
+      state.lastSelectedPin = pin;
     },
   },
   getters: {
@@ -101,6 +106,10 @@ const {
     unsetCurrentInvestigation(context) {
       const { commit } = rootActionContext(context);
       commit.setCurrentInvestigation(null);
+    },
+    selectPin(context, pin: Object | null) {
+      const { commit } = rootActionContext(context);
+      commit.setLastSelectedPin(pin);
     },
   },
 });

@@ -26,7 +26,7 @@ export interface Dataset {
   public?: boolean;
 
   /** Source uri */
-  source_uri: string;
+  source_uri?: string | null;
 
   /** Importer */
   importer?: string | null;
@@ -108,12 +108,6 @@ export interface InvestigationDetail {
   /** Observers */
   observers?: string;
 
-  /** Datasets */
-  datasets?: string;
-
-  /** Pins */
-  pins?: string;
-
   /**
    * Created
    * @format date-time
@@ -134,6 +128,8 @@ export interface InvestigationDetail {
 
   /** Notes */
   notes?: string;
+  datasets: string[];
+  pins: string[];
 }
 
 export interface User {
@@ -382,11 +378,11 @@ export namespace Users {
   /**
    * @description Return the currently logged in user's information.
    * @tags users
-   * @name UsersMeRead
+   * @name UsersMe
    * @request GET:/users/me
    * @response `200` `(User)[]`
    */
-  export namespace UsersMeRead {
+  export namespace UsersMe {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = never;
