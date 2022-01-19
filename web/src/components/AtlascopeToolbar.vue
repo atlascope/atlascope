@@ -14,6 +14,8 @@
         </router-link>
       </v-toolbar-title>
       <v-spacer />
+      <v-toolbar-title> {{ investigationName }}</v-toolbar-title>
+      <v-spacer />
       <v-btn
         v-if="userInfo"
         text
@@ -42,18 +44,18 @@ import store from '../store';
 export default defineComponent({
   setup() {
     const oauthClient = inject<OAuthClient>('oauthClient');
-    const axios = inject('axios');
     const userInfo = computed(() => store.state.userInfo);
+    const investigationName = computed(() => store.state.currentInvestigation?.name);
 
     if (oauthClient === undefined) {
       throw new Error('Must provide "oauthClient" into component.');
     }
 
     onMounted(async () => {
-      await store.dispatch.fetchUserInfo(axios);
+      await store.dispatch.fetchUserInfo();
     });
 
-    return { oauthClient, userInfo };
+    return { oauthClient, userInfo, investigationName };
   },
 
   methods: {
