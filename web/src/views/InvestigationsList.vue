@@ -47,9 +47,8 @@
 </template>
 
 <script lang="ts">
-import { AxiosInstance } from 'axios';
 import Vue from 'vue';
-import { computed, inject, onMounted } from '@vue/composition-api';
+import { computed, onMounted } from '@vue/composition-api';
 import LoginBanner from '../components/LoginBanner.vue';
 
 import store from '../store';
@@ -60,18 +59,15 @@ export default Vue.extend({
   },
 
   setup() {
-    const axiosInstance = inject<AxiosInstance>('axios');
     const investigations = computed(() => store.state.investigations);
     const userInfo = computed(() => store.state.userInfo);
 
     onMounted(async () => {
-      if (axiosInstance) {
-        await store.dispatch.fetchInvestigations(axiosInstance);
-      }
+      await store.dispatch.fetchInvestigations();
+      store.dispatch.unsetCurrentInvestigation();
     });
 
     return {
-      axiosInstance,
       investigations,
       userInfo,
     };

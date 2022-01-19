@@ -5,6 +5,7 @@ import Vue from 'vue';
 import VueCompositionAPI from '@vue/composition-api';
 import App from './App.vue';
 import router from './router';
+import store from './store';
 import vuetify from './plugins/vuetify';
 
 Vue.use(VueCompositionAPI);
@@ -26,6 +27,7 @@ Sentry.init({
 oauthClient.maybeRestoreLogin().then(async () => {
   Object.assign(axiosInstance.defaults.headers.common, oauthClient.authHeaders);
 
+  store.dispatch.storeAxiosInstance(axiosInstance);
   new Vue({
     provide: {
       axios: axiosInstance,
