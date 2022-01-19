@@ -1,3 +1,4 @@
+from typing import List
 from uuid import uuid4
 
 from django.contrib import admin
@@ -56,29 +57,21 @@ class InvestigationDetailSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField('get_owner')
     investigators = serializers.SerializerMethodField('get_investigators')
     observers = serializers.SerializerMethodField('get_observers')
-    datasets = serializers.SerializerMethodField('get_datasets')
-    pins = serializers.SerializerMethodField('get_pins')
 
     def get_owner(self, obj):
         return obj.owner.username or None
 
-    def get_investigators(self, obj):
+    def get_investigators(self, obj) -> List[str]:
         return [
             user.username
             for user in get_users_with_perms(obj, only_with_perms_in=['change_investigation'])
         ]
 
-    def get_observers(self, obj):
+    def get_observers(self, obj) -> List[str]:
         return [
             user.username
             for user in get_users_with_perms(obj, only_with_perms_in=['view_investigation'])
         ]
-
-    def get_datasets(self, obj):
-        return []
-
-    def get_pins(self, obj):
-        return []
 
     class Meta:
         model = Investigation
