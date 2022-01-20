@@ -94,5 +94,5 @@ class InvestigationViewSet(
     @object_permission_required(edit_access=True)
     @action(detail=True, methods=['GET'])
     def pins(self, request, pk=None):
-        payload = {pin.id: PinSerializer(pin).data for pin in self.get_object().pins.all()}
+        payload = {str(pin.id): PinSerializer(pin).data for pin in self.get_object().pins.all()}
         return Response(payload, status=status.HTTP_200_OK)

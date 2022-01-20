@@ -1,6 +1,10 @@
 import pytest
 
-from atlascope.core.models.dataset import DatasetSerializer
+from atlascope.core.models import (
+    DatasetSerializer,
+    InvestigationDetailSerializer,
+    PinSerializer,
+)
 from atlascope.core.rest.permissions import has_read_perm
 
 # ------------------------------------------------------------------
@@ -101,6 +105,7 @@ def test_retrieve_investigation(user_api_client, user, user_factory, investigati
     )
     if has_read_perm(user, investigation):
         assert resp.status_code == 200
+        assert resp.json() == InvestigationDetailSerializer(investigation).data
     else:
         assert resp.status_code == 404
 
@@ -123,6 +128,20 @@ def test_change_investigation_permissions(user_api_client, user, user_factory, i
     )
     assert resp.status_code == 200
     assert resp.data == new_permissions
+
+
+@pytest.mark.django_db
+def test_get_investigation_pins(user_api_client, user, investigation, pin_factory):
+    pin_set = [pin_factory() for i in range(5)]
+    investigation.pins.set(pin_set)
+    resp = user_api_client(investigation=investigation).get(
+        f'/api/v1/investigations/{investigation.id}/pins'
+    )
+    if has_read_perm(user, investigation):
+        assert resp.status_code == 200
+        assert resp.json() == {str(pin.id): PinSerializer(pin).data for pin in pin_set}
+    else:
+        assert resp.status_code == 404
 
 
 # ------------------------------------------------------------------
