@@ -9,6 +9,8 @@ from atlascope.core.rest.endpoints import (
     AtlascopeConfigView,
     DatasetViewSet,
     InvestigationViewSet,
+    JobRunViewSet,
+    JobScriptViewSet,
     PinViewSet,
     UserViewSet,
 )
@@ -27,6 +29,8 @@ for model_name, viewset in [
     ('investigation', InvestigationViewSet),
     ('dataset', DatasetViewSet),
     ('pin', PinViewSet),
+    ('job-script', JobScriptViewSet),
+    ('job-run', JobRunViewSet),
 ]:
     router.register(f'{model_name}s', viewset, basename=model_name)
 
