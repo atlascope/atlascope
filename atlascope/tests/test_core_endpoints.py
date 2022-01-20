@@ -1,8 +1,20 @@
 import pytest
+from pytest_unordered import unordered
 
 from atlascope.core import models
 from atlascope.core.rest.additional_serializers import UserSerializer
 from atlascope.core.rest.permissions import has_read_perm
+
+# ------------------------------------------------------------------
+# GLOBAL ENDPOINT TESTS
+
+
+@pytest.mark.django_db
+def test_get_config(least_perm_api_client):
+    resp = least_perm_api_client().get('/api/v1/configuration')
+    assert resp.status_code == 200
+    assert resp.json() == {'dataset_importer_options': ['vandy']}
+
 
 # ------------------------------------------------------------------
 # USER ENDPOINT TESTS
@@ -10,17 +22,15 @@ from atlascope.core.rest.permissions import has_read_perm
 
 @pytest.mark.django_db
 def test_list_users(least_perm_api_client, user, user_factory):
-    users = [user_factory() for i in range(3)] + [user]
-    users.sort(key=lambda u: u.username)
+    users = [user_factory() for i in range(5)] + [user]
     expected_results = [UserSerializer(u).data for u in users]
     resp = least_perm_api_client().get('/api/v1/users')
     assert resp.status_code == 200
-    assert resp.json()['results'] == expected_results
     assert resp.json() == {
         'count': len(expected_results),
         'next': None,
         'previous': None,
-        'results': expected_results,
+        'results': unordered(expected_results),
     }
 
 
@@ -57,16 +67,10 @@ def test_retrieve_me(least_perm_api_client, user):
 
 @pytest.mark.django_db
 def test_list_investigations(user_api_client, user, investigation_factory):
-    investigations = [investigation_factory() for i in range(3)]
-    investigations.sort(key=lambda i: i.name)
+    investigations = [investigation_factory() for i in range(5)]
     user_api_client = user_api_client(investigation=investigations[0])
     expected_results = [
-        {
-            'id': i.id,
-            'name': i.name,
-            'description': i.description,
-            'owner': i.owner.username,
-        }
+        models.InvestigationSerializer(i).data
         for i in (
             investigations
             if user.is_superuser
@@ -81,7 +85,7 @@ def test_list_investigations(user_api_client, user, investigation_factory):
         'count': len(expected_results),
         'next': None,
         'previous': None,
-        'results': expected_results,
+        'results': unordered(expected_results),
     }
 
 
@@ -93,6 +97,7 @@ def test_retrieve_investigation(user_api_client, user, user_factory, investigati
     )
     if has_read_perm(user, investigation):
         assert resp.status_code == 200
+        assert resp.json() == models.InvestigationDetailSerializer(investigation).data
     else:
         assert resp.status_code == 404
 
@@ -123,8 +128,7 @@ def test_change_investigation_permissions(user_api_client, user, user_factory, i
 
 @pytest.mark.django_db
 def test_list_datasets(user_api_client, user, dataset_factory):
-    datasets = [dataset_factory() for i in range(3)]
-    datasets.sort(key=lambda d: d.name)
+    datasets = [dataset_factory() for i in range(5)]
     user_api_client = user_api_client(dataset=datasets[0])
     expected_results = [
         models.DatasetSerializer(d).data
@@ -138,7 +142,7 @@ def test_list_datasets(user_api_client, user, dataset_factory):
         'count': len(expected_results),
         'next': None,
         'previous': None,
-        'results': expected_results,
+        'results': unordered(expected_results),
     }
 
 
@@ -163,6 +167,13 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
         assert resp_private.status_code == 404
 
 
+@pytest.mark.django_db
+def test_create_dataset(least_perm_api_client):
+    dataset = {'name': 'Test', 'importer': 'vandy', 'source_uri': 'fake.uri'}
+    resp = least_perm_api_client().post(f'/api/v1/datasets', dataset)
+    assert resp.status_code == 201
+
+
 # ------------------------------------------------------------------
 # JOB ENDPOINT TESTS
 
@@ -170,7 +181,6 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
 @pytest.mark.django_db
 def test_list_job_runs(least_perm_api_client, job_run_factory):
     job_runs = [job_run_factory() for i in range(1)]
-    job_runs.sort(key=lambda jr: str(jr.id))
     expected_results = [models.JobRunSerializer(job_run).data for job_run in job_runs]
     resp = least_perm_api_client().get('/api/v1/job-runs')
     assert resp.status_code == 200
@@ -178,7 +188,7 @@ def test_list_job_runs(least_perm_api_client, job_run_factory):
         'count': len(expected_results),
         'next': None,
         'previous': None,
-        'results': expected_results,
+        'results': unordered(expected_results),
     }
 
 
@@ -191,15 +201,12 @@ def test_retrieve_job_run(least_perm_api_client, job_run):
 
 @pytest.mark.django_db
 def test_spawn_job_run(least_perm_api_client, job_script, green_cell_upload):
-    serializer = models.JobRunSpawnSerializer(
-        data={
-            'input_image': green_cell_upload,
-            'other_inputs': {},
-            'script': str(job_script.id),
-        }
-    )
-    assert serializer.is_valid()
-    resp = least_perm_api_client().post('/api/v1/job-runs/spawn', data=serializer.data)
+    data = {
+        'input_image': green_cell_upload,
+        'other_inputs': {},
+        'script': str(job_script.id),
+    }
+    resp = least_perm_api_client().post('/api/v1/job-runs/spawn', data)
     assert resp.status_code == 201
 
 
@@ -212,7 +219,6 @@ def test_rerun_job_run(least_perm_api_client, job_run):
 @pytest.mark.django_db
 def test_list_job_scripts(least_perm_api_client, job_script_factory):
     job_script = [job_script_factory() for i in range(1)]
-    job_script.sort(key=lambda js: js.name)
     expected_results = [models.JobScriptSerializer(job_script).data for job_script in job_script]
     resp = least_perm_api_client().get('/api/v1/job-scripts')
     assert resp.status_code == 200
@@ -220,5 +226,5 @@ def test_list_job_scripts(least_perm_api_client, job_script_factory):
         'count': len(expected_results),
         'next': None,
         'previous': None,
-        'results': expected_results,
+        'results': unordered(expected_results),
     }
