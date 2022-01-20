@@ -12,6 +12,7 @@ from atlascope.core.models import (
     Investigation,
     InvestigationDetailSerializer,
     InvestigationSerializer,
+    PinSerializer,
 )
 from atlascope.core.rest.permissions import object_permission_required
 
@@ -88,4 +89,10 @@ class InvestigationViewSet(
 
         payload = InvestigationDetailSerializer(investigation).data
         payload = {k: v for k, v in payload.items() if k in ['owner', 'investigators', 'observers']}
+        return Response(payload, status=status.HTTP_200_OK)
+
+    @object_permission_required(edit_access=True)
+    @action(detail=True, methods=['GET'])
+    def pins(self, request, pk=None):
+        payload = {pin.id: PinSerializer(pin).data for pin in self.get_object().pins.all()}
         return Response(payload, status=status.HTTP_200_OK)
