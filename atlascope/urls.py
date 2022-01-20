@@ -6,6 +6,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions, routers
 
 from atlascope.core.rest.endpoints import (
+    AtlascopeConfigView,
     DatasetViewSet,
     InvestigationViewSet,
     PinViewSet,
@@ -35,6 +36,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/s3-upload/', include('s3_file_field.urls')),
     path('api/v1/', include(router.urls)),
+    path('api/v1/configuration/', AtlascopeConfigView.as_view()),
     path('api/docs/redoc/', schema_view.with_ui('redoc'), name='docs-redoc'),
     path('api/docs/swagger/', schema_view.with_ui('swagger'), name='docs-swagger'),
     path('api/v1/', include('atlascope.core.rest.endpoints.tile_endpoints')),
