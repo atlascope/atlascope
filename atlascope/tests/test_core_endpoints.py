@@ -170,7 +170,7 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
 @pytest.mark.django_db
 def test_create_dataset(least_perm_api_client):
     dataset = {'name': 'Test', 'importer': 'vandy', 'source_uri': 'fake.uri'}
-    resp = least_perm_api_client().post(f'/api/v1/datasets', dataset)
+    resp = least_perm_api_client().post('/api/v1/datasets', dataset)
     assert resp.status_code == 201
 
 

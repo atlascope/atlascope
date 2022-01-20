@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import Dataset, DatasetSerializer, CreateDatasetSerializer
+from atlascope.core.models import CreateDatasetSerializer, Dataset, DatasetSerializer
 from atlascope.core.rest.permissions import object_permission_required
 
 
