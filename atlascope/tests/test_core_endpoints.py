@@ -1,10 +1,6 @@
 import pytest
 
-from atlascope.core.models import (
-    DatasetSerializer,
-    InvestigationDetailSerializer,
-    PinSerializer,
-)
+from atlascope.core.models import DatasetSerializer, InvestigationDetailSerializer, PinSerializer
 from atlascope.core.rest.permissions import has_read_perm
 
 # ------------------------------------------------------------------
