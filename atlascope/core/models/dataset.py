@@ -66,6 +66,21 @@ class DatasetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CreateDatasetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dataset
+        fields = [
+            'name',
+            'description',
+            'public',
+            'source_uri',
+            'importer',
+            'content',
+        ]
+
+    content = serializers.CharField(required=False)
+
+
 @admin.register(Dataset)
 class DatasetAdmin(GuardedModelAdmin):
     list_display = ('id', 'source_uri')

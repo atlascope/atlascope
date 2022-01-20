@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import Dataset, DatasetSerializer
+from atlascope.core.models import Dataset, DatasetSerializer, CreateDatasetSerializer
 from atlascope.core.rest.permissions import object_permission_required
 
 
@@ -29,6 +29,13 @@ class DatasetViewSet(
         public_datasets = Dataset.objects.filter(public=True)
         datasets = visible_datasets | public_datasets
         return datasets.all().order_by('name')
+
+    @swagger_auto_schema(request_body=CreateDatasetSerializer)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         request_body=no_body,
