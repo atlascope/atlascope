@@ -4,7 +4,7 @@ import numpy as np
 """
 Main function of image analysis job
 - Accepts input image (as a pillow Image) and additional kwargs.
-- Should return an array of one or more outputs.
+- Should return a dict of one or more outputs.
 - Any outputs that are pillow Images will be saved as image outputs.
 - Any other output types must be JSON serializable.
 """
@@ -39,7 +39,7 @@ def main(input_image, **kwargs):
         )
         draw.ellipse(bounding_box, outline=(255, 0, 0), width=3)
 
-    return [
-        output_image,
-        brightest,
-    ]
+    return {
+        'pixel_locations': brightest,
+        'circled_locations': output_image,
+    }
