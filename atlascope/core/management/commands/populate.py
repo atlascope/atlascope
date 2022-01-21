@@ -102,5 +102,10 @@ def command(password):
             if model == JobRun:
                 db_obj.spawn()
                 print('Successfully spawned job run!')
+            if model == Dataset and db_obj.source_uri:
+                print("performing import")
+                db_obj.perform_import()
+                print("import completed")
+
     print('-----')
     print('Dataload complete.')
