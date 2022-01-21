@@ -6,9 +6,9 @@ import requests
 
 def run(source_uri=None):
     params = {'key': os.environ.get('DJANGO_API_TOKEN')}
-    tokenUrl = "https://styx.neurology.emory.edu/girder/api/v1/api_key/token"
+    token_url = "https://styx.neurology.emory.edu/girder/api/v1/api_key/token"
 
-    token = requests.post(tokenUrl, params=params).json()["authToken"]["token"]
+    token = requests.post(token_url, params=params).json()["authToken"]["token"]
 
     headers = {'girder-token': token}
 
