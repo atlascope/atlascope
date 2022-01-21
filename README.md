@@ -15,6 +15,11 @@ This is the simplest configuration for developers to start with.
 3. Access the browseable API, starting at http://localhost:8000/api/v1/
 4. When finished, use `Ctrl+C`
 
+### Run Populate Script
+1. Get API Token from https://styx.neurology.emory.edu/girder/
+2. Run script:
+`docker-compose run -e DJANGO_API_TOKEN=[your token] --rm django ./manage.py populate`
+
 ### Application Maintenance
 Occasionally, new package dependencies or schema changes will necessitate
 maintenance. To non-destructively update your development stack at any time:
