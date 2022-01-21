@@ -2,7 +2,14 @@
     {
         "name": "Vandy Dataset",
         "description": "This is the test dataset from the VANDY Explorer",
-        "source_uri": "https://fake-api/access/for/fake/dataset",
-        "importer": "vandy"
+        "source_uri": "https://styx.neurology.emory.edu/girder/api/v1/file/60e84a1868f4fe34fc7eef72/download",
+        "importer": "vandy",
+        "extension": "tif"
+    },
+    {
+        "name": "Vandy2 Dataset",
+        "description": "This is the test dataset from the VANDY Explorer",
+        "content": "HTA9_1_BA_F_ROI02.ome.tif",
+        "extension": "tif"
     }
 ]

@@ -27,7 +27,7 @@ class Dataset(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=models.Q(content__isnull=False)
-                & (models.Q(source_uri__isnull=False) | models.Q(importer__isnull=False)),
+                | (models.Q(source_uri__isnull=False) & models.Q(importer__isnull=False)),
                 name='has_no_source',
             )
         ]
@@ -39,6 +39,7 @@ class Dataset(models.Model):
     source_uri = models.CharField(max_length=3000, null=True, blank=True)
     importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
     content = S3FileField(null=True)
+    extension = models.CharField(max_length=20, default='file')
     metadata = models.JSONField(null=True)
     dataset_type = models.CharField(
         max_length=20,
@@ -57,7 +58,8 @@ class Dataset(models.Model):
 
     def perform_import(self):
         importer = importers[self.importer]
-        importer(self.source_uri)
+        imported_content = importer(self.source_uri)
+        self.content.save(f'{self.name.replace(" ","_")}.{self.extension}', imported_content)
 
 
 class DatasetSerializer(serializers.ModelSerializer):
