@@ -1,6 +1,7 @@
-import requests
 import io
 import os
+
+import requests
 
 
 def run(source_uri=None):
