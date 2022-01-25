@@ -4,9 +4,28 @@
     fluid
     fill-height
   >
+    <v-row class="ma-2 pa-0">
+      <v-col
+        class="ma-0 pa-0"
+        cols="auto"
+      >
+        <v-select
+          v-model="activeDataset"
+          class="atlascope-dataset-select"
+          :items="datasets"
+          item-text="name"
+          item-value="id"
+          return-object
+          single-line
+          dense
+          hide-details
+          @change="activeDatasetChanged"
+        />
+      </v-col>
+    </v-row>
     <v-row class="ma-0 pa-0">
       <v-col class="ma-0 pa-0">
-        <v-sheet height="90vh">
+        <v-sheet height="85vh">
           <div
             ref="map"
             class="map"
@@ -18,7 +37,7 @@
         class="ma-0 pa-0"
       >
         <v-sheet
-          height="90vh"
+          height="85vh"
           color="teal"
         >
           <v-btn
@@ -50,11 +69,12 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType,
+  ref, defineComponent, onMounted, PropType, computed, Ref
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
+import { Dataset } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
   name: 'InvestigationDetail',
@@ -73,21 +93,36 @@ export default defineComponent({
   setup(props) {
     const map = ref(null);
     const sidebarCollapsed = ref(true);
+    const activeDataset: Ref<Dataset | null> = ref(null);
     const { zoom, center } = useGeoJS(map);
-    const datasets = ['Dataset 1', 'Dataset 2', 'Dataset 3'];
     const mainViews = ['context', 'connections'];
+
+    const investigationDetail = computed(() => store.state.currentInvestigation);
+    const datasets = computed(() => store.state.currentDatasets);
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
+    }
+
+    function activeDatasetChanged(newActiveDataset: Dataset) {
+      store.dispatch.setActiveDataset(newActiveDataset);
     }
 
     onMounted(async () => {
       setTimeout(() => center(-0.1704, 51.5047), 2000);
       setTimeout(() => zoom(14), 3000);
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
+      activeDataset.value = store.state.activeDataset;
     });
     return {
-      map, datasets, mainViews, sidebarCollapsed, toggleSidebar,
+      map,
+      datasets,
+      mainViews,
+      sidebarCollapsed,
+      toggleSidebar,
+      investigationDetail,
+      activeDataset,
+      activeDatasetChanged,
     };
   },
 });
