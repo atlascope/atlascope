@@ -3,7 +3,9 @@ import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance } from 'axios';
-import { User, Investigation } from '../generatedTypes/AtlascopeTypes';
+import {
+  User, Investigation, InvestigationDetail, Dataset,
+} from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
 
@@ -11,7 +13,9 @@ export interface State {
     userInfo: User | null;
     investigations: Investigation[];
     axiosInstance: AxiosInstance | null;
-    currentInvestigation: Investigation | null;
+    currentInvestigation: InvestigationDetail | null;
+    currentDatasets: Dataset[];
+    activeDataset: Dataset | null;
 }
 
 const {
@@ -26,12 +30,14 @@ const {
     investigations: [],
     axiosInstance: null,
     currentInvestigation: null,
+    currentDatasets: [],
+    activeDataset: null,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
       state.investigations = investigations;
     },
-    setCurrentInvestigation(state, currentInvestigation: Investigation | null) {
+    setCurrentInvestigation(state, currentInvestigation: InvestigationDetail | null) {
       state.currentInvestigation = currentInvestigation;
     },
     setUserInfo(state, userInfo: User | null) {
@@ -39,6 +45,13 @@ const {
     },
     setAxiosInstance(state, axiosInstance: AxiosInstance | null) {
       state.axiosInstance = axiosInstance;
+    },
+    setCurrentDatasets(state, datasets: Dataset[]) {
+      state.currentDatasets = datasets;
+    },
+    setActiveDataset(state, dataset: Dataset | null) {
+      // TODO: what does it mean to have a null active dataset?
+      state.activeDataset = dataset;
     },
   },
   getters: {
@@ -62,6 +75,12 @@ const {
       }
       return [];
     },
+    datasets(state: State): string[] {
+      if (state.currentInvestigation !== null) {
+        return state.currentInvestigation.datasets;
+      }
+      return [];
+    },
   },
   actions: {
     async fetchInvestigations(context) {
@@ -78,6 +97,19 @@ const {
       if (store.state.axiosInstance) {
         const investigation = (await store.state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
+
+        if (store.state.currentInvestigation) {
+          const datasetPromises: (Promise<any> | undefined)[] = [];
+          store.state.currentInvestigation.datasets.forEach((datasetId) => {
+            datasetPromises.push(store.state.axiosInstance?.get(`/datasets/${datasetId}`));
+          });
+          const datasets = (await Promise.all(datasetPromises)).map((response) => response.data);
+          commit.setCurrentDatasets(datasets);
+
+          const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
+          const activeDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
+          commit.setActiveDataset(activeDataset);
+        }
       } else {
         commit.setCurrentInvestigation(null);
       }
@@ -88,6 +120,10 @@ const {
         const userInfo = (await store.state.axiosInstance.get('/users/me')).data;
         commit.setUserInfo(userInfo);
       }
+    },
+    setActiveDataset(context, dataset: Dataset | null) {
+      const { commit } = rootActionContext(context);
+      commit.setActiveDataset(dataset);
     },
     logout(context) {
       const { commit } = rootActionContext(context);
@@ -101,6 +137,8 @@ const {
     unsetCurrentInvestigation(context) {
       const { commit } = rootActionContext(context);
       commit.setCurrentInvestigation(null);
+      commit.setCurrentDatasets([]);
+      commit.setActiveDataset(null);
     },
   },
 });
