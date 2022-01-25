@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType, computed, Ref
+  ref, defineComponent, onMounted, PropType, computed, Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import store from '../store';
