@@ -94,7 +94,7 @@ export default defineComponent({
     const map = ref(null);
     const sidebarCollapsed = ref(true);
     const activeDataset: Ref<Dataset | null> = ref(null);
-    const { zoom, center, updateBaseLayerDataset } = useGeoJS(map);
+    const { updateBaseLayerDataset } = useGeoJS(map);
     const mainViews = ['context', 'connections'];
 
     const investigationDetail = computed(() => store.state.currentInvestigation);

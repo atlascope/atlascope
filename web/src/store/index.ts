@@ -2,9 +2,9 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  User, Investigation, InvestigationDetail, Dataset,
+  User, Investigation, InvestigationDetail, Dataset, TileMetadata,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
@@ -99,9 +99,12 @@ const {
         commit.setCurrentInvestigation(investigation);
 
         if (store.state.currentInvestigation) {
-          const datasetPromises: (Promise<any> | undefined)[] = [];
+          const datasetPromises: Promise<AxiosResponse>[] = [];
           store.state.currentInvestigation.datasets.forEach((datasetId) => {
-            datasetPromises.push(store.state.axiosInstance?.get(`/datasets/${datasetId}`));
+            const promise = store.state.axiosInstance?.get(`/datasets/${datasetId}`);
+            if (promise) {
+              datasetPromises.push(promise);
+            }
           });
           const datasets = (await Promise.all(datasetPromises)).map((response) => response.data);
           commit.setCurrentDatasets(datasets);
@@ -124,12 +127,10 @@ const {
       const { commit } = rootActionContext(context);
       commit.setActiveDataset(dataset);
     },
-    async fetchDatasetMetadata(context, datasetId: string): Promise<any> {
-      const { commit } = rootActionContext(context);
+    async fetchDatasetMetadata(_context, datasetId: string): Promise<TileMetadata | null> {
       if (store.state.axiosInstance) {
         const url = `/datasets/${datasetId}/tiles/metadata`;
         const metadata = (await store.state.axiosInstance.get(url)).data;
-        console.log(metadata);
         return metadata;
       }
       return null;

@@ -40,22 +40,26 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   };
 
   const updateBaseLayerDataset = async (datasetId: string) => {
+    const tileSourceMetadata = await store.dispatch.fetchDatasetMetadata(datasetId);
+    if (!tileSourceMetadata) {
+      return;
+    }
+
     // Destroy this map
     map.value.exit();
-    const tileSourceMetadata = await store.dispatch.fetchDatasetMetadata(datasetId);
-    let geojsParams = geo.util.pixelCoordinateParams(
+    const geojsParams = geo.util.pixelCoordinateParams(
       element.value,
       tileSourceMetadata.size_x,
       tileSourceMetadata.size_y,
       tileSourceMetadata.tile_size,
-      tileSourceMetadata.tile_size
+      tileSourceMetadata.tile_size,
     );
     const apiRoot = process.env.VUE_APP_API_ROOT;
     geojsParams.layer.url = `${apiRoot}/datasets/${datasetId}/tiles/{z}/{x}/{y}.png`;
     geojsParams.layer.crossDomain = 'use-credentials';
     map.value = geo.map(geojsParams.map);
     map.value.createLayer('osm', geojsParams.layer);
-  }
+  };
 
   return {
     map, center, zoom, zoomLevel, xCoord, yCoord, updateBaseLayerDataset,
