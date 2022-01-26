@@ -94,7 +94,7 @@ export default defineComponent({
     const map = ref(null);
     const sidebarCollapsed = ref(true);
     const activeDataset: Ref<Dataset | null> = ref(null);
-    const { updateBaseLayerDataset } = useGeoJS(map);
+    const { zoom } = useGeoJS(map);
     const mainViews = ['context', 'connections'];
 
     const investigationDetail = computed(() => store.state.currentInvestigation);
@@ -111,9 +111,7 @@ export default defineComponent({
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       activeDataset.value = store.state.activeDataset;
-      if (store?.state.activeDataset?.id) {
-        updateBaseLayerDataset(store.state.activeDataset.id);
-      }
+      setTimeout(() => zoom(6), 2500);
     });
     return {
       map,

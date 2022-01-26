@@ -1,5 +1,5 @@
 import {
-  ref, onMounted, Ref,
+  ref, onMounted, Ref, watch, computed,
 } from '@vue/composition-api';
 
 import geo from 'geojs';
@@ -10,6 +10,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const zoomLevel = ref(0);
   const xCoord = ref(0);
   const yCoord = ref(0);
+  const activeDataset = computed(() => store.state.activeDataset);
 
   onMounted(() => {
     // `element.value` should always be an `HTMLElement` (not `null`)
@@ -19,7 +20,6 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     // check if valid DOM element is passed.
     if (element.value !== null) {
       map.value = geo.map({ node: element.value });
-      map.value.createLayer('osm');
       zoomLevel.value = map.value.zoom();
     }
   });
@@ -58,8 +58,18 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     geojsParams.layer.url = `${apiRoot}/datasets/${datasetId}/tiles/{z}/{x}/{y}.png`;
     geojsParams.layer.crossDomain = 'use-credentials';
     map.value = geo.map(geojsParams.map);
+    map.value.clampBoundsX(false);
     map.value.createLayer('osm', geojsParams.layer);
   };
+
+  watch(activeDataset, (newValue) => {
+    if (!newValue?.id) {
+      // Tear down the map if activeDataset goes to null
+      map.value.exit();
+    } else {
+      updateBaseLayerDataset(newValue.id);
+    }
+  });
 
   return {
     map, center, zoom, zoomLevel, xCoord, yCoord, updateBaseLayerDataset,
