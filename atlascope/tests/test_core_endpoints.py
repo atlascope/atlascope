@@ -127,7 +127,7 @@ def test_get_investigation_pins(user_api_client, user, investigation, pin_factor
     )
     if has_read_perm(user, investigation):
         assert resp.status_code == 200
-        assert resp.json() == {str(pin.id): models.PinSerializer(pin).data for pin in pin_set}
+        assert resp.json() == [models.PinSerializer(pin).data for pin in pin_set]
     else:
         assert resp.status_code == 404
 
