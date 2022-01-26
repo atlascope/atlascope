@@ -114,16 +114,32 @@ const {
         commit.setCurrentInvestigation(null);
       }
     },
+    unsetCurrentInvestigation(context) {
+      const { commit } = rootActionContext(context);
+      commit.setCurrentInvestigation(null);
+      commit.setCurrentDatasets([]);
+      commit.setActiveDataset(null);
+    },
+    setActiveDataset(context, dataset: Dataset | null) {
+      const { commit } = rootActionContext(context);
+      commit.setActiveDataset(dataset);
+    },
+    async fetchDatasetMetadata(context, datasetId: string): Promise<any> {
+      const { commit } = rootActionContext(context);
+      if (store.state.axiosInstance) {
+        const url = `/datasets/${datasetId}/tiles/metadata`;
+        const metadata = (await store.state.axiosInstance.get(url)).data;
+        console.log(metadata);
+        return metadata;
+      }
+      return null;
+    },
     async fetchUserInfo(context) {
       const { commit } = rootActionContext(context);
       if (store.state.axiosInstance) {
         const userInfo = (await store.state.axiosInstance.get('/users/me')).data;
         commit.setUserInfo(userInfo);
       }
-    },
-    setActiveDataset(context, dataset: Dataset | null) {
-      const { commit } = rootActionContext(context);
-      commit.setActiveDataset(dataset);
     },
     logout(context) {
       const { commit } = rootActionContext(context);
@@ -133,12 +149,6 @@ const {
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
-    },
-    unsetCurrentInvestigation(context) {
-      const { commit } = rootActionContext(context);
-      commit.setCurrentInvestigation(null);
-      commit.setCurrentDatasets([]);
-      commit.setActiveDataset(null);
     },
   },
 });
