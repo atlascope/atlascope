@@ -26,8 +26,7 @@ class Dataset(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=models.Q(content__isnull=False)
-                | (models.Q(source_uri__isnull=False) & models.Q(importer__isnull=False)),
+                check=models.Q(content__isnull=False) | models.Q(importer__isnull=False),
                 name='has_no_source',
             )
         ]
@@ -36,7 +35,6 @@ class Dataset(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     public = models.BooleanField(default=True)
-    source_uri = models.CharField(max_length=3000, null=True, blank=True)
     importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
     content = S3FileField(null=True)
     extension = models.CharField(max_length=20, default='file')
@@ -70,4 +68,4 @@ class DatasetSerializer(serializers.ModelSerializer):
 
 @admin.register(Dataset)
 class DatasetAdmin(GuardedModelAdmin):
-    list_display = ('id', 'source_uri')
+    list_display = ('id', 'name')
