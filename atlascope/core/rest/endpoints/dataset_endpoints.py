@@ -1,4 +1,5 @@
-from drf_yasg.utils import no_body, swagger_auto_schema
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
 from rest_framework.decorators import action
@@ -30,21 +31,41 @@ class DatasetViewSet(
         datasets = visible_datasets | public_datasets
         return datasets.all().order_by('name')
 
-    @swagger_auto_schema(
-        request_body=no_body,
-        responses={204: 'Import successful.'},
-    )
-    @object_permission_required(model=Dataset)
-    @action(
-        detail=True,
-        methods=['POST'],
-        url_path='import',
-    )
-    def perform_import(self, request, **kwargs):
-        dataset: Dataset = self.get_object()
-        try:
-            dataset.perform_import()
-        except Exception as e:
-            raise APIException(str(e))
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_dataset_obj = serializer.save()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if not new_dataset_obj.content:
+            if not new_dataset_obj.importer:
+                raise APIException("Missing required fields: Specify either content or importer.")
+            if 'importer_arguments' not in request.data:
+                raise APIException(
+                    "Missing required fields: Specify importer_arguments as a nested object."
+                )
+            new_dataset_obj.perform_import(**request.data['importer_arguments'])
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    # @swagger_auto_schema(
+    #     # TODO: Is there a way to suggest body schema here?
+    #     request_body=openapi.Schema(
+    #         type=openapi.TYPE_OBJECT,
+    #         properties={},
+    #     ),
+    #     responses={204: 'Import successful.'},
+    # )
+    # @object_permission_required(model=Dataset)
+    # @action(
+    #     detail=True,
+    #     methods=['POST'],
+    #     url_path='import',
+    # )
+    # def perform_import(self, request, **kwargs):
+    #     dataset: Dataset = self.get_object()
+    #     try:
+    #         dataset.perform_import(**kwargs)
+    #     except Exception as e:
+    #         raise APIException(str(e))
+
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
