@@ -21,7 +21,6 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     id = factory.Faker('uuid4')
     name = factory.Faker('word')
     description = factory.Faker('sentence')
-    source_uri = factory.Faker('file_path')
     public = factory.Faker('boolean')
     importer = factory.Faker('word')
     content = None
