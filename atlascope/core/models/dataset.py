@@ -16,7 +16,7 @@ def validate_importer(value):
         return value
     else:
         raise ValidationError(
-            f'Importer value must be'
+            f'Importer value must be '
             f'one of the following installed importers'
             f': {str(list(importers.keys()))}'
         )
@@ -56,7 +56,7 @@ class Dataset(models.Model):
 
     def perform_import(self, **kwargs):
         importer = importers[self.importer]()
-        importer.perform_import(**kwargs)
+        importer.run(**kwargs)
 
         self.content.save(
             f'{self.name.replace(" ","_")}.{self.extension}',
