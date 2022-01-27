@@ -54,10 +54,15 @@ class Dataset(models.Model):
     def get_write_permission_groups():
         return ['change_dataset']
 
-    def perform_import(self):
-        importer = importers[self.importer]
-        imported_content = importer(self.source_uri)
-        self.content.save(f'{self.name.replace(" ","_")}.{self.extension}', imported_content)
+    def perform_import(self, **kwargs):
+        importer = importers[self.importer]()
+        importer.perform_import(**kwargs)
+
+        self.content.save(
+            f'{self.name.replace(" ","_")}.{self.extension}',
+            importer.content,
+        )
+        self.metadata = importer.metadata
 
 
 class DatasetSerializer(serializers.ModelSerializer):

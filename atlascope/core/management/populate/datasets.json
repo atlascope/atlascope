@@ -1,13 +1,16 @@
 [
     {
-        "name": "Vandy Dataset",
+        "name": "Remote Vandy Dataset",
         "description": "This is the test dataset from the VANDY Explorer",
-        "source_uri": "https://styx.neurology.emory.edu/girder/api/v1/file/60e84a1868f4fe34fc7eef72/download",
-        "importer": "vandy",
-        "extension": "tif"
+        "importer": "VandyImporter",
+        "extension": "tif",
+        "kwargs": {
+            "source_uri": "https://styx.neurology.emory.edu/girder/api/v1/file/60e84a1868f4fe34fc7eef72/download",
+            "token_url": "https://styx.neurology.emory.edu/girder/api/v1/api_key/token"
+        }
     },
     {
-        "name": "Vandy2 Dataset",
+        "name": "Local Vandy Dataset",
         "description": "This is the test dataset from the VANDY Explorer",
         "content": "HTA9_1_BA_F_ROI02.ome.tif",
         "extension": "tif"

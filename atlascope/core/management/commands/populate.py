@@ -83,6 +83,9 @@ def command(password):
         print('-----')
         objects = json.load(open(POPULATE_DIR + filename))
         for obj in objects:
+            if 'kwargs' in obj:
+                kwargs = obj['kwargs']
+                del obj['kwargs']
             obj, many_to_many_values, files_to_save, permissions = expand_references(obj, model)
             db_obj = model(**obj)
             db_obj.save()
@@ -102,10 +105,10 @@ def command(password):
             if model == JobRun:
                 db_obj.spawn()
                 print('Successfully spawned job run!')
-            if model == Dataset and db_obj.source_uri:
-                print("performing import")
-                db_obj.perform_import()
-                print("import completed")
+            if model == Dataset and not db_obj.content:
+                print("  performing import...")
+                db_obj.perform_import(**kwargs)
+                print("  import complete!")
 
     print('-----')
     print('Dataload complete.')
