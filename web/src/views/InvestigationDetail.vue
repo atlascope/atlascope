@@ -10,9 +10,10 @@
         cols="auto"
       >
         <v-select
+          v-if="!loaded || tilesourceDatasets.length > 0"
           v-model="activeDataset"
           class="atlascope-dataset-select"
-          :items="datasets"
+          :items="tilesourceDatasets"
           item-text="name"
           item-value="id"
           return-object
@@ -21,6 +22,15 @@
           hide-details
           @change="activeDatasetChanged"
         />
+        <v-banner
+          v-if="loaded && tilesourceDatasets.length === 0"
+          single-line
+        >
+          <v-icon left>
+            mdi-alert
+          </v-icon>
+          No tilesource datasets found for this investigation.
+        </v-banner>
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -69,7 +79,7 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType, computed, Ref,
+  ref, defineComponent, onMounted, PropType, computed,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import store from '../store';
@@ -92,13 +102,11 @@ export default defineComponent({
 
   setup(props) {
     const map = ref(null);
-    const sidebarCollapsed = ref(true);
-    const activeDataset: Ref<Dataset | null> = ref(null);
     const { zoom } = useGeoJS(map);
-    const mainViews = ['context', 'connections'];
-
-    const investigationDetail = computed(() => store.state.currentInvestigation);
-    const datasets = computed(() => store.state.currentDatasets);
+    const loaded = ref(false);
+    const sidebarCollapsed = ref(true);
+    const activeDataset = computed(() => store.state.activeDataset);
+    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
@@ -110,18 +118,17 @@ export default defineComponent({
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      activeDataset.value = store.state.activeDataset;
+      loaded.value = true;
       setTimeout(() => zoom(6), 2500);
     });
     return {
       map,
-      datasets,
-      mainViews,
+      tilesourceDatasets,
       sidebarCollapsed,
       toggleSidebar,
-      investigationDetail,
       activeDataset,
       activeDatasetChanged,
+      loaded,
     };
   },
 });
