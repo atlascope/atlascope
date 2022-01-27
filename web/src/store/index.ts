@@ -50,7 +50,6 @@ const {
       state.currentDatasets = datasets;
     },
     setActiveDataset(state, dataset: Dataset | null) {
-      // TODO: what does it mean to have a null active dataset?
       state.activeDataset = dataset;
     },
   },
@@ -75,11 +74,8 @@ const {
       }
       return [];
     },
-    datasets(state: State): string[] {
-      if (state.currentInvestigation !== null) {
-        return state.currentInvestigation.datasets;
-      }
-      return [];
+    tilesourceDatasets(state: State): Dataset[] {
+      return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'tile_source');
     },
   },
   actions: {
