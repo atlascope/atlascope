@@ -1,4 +1,5 @@
-from inspect import signature, Parameter
+from inspect import Parameter, signature
+
 from rest_framework.exceptions import APIException
 
 
@@ -7,7 +8,6 @@ class AtlascopeImporter:
         self.content = None
         self.metadata = None
 
-    @classmethod
     def get_schema(self):
         return [
             {
@@ -19,7 +19,6 @@ class AtlascopeImporter:
             if name != 'self'
         ]
 
-    @classmethod
     def get_parameters(self, required=False):
         return [param['name'] for param in self.get_schema() if not required or param['required']]
 

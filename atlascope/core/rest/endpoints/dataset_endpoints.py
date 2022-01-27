@@ -1,15 +1,11 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
-from rest_framework.decorators import action
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import Dataset, DatasetSerializer
-from atlascope.core.rest.permissions import object_permission_required
 
 
 class DatasetViewSet(
@@ -46,26 +42,3 @@ class DatasetViewSet(
             new_dataset_obj.perform_import(**request.data['importer_arguments'])
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    # @swagger_auto_schema(
-    #     # TODO: Is there a way to suggest body schema here?
-    #     request_body=openapi.Schema(
-    #         type=openapi.TYPE_OBJECT,
-    #         properties={},
-    #     ),
-    #     responses={204: 'Import successful.'},
-    # )
-    # @object_permission_required(model=Dataset)
-    # @action(
-    #     detail=True,
-    #     methods=['POST'],
-    #     url_path='import',
-    # )
-    # def perform_import(self, request, **kwargs):
-    #     dataset: Dataset = self.get_object()
-    #     try:
-    #         dataset.perform_import(**kwargs)
-    #     except Exception as e:
-    #         raise APIException(str(e))
-
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
