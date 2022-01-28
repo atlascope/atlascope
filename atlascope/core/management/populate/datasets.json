@@ -5,8 +5,7 @@
         "importer": "VandyImporter",
         "extension": "tif",
         "kwargs": {
-            "source_url": "https://styx.neurology.emory.edu/girder/api/v1/file/60e84a1868f4fe34fc7eef72/download",
-            "token_url": "https://styx.neurology.emory.edu/girder/api/v1/api_key/token"
+            "file_id": "60e84a1868f4fe34fc7eef72"
         }
     },
     {
