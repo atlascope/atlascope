@@ -1,8 +1,8 @@
 from .dataset import (
     Dataset,
-    DatasetSerializer,
     DatasetCreateImportSerializer,
     DatasetCreateUploadSerializer,
+    DatasetSerializer,
 )
 from .investigation import Investigation, InvestigationDetailSerializer, InvestigationSerializer
 from .job_run import JobRun, JobRunSerializer, JobRunSpawnSerializer

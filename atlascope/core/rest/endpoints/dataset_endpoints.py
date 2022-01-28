@@ -8,9 +8,9 @@ from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import (
     Dataset,
-    DatasetSerializer,
     DatasetCreateImportSerializer,
     DatasetCreateUploadSerializer,
+    DatasetSerializer,
 )
 
 
