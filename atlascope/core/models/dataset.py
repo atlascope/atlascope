@@ -71,6 +71,37 @@ class DatasetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DatasetCreateUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dataset
+        fields = [
+            'name',
+            'description',
+            'public',
+            'content',
+            'metadata',
+            'dataset_type',
+        ]
+
+
+class DatasetCreateImportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dataset
+        fields = [
+            'name',
+            'description',
+            'public',
+            'importer',
+            'importer_arguments',
+            'extension',
+            'dataset_type',
+        ]
+
+    importer_arguments = serializers.JSONField(
+        help_text="Any arguments to supply to the selected importer function"
+    )
+
+
 @admin.register(Dataset)
 class DatasetAdmin(GuardedModelAdmin):
     list_display = ('id', 'name')

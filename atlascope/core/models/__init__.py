@@ -1,4 +1,9 @@
-from .dataset import Dataset, DatasetSerializer
+from .dataset import (
+    Dataset,
+    DatasetSerializer,
+    DatasetCreateImportSerializer,
+    DatasetCreateUploadSerializer,
+)
 from .investigation import Investigation, InvestigationDetailSerializer, InvestigationSerializer
 from .job_run import JobRun, JobRunSerializer, JobRunSpawnSerializer
 from .job_run_output_image import JobRunOutputImage, JobRunOutputImageSerializer
@@ -11,6 +16,8 @@ __all__ = [
     InvestigationDetailSerializer,
     Dataset,
     DatasetSerializer,
+    DatasetCreateImportSerializer,
+    DatasetCreateUploadSerializer,
     JobRun,
     JobRunSerializer,
     JobRunSpawnSerializer,

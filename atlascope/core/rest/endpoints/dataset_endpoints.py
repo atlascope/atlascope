@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
 from rest_framework.exceptions import APIException
@@ -5,7 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import Dataset, DatasetSerializer
+from atlascope.core.models import (
+    Dataset,
+    DatasetSerializer,
+    DatasetCreateImportSerializer,
+    DatasetCreateUploadSerializer,
+)
 
 
 class DatasetViewSet(
@@ -27,6 +33,12 @@ class DatasetViewSet(
         datasets = visible_datasets | public_datasets
         return datasets.all().order_by('name')
 
+    # TODO: We can't acheive multiple request_body schema options for one endpoint.
+    # Should we split to two endpoints?
+    # Or keep a combined schema wherein some fields will always be non-applicable?
+    @swagger_auto_schema(
+        request_body=DatasetCreateImportSerializer or DatasetCreateUploadSerializer
+    )
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
