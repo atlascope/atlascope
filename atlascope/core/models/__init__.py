@@ -1,7 +1,6 @@
 from .dataset import (
     Dataset,
-    DatasetCreateImportSerializer,
-    DatasetCreateUploadSerializer,
+    DatasetCreateSerializer,
     DatasetSerializer,
 )
 from .investigation import Investigation, InvestigationDetailSerializer, InvestigationSerializer
@@ -16,8 +15,7 @@ __all__ = [
     InvestigationDetailSerializer,
     Dataset,
     DatasetSerializer,
-    DatasetCreateImportSerializer,
-    DatasetCreateUploadSerializer,
+    DatasetCreateSerializer,
     JobRun,
     JobRunSerializer,
     JobRunSpawnSerializer,
