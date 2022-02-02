@@ -1,16 +1,11 @@
 from drf_yasg.utils import swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
-from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import (
-    Dataset,
-    DatasetCreateSerializer,
-    DatasetSerializer,
-)
+from atlascope.core.models import Dataset, DatasetCreateSerializer, DatasetSerializer
 
 
 class DatasetViewSet(
