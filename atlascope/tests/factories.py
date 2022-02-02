@@ -22,10 +22,9 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('word')
     description = factory.Faker('sentence')
     public = factory.Faker('boolean')
-    importer = factory.Faker('word')
     content = None
+    metadata = {}
     dataset_type = 'tile_source'
-    metadata = None
 
     @factory.post_generation
     def derived_datasets(self, create, extracted, **kwargs):
