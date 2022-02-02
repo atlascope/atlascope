@@ -59,6 +59,9 @@ class AtlascopeMixin(ConfigMixin):
         # disable guardian anonymous user
         configuration.ANONYMOUS_USER_NAME = None
 
+        # Allow CORS requests to use credentials. Necessary for geojs on the client
+        configuration.CORS_ALLOW_CREDENTIALS = True
+
 
 class DevelopmentConfiguration(AtlascopeMixin, DevelopmentBaseConfiguration):
     pass

@@ -12,8 +12,8 @@ POPULATE_DIR = 'atlascope/core/management/populate/'
 
 MODEL_JSON_MAPPING = [
     (User, 'users.json'),
-    (Investigation, 'investigations.json'),
     (Dataset, 'datasets.json'),
+    (Investigation, 'investigations.json'),
     (JobScript, 'job_scripts.json'),
     (JobRun, 'job_runs.json'),
 ]
@@ -42,15 +42,16 @@ def expand_references(obj, model):
                 'name': value,
                 'contents': target_file,
             }
-        elif found_field:
-            found_many_to_many = [
-                field for field in model._meta.many_to_many if field.name == field_name
-            ]
-            found_many_to_many = found_many_to_many[0] if len(found_many_to_many) > 0 else None
-            if found_many_to_many:
-                many_to_many_values[field_name] = [
-                    found_many_to_many.remote_field.model.objects.get(email=x) for x in value
-                ]
+        found_many_to_many = [
+            field for field in model._meta.many_to_many if field.name == field_name
+        ]
+        found_many_to_many = found_many_to_many[0] if len(found_many_to_many) > 0 else None
+        if found_many_to_many:
+            remote_model = found_many_to_many.remote_field.model
+            if remote_model == Dataset:
+                many_to_many_values[field_name] = [remote_model.objects.get(name=x) for x in value]
+            elif remote_model == User:
+                many_to_many_values[field_name] = [remote_model.objects.get(email=x) for x in value]
     for field_name in many_to_many_values.keys():
         del obj[field_name]
     for field_name, permission in {

@@ -4,9 +4,38 @@
     fluid
     fill-height
   >
+    <v-row class="ma-2 pa-0">
+      <v-col
+        class="ma-0 pa-0"
+        cols="auto"
+      >
+        <v-select
+          v-if="!loaded || tilesourceDatasets.length > 0"
+          v-model="activeDataset"
+          class="atlascope-dataset-select"
+          :items="tilesourceDatasets"
+          item-text="name"
+          item-value="id"
+          return-object
+          single-line
+          dense
+          hide-details
+          @change="activeDatasetChanged"
+        />
+        <v-banner
+          v-if="loaded && tilesourceDatasets.length === 0"
+          single-line
+        >
+          <v-icon left>
+            mdi-alert
+          </v-icon>
+          No tilesource datasets found for this investigation.
+        </v-banner>
+      </v-col>
+    </v-row>
     <v-row class="ma-0 pa-0">
       <v-col class="ma-0 pa-0">
-        <v-sheet height="90vh">
+        <v-sheet height="85vh">
           <div
             ref="map"
             class="map"
@@ -18,7 +47,7 @@
         class="ma-0 pa-0"
       >
         <v-sheet
-          height="90vh"
+          height="85vh"
           color="teal"
         >
           <v-btn
@@ -50,11 +79,12 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType,
+  ref, defineComponent, onMounted, PropType, computed,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
+import { Dataset } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
   name: 'InvestigationDetail',
@@ -72,22 +102,33 @@ export default defineComponent({
 
   setup(props) {
     const map = ref(null);
+    const { zoom } = useGeoJS(map);
+    const loaded = ref(false);
     const sidebarCollapsed = ref(true);
-    const { zoom, center } = useGeoJS(map);
-    const datasets = ['Dataset 1', 'Dataset 2', 'Dataset 3'];
-    const mainViews = ['context', 'connections'];
+    const activeDataset = computed(() => store.state.activeDataset);
+    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
     }
 
+    function activeDatasetChanged(newActiveDataset: Dataset) {
+      store.dispatch.setActiveDataset(newActiveDataset);
+    }
+
     onMounted(async () => {
-      setTimeout(() => center(-0.1704, 51.5047), 2000);
-      setTimeout(() => zoom(14), 3000);
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
+      loaded.value = true;
+      setTimeout(() => zoom(6), 2500);
     });
     return {
-      map, datasets, mainViews, sidebarCollapsed, toggleSidebar,
+      map,
+      tilesourceDatasets,
+      sidebarCollapsed,
+      toggleSidebar,
+      activeDataset,
+      activeDatasetChanged,
+      loaded,
     };
   },
 });
