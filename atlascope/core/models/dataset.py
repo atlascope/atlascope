@@ -42,6 +42,8 @@ class Dataset(models.Model):
             importer_obj.content,
         )
         self.metadata = importer_obj.metadata
+        if not self.name:
+            self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
 
 class DatasetSerializer(serializers.ModelSerializer):
@@ -59,7 +61,7 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
             'public',
             'dataset_type',
             'importer',
-            'importer_arguments',
+            'import_arguments',
         ]
 
     def validate(self, data):
@@ -70,15 +72,22 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
                 f': {str(list(importers.keys()))}'
             )
         importer_obj = importers[data['importer']]()
-        importer_obj.validate_arguments(**data['importer_arguments'])
+        importer_obj.validate_arguments(**data['import_arguments'])
         return data
 
+    def create(self, validated_data):
+        true_data = {
+            k: v for k, v in validated_data.items() if k not in ['importer', 'import_arguments']
+        }
+        return super().create(true_data)
+
+    name = serializers.CharField(required=False)
     importer = serializers.CharField(
         default='UploadImporter',
         help_text=f"The importer module to invoke. Must be one of {str(list(importers.keys()))}.",
     )
-    importer_arguments = serializers.JSONField(
-        default={},
+    import_arguments = serializers.JSONField(
+        required=True,
         help_text="Any arguments to supply to the selected importer function",
     )
 
