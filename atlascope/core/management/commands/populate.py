@@ -86,6 +86,10 @@ def command(password):
             if 'kwargs' in obj:
                 kwargs = obj['kwargs']
                 del obj['kwargs']
+                kwargs = {
+                    k: open(Path(POPULATE_DIR, 'inputs', v), 'rb').read() if k == 'content' else v
+                    for k, v in kwargs.items()
+                }
             obj, many_to_many_values, files_to_save, permissions = expand_references(obj, model)
             db_obj = model(**obj)
             db_obj.save()

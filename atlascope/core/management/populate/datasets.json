@@ -1,17 +1,17 @@
 [
     {
-        "name": "Remote Vandy Dataset",
+        "name": "Local Vandy Dataset",
         "description": "This is the test dataset from the VANDY Explorer",
-        "importer": "VandyImporter",
-        "extension": "tif",
         "kwargs": {
-            "file_id": "60e84a1868f4fe34fc7eef72"
+            "content": "HTA9_1_BA_F_ROI02.ome.tif"
         }
     },
     {
-        "name": "Local Vandy Dataset",
+        "name": "Remote Vandy Dataset",
         "description": "This is the test dataset from the VANDY Explorer",
-        "content": "HTA9_1_BA_F_ROI02.ome.tif",
-        "extension": "tif"
+        "kwargs": {
+            "importer": "VandyImporter",
+            "file_id": "60e84a1868f4fe34fc7eef72"
+        }
     }
 ]

@@ -11,33 +11,12 @@ from s3_file_field import S3FileField
 from .importer import importers
 
 
-def validate_importer(value):
-    if value in importers:
-        return value
-    else:
-        raise ValidationError(
-            f'Importer value must be '
-            f'one of the following installed importers'
-            f': {str(list(importers.keys()))}'
-        )
-
-
 class Dataset(models.Model):
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(content__isnull=False) | models.Q(importer__isnull=False),
-                name='has_no_source',
-            )
-        ]
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     public = models.BooleanField(default=True)
-    importer = models.CharField(max_length=100, null=True, validators=[validate_importer])
     content = S3FileField(null=True)
-    extension = models.CharField(max_length=20, default='file')
     metadata = models.JSONField(null=True)
     dataset_type = models.CharField(
         max_length=20,
@@ -54,15 +33,15 @@ class Dataset(models.Model):
     def get_write_permission_groups():
         return ['change_dataset']
 
-    def perform_import(self, **kwargs):
-        importer = importers[self.importer]()
-        importer.run(**kwargs)
+    def perform_import(self, importer="UploadImporter", **kwargs):
+        importer_obj = importers[importer]()
+        importer_obj.run(**kwargs)
 
         self.content.save(
-            f'{self.name.replace(" ","_")}.{self.extension}',
-            importer.content,
+            f'{self.name.replace(" ","_")}_{str(self.id)}',
+            importer_obj.content,
         )
-        self.metadata = importer.metadata
+        self.metadata = importer_obj.metadata
 
 
 class DatasetSerializer(serializers.ModelSerializer):
@@ -71,34 +50,36 @@ class DatasetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DatasetCreateUploadSerializer(serializers.ModelSerializer):
+class DatasetCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dataset
         fields = [
             'name',
             'description',
             'public',
-            'content',
-            'metadata',
             'dataset_type',
-        ]
-
-
-class DatasetCreateImportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dataset
-        fields = [
-            'name',
-            'description',
-            'public',
             'importer',
             'importer_arguments',
-            'extension',
-            'dataset_type',
         ]
 
+    def validate(self, data):
+        if data['importer'] not in importers:
+            raise ValidationError(
+                f'Importer value must be '
+                f'one of the following installed importers'
+                f': {str(list(importers.keys()))}'
+            )
+        importer_obj = importers[data['importer']]()
+        importer_obj.validate_arguments(**data['importer_arguments'])
+        return data
+
+    importer = serializers.CharField(
+        default='UploadImporter',
+        help_text=f"The importer module to invoke. Must be one of {str(list(importers.keys()))}.",
+    )
     importer_arguments = serializers.JSONField(
-        help_text="Any arguments to supply to the selected importer function"
+        default={},
+        help_text="Any arguments to supply to the selected importer function",
     )
 
 
