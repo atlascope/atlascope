@@ -1,13 +1,14 @@
 from inspect import Parameter, signature
 
-from django.core.exceptions import ValidationError
 from rest_framework.exceptions import APIException
+from rest_framework.serializers import ValidationError
 
 
 class AtlascopeImporter:
     def __init__(self):
         self.content = None
         self.metadata = None
+        self.dataset_name = None
 
     def get_schema(self):
         return [
@@ -25,7 +26,9 @@ class AtlascopeImporter:
 
     def raise_schema_exception(self):
         raise ValidationError(
-            f"This importer function accepts the following arguments: {self.get_schema()}"
+            {
+                'import_arguments': f"The {self.__class__.__name__} function accepts the following arguments: {self.get_schema()}"
+            }
         )
 
     def perform_import(self, **kwargs):

@@ -17,6 +17,12 @@ class DatasetViewSet(
     serializer_class = DatasetSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return DatasetCreateSerializer
+        else:
+            return DatasetSerializer
+
     def get_queryset(self):
         visible_datasets = get_objects_for_user(
             self.request.user,
@@ -34,7 +40,7 @@ class DatasetViewSet(
         new_dataset_obj = serializer.save()
         new_dataset_obj.perform_import(
             request.data['importer'],
-            **request.data['importer_arguments'],
+            **request.data['import_arguments'],
         )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(DatasetSerializer(new_dataset_obj).data, status=status.HTTP_201_CREATED)
