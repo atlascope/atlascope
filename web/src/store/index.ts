@@ -2,8 +2,10 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
-import { AxiosInstance } from 'axios';
-import { User, Investigation } from '../generatedTypes/AtlascopeTypes';
+import { AxiosInstance, AxiosResponse } from 'axios';
+import {
+  User, Investigation, InvestigationDetail, Dataset, TileMetadata,
+} from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
 
@@ -11,7 +13,9 @@ export interface State {
     userInfo: User | null;
     investigations: Investigation[];
     axiosInstance: AxiosInstance | null;
-    currentInvestigation: Investigation | null;
+    currentInvestigation: InvestigationDetail | null;
+    currentDatasets: Dataset[];
+    activeDataset: Dataset | null;
 }
 
 const {
@@ -26,12 +30,14 @@ const {
     investigations: [],
     axiosInstance: null,
     currentInvestigation: null,
+    currentDatasets: [],
+    activeDataset: null,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
       state.investigations = investigations;
     },
-    setCurrentInvestigation(state, currentInvestigation: Investigation | null) {
+    setCurrentInvestigation(state, currentInvestigation: InvestigationDetail | null) {
       state.currentInvestigation = currentInvestigation;
     },
     setUserInfo(state, userInfo: User | null) {
@@ -39,6 +45,12 @@ const {
     },
     setAxiosInstance(state, axiosInstance: AxiosInstance | null) {
       state.axiosInstance = axiosInstance;
+    },
+    setCurrentDatasets(state, datasets: Dataset[]) {
+      state.currentDatasets = datasets;
+    },
+    setActiveDataset(state, dataset: Dataset | null) {
+      state.activeDataset = dataset;
     },
   },
   getters: {
@@ -62,6 +74,9 @@ const {
       }
       return [];
     },
+    tilesourceDatasets(state: State): Dataset[] {
+      return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'tile_source');
+    },
   },
   actions: {
     async fetchInvestigations(context) {
@@ -78,9 +93,43 @@ const {
       if (store.state.axiosInstance) {
         const investigation = (await store.state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
+
+        if (store.state.currentInvestigation) {
+          const datasetPromises: Promise<AxiosResponse>[] = [];
+          store.state.currentInvestigation.datasets.forEach((datasetId) => {
+            const promise = store.state.axiosInstance?.get(`/datasets/${datasetId}`);
+            if (promise) {
+              datasetPromises.push(promise);
+            }
+          });
+          const datasets = (await Promise.all(datasetPromises)).map((response) => response.data);
+          commit.setCurrentDatasets(datasets);
+
+          const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
+          const activeDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
+          commit.setActiveDataset(activeDataset);
+        }
       } else {
         commit.setCurrentInvestigation(null);
       }
+    },
+    unsetCurrentInvestigation(context) {
+      const { commit } = rootActionContext(context);
+      commit.setCurrentInvestigation(null);
+      commit.setCurrentDatasets([]);
+      commit.setActiveDataset(null);
+    },
+    setActiveDataset(context, dataset: Dataset | null) {
+      const { commit } = rootActionContext(context);
+      commit.setActiveDataset(dataset);
+    },
+    async fetchDatasetMetadata(_context, datasetId: string): Promise<TileMetadata | null> {
+      if (store.state.axiosInstance) {
+        const url = `/datasets/${datasetId}/tiles/metadata`;
+        const metadata = (await store.state.axiosInstance.get(url)).data;
+        return metadata;
+      }
+      return null;
     },
     async fetchUserInfo(context) {
       const { commit } = rootActionContext(context);
@@ -97,10 +146,6 @@ const {
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
-    },
-    unsetCurrentInvestigation(context) {
-      const { commit } = rootActionContext(context);
-      commit.setCurrentInvestigation(null);
     },
   },
 });

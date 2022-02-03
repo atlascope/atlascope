@@ -8,7 +8,11 @@
             "matt.covalt@kitware.com",
             "mike.nagler@kitware.com"
         ],
-        "observers": []
+        "observers": [],
+        "datasets": [
+            "Vandy Dataset",
+            "Vandy2 Dataset"
+        ]
     },
     {
         "name": "Backend Investigation",
@@ -20,6 +24,9 @@
         "observers": [
             "matt.covalt@kitware.com",
             "mike.nagler@kitware.com"
+        ],
+        "datasets": [
+            "Vandy Dataset"
         ]
     },
     {
@@ -32,6 +39,9 @@
         "observers": [
             "anne.haley@kitware.com",
             "mary.salvi@kitware.com"
+        ],
+        "datasets": [
+            "Vandy2 Dataset"
         ]
     }
 ]
