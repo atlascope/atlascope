@@ -25,14 +25,14 @@ export interface Dataset {
   /** Public */
   public?: boolean;
 
-  /** Importer */
-  importer?: string | null;
-
   /**
    * Content
    * @format uri
    */
   content?: string | null;
+
+  /** Extension */
+  extension?: string;
 
   /** Metadata */
   metadata?: object | null;
@@ -105,12 +105,6 @@ export interface InvestigationDetail {
   /** Observers */
   observers?: string;
 
-  /** Datasets */
-  datasets?: string;
-
-  /** Pins */
-  pins?: string;
-
   /**
    * Created
    * @format date-time
@@ -131,6 +125,71 @@ export interface InvestigationDetail {
 
   /** Notes */
   notes?: string;
+  datasets: string[];
+  pins: string[];
+}
+
+export interface JobRun {
+  /**
+   * Id
+   * @format uuid
+   */
+  id?: string;
+
+  /**
+   * Input image
+   * @format uri
+   */
+  input_image?: string | null;
+
+  /** Other inputs */
+  other_inputs?: object | null;
+
+  /** Outputs */
+  outputs?: object | null;
+
+  /**
+   * Last run
+   * @format date-time
+   */
+  last_run?: string | null;
+
+  /**
+   * Preview visual
+   * @format uri
+   */
+  preview_visual?: string | null;
+
+  /**
+   * Script
+   * @format uuid
+   */
+  script: string;
+}
+
+export interface JobRunSpawn {
+  /** Input image */
+  input_image: string;
+
+  /** Other inputs */
+  other_inputs?: object | null;
+
+  /**
+   * Script
+   * @format uuid
+   */
+  script: string;
+}
+
+export interface JobScript {
+  /**
+   * Id
+   * @format uuid
+   */
+  id?: string;
+
+  /** Name */
+  name: string;
 }
 
 export interface User {
@@ -182,6 +241,22 @@ export interface InvestigationsPermissionsPayload {
 
   /** a list of the usernames of users who should have write access on this investigation */
   investigators?: string[];
+}
+
+export interface JobRunsListParams {
+  /** Number of results to return per page. */
+  limit?: number;
+
+  /** The initial index from which to return the results. */
+  offset?: number;
+}
+
+export interface JobScriptsListParams {
+  /** Number of results to return per page. */
+  limit?: number;
+
+  /** The initial index from which to return the results. */
+  offset?: number;
 }
 
 export interface UsersListParams {
@@ -313,6 +388,82 @@ export namespace Investigations {
     export type RequestBody = InvestigationsPermissionsPayload;
     export type RequestHeaders = {};
     export type ResponseBody = InvestigationDetail;
+  }
+}
+
+export namespace JobRuns {
+  /**
+   * No description
+   * @tags job-runs
+   * @name JobRunsList
+   * @request GET:/job-runs
+   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (JobRun)[] }`
+   */
+  export namespace JobRunsList {
+    export type RequestParams = {};
+    export type RequestQuery = { limit?: number; offset?: number };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = { count: number; next?: string | null; previous?: string | null; results: JobRun[] };
+  }
+  /**
+   * No description
+   * @tags job-runs
+   * @name JobRunsSpawn
+   * @request POST:/job-runs/spawn
+   * @response `201` `JobRunSpawn`
+   */
+  export namespace JobRunsSpawn {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = JobRunSpawn;
+    export type RequestHeaders = {};
+    export type ResponseBody = JobRunSpawn;
+  }
+  /**
+   * No description
+   * @tags job-runs
+   * @name JobRunsRead
+   * @request GET:/job-runs/{id}
+   * @response `200` `JobRun`
+   */
+  export namespace JobRunsRead {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = JobRun;
+  }
+  /**
+   * No description
+   * @tags job-runs
+   * @name JobRunsRerun
+   * @request POST:/job-runs/{id}/rerun
+   * @response `204` `void` Rerun spawned.
+   */
+  export namespace JobRunsRerun {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
+  }
+}
+
+export namespace JobScripts {
+  /**
+   * No description
+   * @tags job-scripts
+   * @name JobScriptsList
+   * @request GET:/job-scripts
+   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (JobScript)[] }`
+   */
+  export namespace JobScriptsList {
+    export type RequestParams = {};
+    export type RequestQuery = { limit?: number; offset?: number };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = { count: number; next?: string | null; previous?: string | null; results: JobScript[] };
   }
 }
 
