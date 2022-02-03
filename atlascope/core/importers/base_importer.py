@@ -27,7 +27,8 @@ class AtlascopeImporter:
     def raise_schema_exception(self):
         raise ValidationError(
             {
-                'import_arguments': f"The {self.__class__.__name__} function accepts the following arguments: {self.get_schema()}"
+                'import_arguments': f"The {self.__class__.__name__}\
+                     function accepts the following arguments: {self.get_schema()}"
             }
         )
 
