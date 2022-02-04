@@ -21,12 +21,10 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     id = factory.Faker('uuid4')
     name = factory.Faker('word')
     description = factory.Faker('sentence')
-    source_uri = factory.Faker('file_path')
     public = factory.Faker('boolean')
-    importer = factory.Faker('word')
     content = None
+    metadata = {}
     dataset_type = 'tile_source'
-    metadata = None
 
     @factory.post_generation
     def derived_datasets(self, create, extracted, **kwargs):
