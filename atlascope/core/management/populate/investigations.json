@@ -10,8 +10,8 @@
         ],
         "observers": [],
         "datasets": [
-            "Vandy Dataset",
-            "Vandy2 Dataset"
+            "Local Vandy Dataset",
+            "Remote Vandy Dataset"
         ]
     },
     {
@@ -26,7 +26,7 @@
             "mike.nagler@kitware.com"
         ],
         "datasets": [
-            "Vandy Dataset"
+            "Local Vandy Dataset"
         ]
     },
     {
@@ -41,7 +41,7 @@
             "mary.salvi@kitware.com"
         ],
         "datasets": [
-            "Vandy2 Dataset"
+            "Remote Vandy Dataset"
         ]
     }
 ]
