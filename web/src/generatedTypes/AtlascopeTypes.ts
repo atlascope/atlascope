@@ -25,12 +25,6 @@ export interface Dataset {
   /** Public */
   public?: boolean;
 
-  /** Source uri */
-  source_uri?: string | null;
-
-  /** Importer */
-  importer?: string | null;
-
   /**
    * Content
    * @format uri

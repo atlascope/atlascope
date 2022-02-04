@@ -1,4 +1,5 @@
-from importlib_metadata import entry_points
+import inspect
+import sys
 
-discovered_importer_plugins = entry_points(group='atlascope.plugins')
-importers = {importer.name: importer.load() for importer in discovered_importer_plugins}
+clsmembers = inspect.getmembers(sys.modules['atlascope.core.importers'], inspect.isclass)
+importers = {module[0]: module[1] for module in clsmembers if module[0] != 'AtlascopeImporter'}

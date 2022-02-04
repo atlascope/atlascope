@@ -1,14 +1,11 @@
-from drf_yasg.utils import no_body, swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
-from rest_framework.decorators import action
-from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import Dataset, DatasetSerializer
-from atlascope.core.rest.permissions import object_permission_required
+from atlascope.core.models import Dataset, DatasetCreateSerializer, DatasetSerializer
 
 
 class DatasetViewSet(
@@ -20,6 +17,12 @@ class DatasetViewSet(
     serializer_class = DatasetSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return DatasetCreateSerializer
+        else:
+            return DatasetSerializer
+
     def get_queryset(self):
         visible_datasets = get_objects_for_user(
             self.request.user,
@@ -30,21 +33,14 @@ class DatasetViewSet(
         datasets = visible_datasets | public_datasets
         return datasets.all().order_by('name')
 
-    @swagger_auto_schema(
-        request_body=no_body,
-        responses={204: 'Import successful.'},
-    )
-    @object_permission_required(model=Dataset)
-    @action(
-        detail=True,
-        methods=['POST'],
-        url_path='import',
-    )
-    def perform_import(self, request, **kwargs):
-        dataset: Dataset = self.get_object()
-        try:
-            dataset.perform_import()
-        except Exception as e:
-            raise APIException(str(e))
+    @swagger_auto_schema(request_body=DatasetCreateSerializer())
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_dataset_obj = serializer.save()
+        new_dataset_obj.perform_import(
+            request.data['importer'],
+            **request.data['import_arguments'],
+        )
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(DatasetSerializer(new_dataset_obj).data, status=status.HTTP_201_CREATED)
