@@ -3,65 +3,34 @@
     max-width="33vw"
     min-width="33vw"
   >
-    <v-expansion-panels
-      accordian
-      flat
-    >
-      <v-expansion-panel>
-        <v-expansion-panel-header>
-          Pins
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <pin-list />
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-      <v-expansion-panel>
-        <v-expansion-panel-header>
-          Metadata
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <span class="metadata">
-            {{ investigationMetadata }}
-          </span>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+    <v-tabs>
+      <v-tab>
+        Data
+      </v-tab>
+      <v-tab-item>
+        <investigation-sidebar-info />
+      </v-tab-item>
+      <v-tab>
+        Analytics
+      </v-tab>
+      <v-tab-item>
+        Tab content 2
+      </v-tab-item>
+    </v-tabs>
   </v-sheet>
 </template>
 
-<style scoped>
-.metadata {
-    white-space: pre;
-}
-</style>
-
 <script lang="ts">
 import {
-  defineComponent, computed,
+  defineComponent,
 } from '@vue/composition-api';
-import store from '../store';
 import PinList from './PinList.vue';
+import InvestigationSidebarInfo from './InvestigationSidebarInfo.vue';
 
 export default defineComponent({
   components: {
     PinList,
-  },
-
-  setup() {
-    const metadataFields = [
-      'id',
-      'owner',
-      'investigators',
-      'ovservers',
-      'created',
-      'updated',
-      'description',
-      'notes',
-    ];
-    const investigationMetadata = computed(
-      () => JSON.stringify(store.state.currentInvestigation, metadataFields, 4),
-    );
-    return { investigationMetadata };
+    InvestigationSidebarInfo,
   },
 });
 </script>
