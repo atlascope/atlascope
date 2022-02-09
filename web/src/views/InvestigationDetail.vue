@@ -11,7 +11,7 @@
       >
         <v-select
           v-if="!loaded || tilesourceDatasets.length > 0"
-          v-model="activeDataset"
+          v-model="selectedDataset"
           class="atlascope-dataset-select"
           :items="tilesourceDatasets"
           item-text="name"
@@ -79,7 +79,7 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType, computed,
+  ref, defineComponent, onMounted, PropType, computed, watch, Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import store from '../store';
@@ -102,9 +102,12 @@ export default defineComponent({
 
   setup(props) {
     const map = ref(null);
-    const { zoom } = useGeoJS(map);
+    const {
+      zoom, exit, generatePixelCoordinateParams, createMap, createLayer,
+    } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
+    const selectedDataset: Ref<Dataset | null> = ref(null);
     const activeDataset = computed(() => store.state.activeDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
 
@@ -113,20 +116,50 @@ export default defineComponent({
     }
 
     function activeDatasetChanged(newActiveDataset: Dataset) {
+      selectedDataset.value = newActiveDataset;
       store.dispatch.setActiveDataset(newActiveDataset);
     }
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
+      selectedDataset.value = store.state.activeDataset;
       loaded.value = true;
       setTimeout(() => zoom(6), 2500);
     });
+
+    watch(activeDataset, async (newValue) => {
+      exit(); // tear down the map
+      if (!newValue || !newValue.id) {
+        return;
+      }
+      const tileSourceMetadata = await store.dispatch.fetchDatasetMetadata(newValue.id);
+      if (!tileSourceMetadata) {
+        return;
+      }
+
+      const geojsParams = generatePixelCoordinateParams(
+        tileSourceMetadata.size_x || 0,
+        tileSourceMetadata.size_y || 0,
+        tileSourceMetadata.tile_size || 0,
+        tileSourceMetadata.tile_size || 0,
+      );
+      if (!geojsParams || !geojsParams.map || !geojsParams.layer) {
+        return;
+      }
+      const apiRoot = process.env.VUE_APP_API_ROOT;
+      geojsParams.layer.url = `${apiRoot}/datasets/${newValue.id}/tiles/{z}/{x}/{y}.png`;
+      geojsParams.layer.crossDomain = 'use-credentials';
+      createMap(geojsParams.map);
+      createLayer('osm', geojsParams.layer);
+    });
+
     return {
       map,
       tilesourceDatasets,
       sidebarCollapsed,
       toggleSidebar,
       activeDataset,
+      selectedDataset,
       activeDatasetChanged,
       loaded,
     };
