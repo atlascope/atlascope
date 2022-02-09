@@ -7,8 +7,10 @@ from django.db import models
 from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 from s3_file_field import S3FileField
+from s3_file_field.rest_framework import S3FileSerializerField
 
 from .importer import importers
+from .job_script import JobScript
 
 
 class Dataset(models.Model):
@@ -90,6 +92,15 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
         required=True,
         help_text="Any arguments to supply to the selected importer function",
     )
+
+
+class JobSpawnSerializer(serializers.Serializer):
+    original_dataset = serializers.PrimaryKeyRelatedField(
+        required=True, queryset=Dataset.objects.all()
+        )
+    script = serializers.PrimaryKeyRelatedField(required=True, queryset=JobScript.objects.all())
+    region = serializers.JSONField(default={})
+    additional_inputs = serializers.JSONField(default={})
 
 
 @admin.register(Dataset)

@@ -3,18 +3,29 @@ import io
 
 from PIL import Image
 from celery import shared_task
-from django.apps import apps
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
+# from s3_file_field.widgets import S3PlaceholderFile
+
+from atlascope.core.models import Dataset, JobScript
 
 
 @shared_task
-def spawn_job(job_run_id):
+def spawn_job(job_data):
     # celery arguments must be serializable
-    job_run = apps.get_model('core', 'JobRun').objects.get(id=job_run_id)
-    script = job_run.script.script_contents.read()
-    input_image = Image.open(io.BytesIO(job_run.input_image.read()))
-    kwargs = job_run.other_inputs or {}
+    original_dataset = Dataset.objects.get(
+        id=job_data['original_dataset']
+        )
+    job_script = JobScript.objects.get(id=job_data['script'])
+    script = job_script.script_contents.read()
+    # input_image_placeholder = S3PlaceholderFile.from_field(job_data['input_image'])
+    # print(job_data['input_image'])
+    # input_image = Image.open(io.BytesIO(
+    #     job_data['input_image']
+    # ))
+    # TODO: use job data region to extract sub image
+    input_image = Image.open(io.BytesIO(original_dataset.content.read()))
+    kwargs = job_data['additional_inputs'] or {}
 
     # TODO: sandbox this
     module = imp.new_module('main')
@@ -28,7 +39,8 @@ def spawn_job(job_run_id):
             return store_image(output, key)
 
     def store_image(image, output_key):
-        filename = f'{job_run_id}_image_output_{output_key}.png'
+        filename = f'{original_dataset.name.replace(" ", "_")+"_"}'\
+            f'{job_script.name.replace(" ", "_")}_image_output_{output_key}.png'
         image_bytes = io.BytesIO()
         image.save(image_bytes, format="PNG")
         image_file = InMemoryUploadedFile(
@@ -40,11 +52,7 @@ def spawn_job(job_run_id):
             None,
         )
 
-        image_output_obj = apps.get_model('core', 'JobRunOutputImage')(job_run=job_run)
-        image_output_obj.stored_image.save(filename, image_file)
-        image_output_obj.save()
-        return image_output_obj.stored_image.url
+        return image_file
 
-    job_run.outputs = {key: interpret_output(key, output) for key, output in output_dict.items()}
-    job_run.last_run = timezone.now()
-    job_run.save()
+    print({key: interpret_output(key, output) for key, output in output_dict.items()})
+    print(timezone.now())

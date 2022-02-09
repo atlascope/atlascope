@@ -4,8 +4,15 @@ from rest_framework import mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.decorators import action
+from atlascope.core.tasks import spawn_job
 
-from atlascope.core.models import Dataset, DatasetCreateSerializer, DatasetSerializer
+from atlascope.core.models import (
+    Dataset,
+    DatasetCreateSerializer,
+    DatasetSerializer,
+    JobSpawnSerializer
+    )
 
 
 class DatasetViewSet(
@@ -44,3 +51,13 @@ class DatasetViewSet(
         )
 
         return Response(DatasetSerializer(new_dataset_obj).data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(request_body=JobSpawnSerializer(), responses={204: 'Job Spawned'})
+    @action(detail=False, methods=['POST'])
+    def run_job(self, request, **kwargs):
+        serializer = JobSpawnSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        spawn_job(serializer.data)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
