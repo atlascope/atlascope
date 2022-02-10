@@ -3,18 +3,27 @@
     max-width="33vw"
     min-width="33vw"
   >
-    <v-tabs>
+    <v-tabs
+      centered
+      grow
+    >
       <v-tab>
-        Data
+        Investigation Data
       </v-tab>
       <v-tab-item>
         <investigation-sidebar-info />
       </v-tab-item>
       <v-tab>
-        Analytics
+        Run Analytics
       </v-tab>
       <v-tab-item>
-        Tab content 2
+        <investigation-sidebar-run-analytics />
+      </v-tab-item>
+      <v-tab>
+        Analytics Results
+      </v-tab>
+      <v-tab-item>
+        <investigation-sidebar-analytics-results />
       </v-tab-item>
     </v-tabs>
   </v-sheet>
@@ -26,11 +35,15 @@ import {
 } from '@vue/composition-api';
 import PinList from './PinList.vue';
 import InvestigationSidebarInfo from './InvestigationSidebarInfo.vue';
+import InvestigationSidebarRunAnalytics from './InvestigationSidebarRunAnalytics.vue';
+import InvestigationSidebarAnalyticsResults from './InvestigationSidebarAnalyticsResults.vue';
 
 export default defineComponent({
   components: {
     PinList,
     InvestigationSidebarInfo,
+    InvestigationSidebarRunAnalytics,
+    InvestigationSidebarAnalyticsResults,
   },
 });
 </script>

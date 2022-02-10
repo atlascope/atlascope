@@ -9,6 +9,17 @@ import {
 
 Vue.use(Vuex);
 
+export interface JobResults {
+  id?: string;
+  jobType: 'Brightest N Pixels' | 'Average Color';
+  status: 'running' | 'error' | 'success';
+  resultsType: 'image' | 'text';
+  results?: string;
+  metadata?: string;
+  inputs?: string;
+  updated?: string;
+}
+
 export interface State {
     userInfo: User | null;
     investigations: Investigation[];
@@ -69,6 +80,52 @@ const {
             dataset: null,
             color: 'green',
             note: 'I am also just a test pin.',
+          },
+        ];
+      }
+      return [];
+    },
+    jobs(state: State): any[] {
+      if (state.userInfo !== null) {
+        return [
+          {
+            name: 'Brightest N Pixels',
+            id: '1',
+            inputs: [
+              { name: 'n', type: 'number' },
+            ],
+          },
+          {
+            name: 'Average Color',
+            id: '2',
+          },
+        ];
+      }
+      return [];
+    },
+    jobResults(state: State): JobResults[] {
+      if (state.userInfo !== null) {
+        return [
+          {
+            jobType: 'Brightest N Pixels',
+            id: '1',
+            status: 'running',
+            resultsType: 'text',
+            updated: '1/1/2022 12:36:35',
+          },
+          {
+            jobType: 'Brightest N Pixels',
+            id: '2',
+            status: 'error',
+            resultsType: 'text',
+            updated: '1/7/2022 14:49:44',
+          },
+          {
+            jobType: 'Brightest N Pixels',
+            id: '3',
+            status: 'success',
+            resultsType: 'text',
+            updated: '1/18/2022 18:07:11',
           },
         ];
       }
