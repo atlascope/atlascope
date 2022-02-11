@@ -18,7 +18,7 @@ def validate_job_type(value):
         )
 
 
-class JobRun(models.Model):
+class Job(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     job_type = models.CharField(
         default='average_color', max_length=100, validators=[validate_job_type]
@@ -32,23 +32,23 @@ class JobRun(models.Model):
         runner = available_job_types[self.job_type]
         runner.delay(
             # celery arguments must be serializable
-            original_dataset_id=self.original_dataset.id,
+            self.original_dataset.id,
             **self.additional_inputs or {},
         )
 
 
-class JobRunSpawnSerializer(serializers.ModelSerializer):
+class JobSpawnSerializer(serializers.ModelSerializer):
     class Meta:
-        model = JobRun
+        model = Job
         fields = ['original_dataset', 'additional_inputs', 'job_type']
 
 
-class JobRunSerializer(serializers.ModelSerializer):
+class JobSerializer(serializers.ModelSerializer):
     class Meta:
-        model = JobRun
+        model = Job
         fields = '__all__'
 
 
-@admin.register(JobRun)
-class JobRunAdmin(admin.ModelAdmin):
+@admin.register(Job)
+class JobAdmin(admin.ModelAdmin):
     list_display = ('id', 'job_type', 'last_run')
