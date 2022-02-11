@@ -1,6 +1,6 @@
 import io
 
-from atlascope.core.importers import AtlascopeImporter
+from .base_importer import AtlascopeImporter
 
 
 class UploadImporter(AtlascopeImporter):

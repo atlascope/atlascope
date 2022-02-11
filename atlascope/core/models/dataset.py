@@ -8,7 +8,7 @@ from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 from s3_file_field import S3FileField
 
-from .importer import importers
+from atlascope.core.importers import available_importers
 
 
 class Dataset(models.Model):
@@ -34,7 +34,7 @@ class Dataset(models.Model):
         return ['change_dataset']
 
     def perform_import(self, importer="UploadImporter", **kwargs):
-        importer_obj = importers[importer]()
+        importer_obj = available_importers[importer]()
         importer_obj.run(**kwargs)
 
         self.content.save(
@@ -65,13 +65,13 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        if data['importer'] not in importers:
+        if data['importer'] not in available_importers:
             raise ValidationError(
                 f'Importer value must be '
                 f'one of the following installed importers'
-                f': {str(list(importers.keys()))}'
+                f': {str(list(available_importers.keys()))}'
             )
-        importer_obj = importers[data['importer']]()
+        importer_obj = available_importers[data['importer']]()
         importer_obj.validate_arguments(**data['import_arguments'])
         return data
 
@@ -84,7 +84,7 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     importer = serializers.CharField(
         default='UploadImporter',
-        help_text=f"The importer module to invoke. Must be one of {str(list(importers.keys()))}.",
+        help_text=f"The importer module to invoke. Must be one of {str(list(available_importers.keys()))}.",
     )
     import_arguments = serializers.JSONField(
         required=True,
