@@ -1,0 +1,13 @@
+[
+    {
+        "job_type": "average_color",
+        "original_dataset": "Green Cell Image"
+    },
+    {
+        "job_type": "brightest_n_pixels",
+        "original_dataset": "Green Cell Image",
+        "additional_inputs": {
+            "n": 5
+        }
+    }
+]
