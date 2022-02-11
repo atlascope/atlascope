@@ -25,11 +25,10 @@ def run(original_dataset_id):
         public=original_dataset.public,
         metadata={'origin': f'Job Spawned at {timezone.now()}', 'rgba': average_color},
         dataset_type='analytics',
+        source_dataset=original_dataset,
     )
     new_dataset.content.save(
         'average_color.png',
         PIL_to_image_file(output_image),
     )
     new_dataset.save()
-
-    original_dataset.derived_datasets.add(new_dataset)

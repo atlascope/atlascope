@@ -49,6 +49,7 @@ def run(original_dataset_id, n):
         public=original_dataset.public,
         metadata={'origin': f'Job Spawned at {timezone.now()}', 'pixel_locations': brightest},
         dataset_type='analytics',
+        source_dataset=original_dataset,
     )
     new_dataset.content.save(
         f'brightest_{n}_pixels.png',
