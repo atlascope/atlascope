@@ -183,10 +183,10 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
 
 
 @pytest.mark.django_db
-def test_list_job_runs(least_perm_api_client, job_run_factory):
-    job_runs = [job_run_factory() for i in range(1)]
-    job_runs.sort(key=lambda jr: str(jr.id))
-    expected_results = [models.JobRunSerializer(job_run).data for job_run in job_runs]
+def test_list_jobs(least_perm_api_client, job_factory):
+    jobs = [job_factory() for i in range(1)]
+    jobs.sort(key=lambda jr: str(jr.id))
+    expected_results = [models.JobSerializer(job).data for job in jobs]
     resp = least_perm_api_client().get('/api/v1/job-runs')
     assert resp.status_code == 200
     assert resp.json() == {
@@ -198,15 +198,15 @@ def test_list_job_runs(least_perm_api_client, job_run_factory):
 
 
 @pytest.mark.django_db
-def test_retrieve_job_run(least_perm_api_client, job_run):
-    resp = least_perm_api_client().get(f'/api/v1/job-runs/{job_run.id}')
+def test_retrieve_job(least_perm_api_client, job):
+    resp = least_perm_api_client().get(f'/api/v1/job-runs/{job.id}')
     assert resp.status_code == 200
-    assert resp.json() == models.JobRunSerializer(job_run).data
+    assert resp.json() == models.JobSerializer(job).data
 
 
 @pytest.mark.django_db
-def test_spawn_job_run(least_perm_api_client, job_script, green_cell_upload):
-    serializer = models.JobRunSpawnSerializer(
+def test_spawn_job(least_perm_api_client, job_script, green_cell_upload):
+    serializer = models.JobSpawnSerializer(
         data={
             'input_image': green_cell_upload,
             'other_inputs': {},
@@ -219,8 +219,8 @@ def test_spawn_job_run(least_perm_api_client, job_script, green_cell_upload):
 
 
 @pytest.mark.django_db
-def test_rerun_job_run(least_perm_api_client, job_run):
-    resp = least_perm_api_client().post(f'/api/v1/job-runs/{job_run.id}/rerun')
+def test_rerun_job(least_perm_api_client, job):
+    resp = least_perm_api_client().post(f'/api/v1/job-runs/{job.id}/rerun')
     assert resp.status_code == 204
 
 

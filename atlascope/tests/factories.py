@@ -68,9 +68,9 @@ class JobScriptFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('word')
 
 
-class JobRunFactory(factory.django.DjangoModelFactory):
+class JobFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.JobRun
+        model = models.Job
 
     id = factory.Faker('uuid4')
     script = factory.SubFactory(JobScriptFactory)
