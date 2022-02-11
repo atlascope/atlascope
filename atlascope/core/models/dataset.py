@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
+from django_extensions.db.models import TimeStampedModel
 from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 from s3_file_field import S3FileField
@@ -11,7 +12,7 @@ from s3_file_field import S3FileField
 from atlascope.core.importers import available_importers
 
 
-class Dataset(models.Model):
+class Dataset(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
@@ -23,7 +24,9 @@ class Dataset(models.Model):
         choices=[(choice, choice) for choice in settings.DATASET_TYPES],
         default=settings.DATASET_TYPES[0],
     )
-    derived_datasets = models.ManyToManyField('Dataset', blank=True)
+    source_dataset = models.ForeignKey(
+        'Dataset', null=True, on_delete=models.PROTECT, related_name='derived_datasets'
+    )
     # scale
     # applicable_heuristics
 
@@ -49,7 +52,17 @@ class Dataset(models.Model):
 class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dataset
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'description',
+            'public',
+            'content',
+            'metadata',
+            'dataset_type',
+            'source_dataset',
+            'derived_datasets',
+        ]
 
 
 class DatasetCreateSerializer(serializers.ModelSerializer):
