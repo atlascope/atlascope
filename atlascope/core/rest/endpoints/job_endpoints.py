@@ -6,23 +6,23 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import (
-    JobRun,
-    JobRunSerializer,
-    JobRunSpawnSerializer,
+    Job,
+    JobSerializer,
+    JobSpawnSerializer,
 )
 
 
-class JobRunViewSet(
+class JobViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
-    model = JobRun
-    queryset = JobRun.objects.all().order_by('id')
-    serializer_class = JobRunSerializer
+    model = Job
+    queryset = Job.objects.all().order_by('id')
+    serializer_class = JobSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=JobRunSpawnSerializer)
+    @swagger_auto_schema(request_body=JobSpawnSerializer)
     @action(
         detail=False,
         methods=['POST'],
@@ -30,8 +30,8 @@ class JobRunViewSet(
     def spawn(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        job_run: JobRun = serializer.save()
-        job_run.spawn()
+        job: Job = serializer.save()
+        job.spawn()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -41,7 +41,7 @@ class JobRunViewSet(
     )
     @action(detail=True, methods=['POST'])
     def rerun(self, request, **kwargs):
-        job_run: JobRun = self.get_object()
-        job_run.spawn()
+        job: Job = self.get_object()
+        job.spawn()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
