@@ -30,7 +30,11 @@ class JobRun(models.Model):
 
     def spawn(self):
         runner = available_job_types[self.job_type]
-        runner.delay(self.original_dataset, **self.additional_inputs)
+        runner.delay(
+            # celery arguments must be serializable
+            original_dataset_id=self.original_dataset.id,
+            **self.additional_inputs or {},
+        )
 
 
 class JobRunSpawnSerializer(serializers.ModelSerializer):

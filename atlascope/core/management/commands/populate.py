@@ -6,7 +6,7 @@ import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 
-from atlascope.core.models import Dataset, Investigation, JobRun, JobScript
+from atlascope.core.models import Dataset, Investigation, Job
 
 POPULATE_DIR = 'atlascope/core/management/populate/'
 
@@ -14,8 +14,7 @@ MODEL_JSON_MAPPING = [
     (User, 'users.json'),
     (Dataset, 'datasets.json'),
     (Investigation, 'investigations.json'),
-    (JobScript, 'job_scripts.json'),
-    (JobRun, 'job_runs.json'),
+    (Job, 'jobs.json'),
 ]
 
 DEFAULT_PASSWORD = 'letmein'
@@ -107,7 +106,7 @@ def command(password):
             if model == User:
                 db_obj.set_password(password or DEFAULT_PASSWORD)
             db_obj.save()
-            if model == JobRun:
+            if model == Job:
                 db_obj.spawn()
                 print('Successfully spawned job run!')
             if model == Dataset and not db_obj.content:
