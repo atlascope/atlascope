@@ -3,7 +3,7 @@ import os
 
 import requests
 
-from atlascope.core.importers import AtlascopeImporter
+from .base_importer import AtlascopeImporter
 
 
 class VandyImporter(AtlascopeImporter):
