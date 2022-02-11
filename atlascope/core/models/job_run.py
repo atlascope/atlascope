@@ -6,7 +6,6 @@ from django.db import models
 from rest_framework import serializers
 from s3_file_field import S3FileField
 
-from atlascope.core.tasks import spawn_job
 from atlascope.core.job_types import available_job_types
 
 
@@ -21,29 +20,29 @@ def validate_job_type(value):
 
 class JobRun(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    job_type = models.CharField(default='CloneData', max_length=100, validators=[validate_job_type])
-    input_image = S3FileField(null=True)
-    other_inputs = models.JSONField(null=True)
+    job_type = models.CharField(
+        default='average_color', max_length=100, validators=[validate_job_type]
+    )
+    original_dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE)
+    additional_inputs = models.JSONField(null=True)
     outputs = models.JSONField(null=True)
     last_run = models.DateTimeField(null=True)
-    preview_visual = S3FileField(null=True)
 
     def spawn(self):
-        spawn_job.delay(str(self.id))
+        runner = available_job_types[self.job_type]
+        runner.delay(self.original_dataset, **self.additional_inputs)
+
+
+class JobRunSpawnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobRun
+        fields = ['original_dataset', 'additional_inputs', 'job_type']
 
 
 class JobRunSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobRun
         fields = '__all__'
-
-
-class JobRunSpawnSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JobRun
-        fields = ['input_image', 'other_inputs', 'job_type']
-
-    input_image = serializers.CharField()
 
 
 @admin.register(JobRun)
