@@ -4,7 +4,6 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
 from rest_framework import serializers
-from s3_file_field import S3FileField
 
 from atlascope.core.job_types import available_job_types
 
@@ -25,8 +24,6 @@ class Job(models.Model):
     )
     original_dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE)
     additional_inputs = models.JSONField(null=True)
-    outputs = models.JSONField(null=True)
-    last_run = models.DateTimeField(null=True)
 
     def spawn(self):
         runner = available_job_types[self.job_type]
@@ -37,12 +34,6 @@ class Job(models.Model):
         )
 
 
-class JobSpawnSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Job
-        fields = ['original_dataset', 'additional_inputs', 'job_type']
-
-
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
@@ -51,4 +42,4 @@ class JobSerializer(serializers.ModelSerializer):
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
-    list_display = ('id', 'job_type', 'last_run')
+    list_display = ('id', 'job_type')
