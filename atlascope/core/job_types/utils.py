@@ -1,8 +1,9 @@
 import io
+
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
-def PIL_to_image_file(pil_image):
+def to_saveable_image(pil_image):
     output_bytes = io.BytesIO()
     pil_image.save(output_bytes, format="PNG")
     output_file = InMemoryUploadedFile(

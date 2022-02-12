@@ -1,15 +1,18 @@
 import io
-import numpy as np
+
 from PIL import Image, ImageDraw
 from celery import shared_task
 from django.utils import timezone
+import numpy as np
+
 from atlascope.core.models import Dataset
 
-from .utils import PIL_to_image_file
+from .utils import to_saveable_image
 
 
 @shared_task
 def run(original_dataset_id, n):
+    """Return the locations of the N pixels with the greatest RGB values in the input dataset."""
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     # TODO: we need a module to parse dataset type and return an image from it
     #   This is currently only tolerant to Green Cell Image dataset,
@@ -53,7 +56,7 @@ def run(original_dataset_id, n):
     )
     new_dataset.content.save(
         f'brightest_{n}_pixels.png',
-        PIL_to_image_file(output_image),
+        to_saveable_image(output_image),
     )
     new_dataset.save()
 
