@@ -1,6 +1,6 @@
 from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer
 from .investigation import Investigation, InvestigationDetailSerializer, InvestigationSerializer
-from .job import Job, JobSerializer, JobSpawnSerializer
+from .job import Job, JobSerializer
 from .pin import Pin, PinSerializer
 
 __all__ = [
@@ -12,7 +12,6 @@ __all__ = [
     DatasetCreateSerializer,
     Job,
     JobSerializer,
-    JobSpawnSerializer,
     Pin,
     PinSerializer,
 ]

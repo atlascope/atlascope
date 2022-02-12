@@ -27,7 +27,7 @@ for model_name, viewset in [
     ('investigation', InvestigationViewSet),
     ('dataset', DatasetViewSet),
     ('pin', PinViewSet),
-    ('job-run', JobViewSet),
+    ('job', JobViewSet),
 ]:
     router.register(f'{model_name}s', viewset, basename=model_name)
 

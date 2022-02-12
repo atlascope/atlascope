@@ -1,3 +1,4 @@
+from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
@@ -5,16 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import (
-    Job,
-    JobSerializer,
-    JobSpawnSerializer,
-)
+from atlascope.core.job_types import available_job_types
+from atlascope.core.models import Job, JobSerializer
 
 
 class JobViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
     GenericViewSet,
 ):
     model = Job
@@ -22,12 +21,7 @@ class JobViewSet(
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=JobSpawnSerializer)
-    @action(
-        detail=False,
-        methods=['POST'],
-    )
-    def spawn(self, request, **kwargs):
+    def create(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         job: Job = serializer.save()
@@ -45,3 +39,13 @@ class JobViewSet(
         job.spawn()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        operation_description='Retrieve a list of available options for job_type on Jobs',
+        manual_parameters=[],
+        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)},
+    )
+    @action(detail=False, methods=['GET'])
+    def types(self, request, **kwargs):
+        payload = {key: module.__doc__ for key, module in available_job_types.items()}
+        return Response(payload)
