@@ -97,7 +97,8 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     importer = serializers.CharField(
         default='UploadImporter',
-        help_text=f"The importer module to invoke. Must be one of {str(list(available_importers.keys()))}.",
+        help_text=f"The importer module to invoke.\
+            Must be one of {str(list(available_importers.keys()))}.",
     )
     import_arguments = serializers.JSONField(
         required=True,
