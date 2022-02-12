@@ -14,7 +14,6 @@ register(factories.UserFactory)
 register(factories.InvestigationFactory)
 register(factories.DatasetFactory)
 register(factories.PinFactory)
-register(factories.JobScriptFactory)
 register(factories.JobFactory)
 
 
