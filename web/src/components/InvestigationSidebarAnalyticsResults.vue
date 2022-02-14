@@ -24,13 +24,16 @@
         <v-spacer />
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        <span
+        <div
           v-if="result.job.resultsType === 'image'"
           class="show-white-space"
         >
-          Image
-        </span>
-        <span v-if="result.job.resultsType === 'text'">{{ result.results }}</span>
+          <img
+            :src="require(`@/assets/local/images/${result.results}`)"
+            alt="Job results"
+          >
+        </div>
+        <span v-if="result.job.resultsType === 'text'">{{ result.results || 'No results' }}</span>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>

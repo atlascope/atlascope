@@ -50,12 +50,27 @@ const jobResultList: JobResults[] = [
     job: jobs[0],
     status: 'error',
     updated: '1/7/2022 14:49:44',
+    errors: ['There was an error running this job.'],
   },
   {
     id: '3',
     job: jobs[0],
     status: 'success',
     updated: '1/18/2022 18:07:11',
+    results: `[
+      (4563, 890),
+      (28914, 44711)
+    ]`,
+    inputs: `[
+      { "name": "n", "value": 2 }
+    ]`,
+  },
+  {
+    id: '4',
+    job: jobs[1],
+    status: 'success',
+    updated: '2/14/2022 12:37:06',
+    results: 'test.png',
   },
 ];
 

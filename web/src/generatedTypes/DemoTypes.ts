@@ -6,6 +6,7 @@ export interface JobResults {
   metadata?: string;
   inputs?: string;
   updated?: string;
+  errors?: string[];
 }
 
 export interface JobInput {
