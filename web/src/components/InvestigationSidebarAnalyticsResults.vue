@@ -15,7 +15,7 @@
             </v-icon>
           </v-col>
           <v-col>
-            {{ result.jobType }}
+            {{ result.job.name }}
           </v-col>
           <v-col align="end">
             {{ result.updated }}
@@ -24,11 +24,23 @@
         <v-spacer />
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        Test
+        <span
+          v-if="result.job.resultsType === 'image'"
+          class="show-white-space"
+        >
+          Image
+        </span>
+        <span v-if="result.job.resultsType === 'text'">{{ result.results }}</span>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
 </template>
+
+<style scoped>
+.show-white-space {
+  white-space: pre;
+}
+</style>
 
 <script lang="ts">
 import { computed, defineComponent } from '@vue/composition-api';

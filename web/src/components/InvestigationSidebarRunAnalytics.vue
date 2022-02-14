@@ -18,13 +18,22 @@
     </span>
     <v-textarea
       v-if="selectedJob"
+      v-model="jobInputs"
       label="Input Values"
     />
     <v-btn
       v-if="selectedJob"
+      @click="submitJobRun"
     >
       Submit
     </v-btn>
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="2000"
+      right
+    >
+      Job submitted
+    </v-snackbar>
   </div>
 </template>
 
@@ -39,18 +48,50 @@ import {
   computed, defineComponent, ref, Ref,
 } from '@vue/composition-api';
 import store from '../store';
+import { Job, JobResults } from '../generatedTypes/DemoTypes';
 
 export default defineComponent({
   setup() {
     const jobs = computed(() => store.getters.jobs);
-    const selectedJob: Ref<any | null> = ref(null);
+    const selectedJob: Ref<Job | null> = ref(null);
+    const jobInputs = ref('');
+    const snackbar = ref(false);
     const selectedJobInputs: Ref<string> = computed(() => {
       if (!selectedJob.value || !selectedJob.value.inputs) {
         return '';
       }
       return JSON.stringify(selectedJob.value.inputs, undefined, 4);
     });
-    return { jobs, selectedJob, selectedJobInputs };
+
+    function submitJobRun(): void {
+      if (!selectedJob.value) {
+        return;
+      }
+      // launch job, listen for results
+      // jobRun = await store.dispatch.spawnJob({job, inputs});
+      // pollForJobResults(jobRun)
+      const jobRun: JobResults = {
+        job: selectedJob.value,
+        status: 'success',
+        inputs: jobInputs.value,
+        results: 'dummy job results',
+        updated: new Date().toLocaleString(),
+      };
+      store.dispatch.addJobResults(jobRun);
+      // clear the form, maybe navigate to results tab?
+      selectedJob.value = null;
+      jobInputs.value = '';
+      snackbar.value = true;
+    }
+
+    return {
+      jobs,
+      jobInputs,
+      selectedJob,
+      selectedJobInputs,
+      snackbar,
+      submitJobRun,
+    };
   },
 });
 </script>

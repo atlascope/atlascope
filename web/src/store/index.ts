@@ -6,19 +6,11 @@ import { AxiosInstance, AxiosResponse } from 'axios';
 import {
   User, Investigation, InvestigationDetail, Dataset, TileMetadata,
 } from '../generatedTypes/AtlascopeTypes';
+import {
+  JobResults, Job,
+} from '../generatedTypes/DemoTypes';
 
 Vue.use(Vuex);
-
-export interface JobResults {
-  id?: string;
-  jobType: 'Brightest N Pixels' | 'Average Color';
-  status: 'running' | 'error' | 'success';
-  resultsType: 'image' | 'text';
-  results?: string;
-  metadata?: string;
-  inputs?: string;
-  updated?: string;
-}
 
 export interface State {
     userInfo: User | null;
@@ -27,7 +19,45 @@ export interface State {
     currentInvestigation: InvestigationDetail | null;
     currentDatasets: Dataset[];
     activeDataset: Dataset | null;
+    jobResults: JobResults[];
 }
+
+const jobs: Job[] = [
+  {
+    name: 'Brightest N Pixels',
+    id: '1',
+    inputs: [
+      { name: 'n', type: 'number' },
+    ],
+    resultsType: 'text',
+  },
+  {
+    name: 'Average Color',
+    id: '2',
+    resultsType: 'image',
+  },
+];
+
+const jobResultList: JobResults[] = [
+  {
+    id: '1',
+    job: jobs[0],
+    status: 'running',
+    updated: '1/1/2022 12:36:35',
+  },
+  {
+    id: '2',
+    job: jobs[0],
+    status: 'error',
+    updated: '1/7/2022 14:49:44',
+  },
+  {
+    id: '3',
+    job: jobs[0],
+    status: 'success',
+    updated: '1/18/2022 18:07:11',
+  },
+];
 
 const {
   store,
@@ -43,6 +73,7 @@ const {
     currentInvestigation: null,
     currentDatasets: [],
     activeDataset: null,
+    jobResults: jobResultList || [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -63,8 +94,13 @@ const {
     setActiveDataset(state, dataset: Dataset | null) {
       state.activeDataset = dataset;
     },
+    // Demo/mock functions
+    addNewJobResults(state, results: JobResults) {
+      state.jobResults.push(results);
+    },
   },
   getters: {
+    // Demo/mock functions
     pins(state: State): any[] {
       if (state.currentInvestigation !== null) {
         // Use placeholders until GET /pins is implemented
@@ -85,49 +121,15 @@ const {
       }
       return [];
     },
-    jobs(state: State): any[] {
+    jobs(state: State): Job[] {
       if (state.userInfo !== null) {
-        return [
-          {
-            name: 'Brightest N Pixels',
-            id: '1',
-            inputs: [
-              { name: 'n', type: 'number' },
-            ],
-          },
-          {
-            name: 'Average Color',
-            id: '2',
-          },
-        ];
+        return jobs;
       }
       return [];
     },
-    jobResults(state: State): JobResults[] {
+    jobResults(state: State): JobResults[] | undefined {
       if (state.userInfo !== null) {
-        return [
-          {
-            jobType: 'Brightest N Pixels',
-            id: '1',
-            status: 'running',
-            resultsType: 'text',
-            updated: '1/1/2022 12:36:35',
-          },
-          {
-            jobType: 'Brightest N Pixels',
-            id: '2',
-            status: 'error',
-            resultsType: 'text',
-            updated: '1/7/2022 14:49:44',
-          },
-          {
-            jobType: 'Brightest N Pixels',
-            id: '3',
-            status: 'success',
-            resultsType: 'text',
-            updated: '1/18/2022 18:07:11',
-          },
-        ];
+        return state.jobResults;
       }
       return [];
     },
@@ -203,6 +205,12 @@ const {
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
+    },
+
+    // Demo/mock functions
+    addJobResults(context, results: JobResults) {
+      const { commit } = rootActionContext(context);
+      commit.addNewJobResults(results);
     },
   },
 });
