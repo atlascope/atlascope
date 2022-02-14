@@ -1,3 +1,5 @@
+from inspect import Parameter, signature
+
 import pytest
 
 from atlascope.core import models
@@ -220,7 +222,21 @@ def test_rerun_job(least_perm_api_client, job):
 
 @pytest.mark.django_db
 def test_list_job_types(least_perm_api_client):
-    expected_results = {key: module.__doc__ for key, module in available_job_types.items()}
+    expected_results = {
+        key: {
+            'description': module.__doc__,
+            'additional_inputs': [
+                {
+                    "name": name,
+                    "class": param.annotation.__name__,
+                    "required": param.default == Parameter.empty,
+                }
+                for name, param in signature(module).parameters.items()
+                if name != 'original_dataset_id'
+            ],
+        }
+        for key, module in available_job_types.items()
+    }
     resp = least_perm_api_client().get('/api/v1/jobs/types')
     assert resp.status_code == 200
     assert resp.json() == expected_results
