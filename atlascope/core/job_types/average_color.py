@@ -11,7 +11,7 @@ from .utils import to_saveable_image
 
 
 @shared_task
-def run(original_dataset_id):
+def run(original_dataset_id: str):
     """Return the average among all RGBA values in the input dataset image."""
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     # TODO: we need a module to parse dataset type and return an image from it

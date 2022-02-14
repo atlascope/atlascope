@@ -1,3 +1,5 @@
+from inspect import Parameter, signature
+
 from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, status
@@ -47,5 +49,19 @@ class JobViewSet(
     )
     @action(detail=False, methods=['GET'])
     def types(self, request, **kwargs):
-        payload = {key: module.__doc__ for key, module in available_job_types.items()}
+        payload = {
+            key: {
+                'description': module.__doc__,
+                'additional_inputs': [
+                    {
+                        "name": name,
+                        "class": param.annotation.__name__,
+                        "required": param.default == Parameter.empty,
+                    }
+                    for name, param in signature(module).parameters.items()
+                    if name != 'original_dataset_id'
+                ],
+            }
+            for key, module in available_job_types.items()
+        }
         return Response(payload)
