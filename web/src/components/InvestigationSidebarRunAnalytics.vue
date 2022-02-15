@@ -23,6 +23,15 @@
     />
     <v-btn
       v-if="selectedJob"
+      color="primary"
+      @click="console.log('ROI button clicked')"
+    >
+      Select ROI
+    </v-btn>
+    <v-btn
+      v-if="selectedJob"
+      class="ma-2 pa-2"
+      color="success"
       @click="submitJobRun"
     >
       Submit

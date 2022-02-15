@@ -103,7 +103,7 @@ export default defineComponent({
   setup(props) {
     const map = ref(null);
     const {
-      zoom, exit, generatePixelCoordinateParams, createMap, createLayer,
+      exit, generatePixelCoordinateParams, createMap, createLayer, clampBoundsX,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -124,7 +124,6 @@ export default defineComponent({
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.activeDataset;
       loaded.value = true;
-      setTimeout(() => zoom(6), 2500);
     });
 
     watch(activeDataset, async (newValue) => {
@@ -150,6 +149,7 @@ export default defineComponent({
       geojsParams.layer.url = `${apiRoot}/datasets/${newValue.id}/tiles/{z}/{x}/{y}.png`;
       geojsParams.layer.crossDomain = 'use-credentials';
       createMap(geojsParams.map);
+      clampBoundsX(false);
       createLayer('osm', geojsParams.layer);
     });
 

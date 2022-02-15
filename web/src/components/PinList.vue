@@ -4,7 +4,7 @@
     flat
     class="pa-0 ma-0"
   >
-    <v-list-item-group v-model="selectedItem">
+    <v-list-item-group>
       <v-list-item
         v-for="pin in pins"
         :key="pin.id"

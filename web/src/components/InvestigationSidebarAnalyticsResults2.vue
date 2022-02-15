@@ -19,10 +19,12 @@
       </div>
       <div v-if="currentResult.job.resultsType === 'image'">
         <span>Image Results:</span><br>
-        <img
-          :src="require(`@/assets/local/images/${currentResult.results}`)"
-          alt="Job results"
-        >
+        <div class="results-image-container">
+          <img
+            :src="require(`@/assets/local/images/${currentResult.results}`)"
+            alt="Job results"
+          >
+        </div>
       </div>
     </div>
   </div>
@@ -33,6 +35,12 @@
   padding: 0px;
   margin: 0px;
   white-space: pre;
+}
+
+.results-image-container {
+  width: 100%;
+  display: grid;
+  justify-content: center;
 }
 </style>
 

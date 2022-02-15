@@ -37,6 +37,12 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     }
   };
 
+  const clampBoundsX = (value: boolean) => {
+    if (map.value) {
+      map.value.clampBoundsX(value);
+    }
+  };
+
   const exit = () => {
     map.value.exit();
   };
@@ -75,5 +81,6 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     createMap,
     createLayer,
     generatePixelCoordinateParams,
+    clampBoundsX,
   };
 }
