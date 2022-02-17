@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.db.models.deletion import ProtectedError
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
@@ -79,6 +80,8 @@ def command(password):
     )
     # delete in reverse order because of dependency protections
     for model, _ in reversed(MODEL_JSON_MAPPING):
+        if model == Dataset:
+            model.objects.filter(source_dataset__isnull=False).delete()
         model.objects.all().delete()
         print(f'Deleted all existing {model.__name__}s.')
     for model, filename in MODEL_JSON_MAPPING:
