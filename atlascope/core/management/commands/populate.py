@@ -5,13 +5,12 @@ from pathlib import Path
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
-from django.db.models.deletion import ProtectedError
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 from rest_framework.serializers import ValidationError
 
-from atlascope.core.models import DatasetEmbedding, Dataset, Investigation, Job
+from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job
 
 POPULATE_DIR = 'atlascope/core/management/populate/'
 
