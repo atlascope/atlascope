@@ -13,5 +13,12 @@
             "importer": "VandyImporter",
             "file_id": "60e84a1868f4fe34fc7eef72"
         }
+    },
+    {
+        "name": "Green Cell Image",
+        "description": "This is a screenshot of some green cells",
+        "kwargs": {
+            "content": "green_cell_dataset_selection.png"
+        }
     }
 ]

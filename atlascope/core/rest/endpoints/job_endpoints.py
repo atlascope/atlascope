@@ -1,3 +1,6 @@
+from inspect import Parameter, signature
+
+from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
@@ -5,45 +8,26 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import (
-    JobRun,
-    JobRunSerializer,
-    JobRunSpawnSerializer,
-    JobScript,
-    JobScriptSerializer,
-)
+from atlascope.core.job_types import available_job_types
+from atlascope.core.models import Job, JobSerializer
 
 
-class JobScriptViewSet(
-    mixins.ListModelMixin,
-    GenericViewSet,
-):
-    model = JobScript
-    queryset = JobScript.objects.all().order_by('name')
-    serializer_class = JobScriptSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class JobRunViewSet(
+class JobViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
     GenericViewSet,
 ):
-    model = JobRun
-    queryset = JobRun.objects.all().order_by('id')
-    serializer_class = JobRunSerializer
+    model = Job
+    queryset = Job.objects.all().order_by('id')
+    serializer_class = JobSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=JobRunSpawnSerializer)
-    @action(
-        detail=False,
-        methods=['POST'],
-    )
-    def spawn(self, request, **kwargs):
+    def create(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        job_run: JobRun = serializer.save()
-        job_run.spawn()
+        job: Job = serializer.save()
+        job.spawn()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -53,7 +37,31 @@ class JobRunViewSet(
     )
     @action(detail=True, methods=['POST'])
     def rerun(self, request, **kwargs):
-        job_run: JobRun = self.get_object()
-        job_run.spawn()
+        job: Job = self.get_object()
+        job.spawn()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        operation_description='Retrieve a list of available options for job_type on Jobs',
+        manual_parameters=[],
+        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)},
+    )
+    @action(detail=False, methods=['GET'])
+    def types(self, request, **kwargs):
+        payload = {
+            key: {
+                'description': module.__doc__,
+                'additional_inputs': [
+                    {
+                        "name": name,
+                        "class": param.annotation.__name__,
+                        "required": param.default == Parameter.empty,
+                    }
+                    for name, param in signature(module).parameters.items()
+                    if name != 'original_dataset_id'
+                ],
+            }
+            for key, module in available_job_types.items()
+        }
+        return Response(payload)

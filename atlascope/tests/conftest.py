@@ -14,8 +14,7 @@ register(factories.UserFactory)
 register(factories.InvestigationFactory)
 register(factories.DatasetFactory)
 register(factories.PinFactory)
-register(factories.JobScriptFactory)
-register(factories.JobRunFactory)
+register(factories.JobFactory)
 
 
 @pytest.fixture(params=[None, 'superuser', 'view_model', 'change_model'])

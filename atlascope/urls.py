@@ -8,8 +8,7 @@ from rest_framework import permissions, routers
 from atlascope.core.rest.endpoints import (
     DatasetViewSet,
     InvestigationViewSet,
-    JobRunViewSet,
-    JobScriptViewSet,
+    JobViewSet,
     PinViewSet,
     UserViewSet,
 )
@@ -28,8 +27,7 @@ for model_name, viewset in [
     ('investigation', InvestigationViewSet),
     ('dataset', DatasetViewSet),
     ('pin', PinViewSet),
-    ('job-script', JobScriptViewSet),
-    ('job-run', JobRunViewSet),
+    ('job', JobViewSet),
 ]:
     router.register(f'{model_name}s', viewset, basename=model_name)
 
