@@ -1,10 +1,12 @@
 import json
+import os
 from pathlib import Path
 
 from django.contrib.auth.models import User
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
+from rest_framework.serializers import ValidationError
 
 from atlascope.core.models import Dataset, Investigation, Job
 
@@ -111,7 +113,14 @@ def command(password):
                 print('Successfully spawned job run!')
             if model == Dataset and not db_obj.content:
                 print("  performing import...")
-                db_obj.perform_import(**kwargs)
+                try:
+                    db_obj.perform_import(**kwargs)
+                except ValidationError as e:
+                    if 'DJANGO_API_TOKEN' not in os.environ:
+                        print('    ! DJANGO_API_TOKEN not set in environment.')
+                        print('    ! Skipping import for {db_obj.name}.')
+                    else:
+                        raise e
                 print("  import complete!")
 
     print('-----')
