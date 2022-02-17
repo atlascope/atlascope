@@ -1,5 +1,5 @@
-from .dataset_embedding import DatasetEmbedding, DatasetEmbeddingSerializer
 from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer
+from .dataset_embedding import DatasetEmbedding, DatasetEmbeddingSerializer
 from .investigation import Investigation, InvestigationDetailSerializer, InvestigationSerializer
 from .job import Job, JobSerializer
 from .pin import Pin, PinSerializer
