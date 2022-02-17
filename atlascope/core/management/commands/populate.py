@@ -3,13 +3,15 @@ import os
 from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
 from django.db.models.deletion import ProtectedError
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
 from rest_framework.serializers import ValidationError
 
-from atlascope.core.models import Dataset, Investigation, Job
+from atlascope.core.models import DatasetEmbedding, Dataset, Investigation, Job
 
 POPULATE_DIR = 'atlascope/core/management/populate/'
 
@@ -17,6 +19,7 @@ MODEL_JSON_MAPPING = [
     (User, 'users.json'),
     (Dataset, 'datasets.json'),
     (Investigation, 'investigations.json'),
+    (DatasetEmbedding, 'embeddings.json'),
     (Job, 'jobs.json'),
 ]
 
@@ -44,6 +47,8 @@ def expand_references(obj, model):
                 'name': value,
                 'contents': target_file,
             }
+        elif isinstance(found_field, PointField):
+            obj[field_name] = Point(*value)
         found_many_to_many = [
             field for field in model._meta.many_to_many if field.name == field_name
         ]
@@ -91,26 +96,27 @@ def command(password):
             if 'kwargs' in obj:
                 kwargs = obj['kwargs']
                 del obj['kwargs']
-                kwargs = {
-                    k: open(Path(POPULATE_DIR, 'inputs', v), 'rb').read() if k == 'content' else v
-                    for k, v in kwargs.items()
-                }
+                if 'content' in kwargs:
+                    obj['content'] = kwargs['content']
+                    del kwargs['content']
             obj, many_to_many_values, files_to_save, permissions = expand_references(obj, model)
             db_obj = model(**obj)
             db_obj.save()
             identifier = list(obj.values())[0]
             if type(identifier) != str:
-                identifier = str(db_obj.id)
+                identifier = str(db_obj)
             print(f'Saved {model.__name__}: {identifier}')
+
             for field_name, relations in many_to_many_values.items():
                 getattr(db_obj, field_name).set(relations)
             for field_name, file_to_save in files_to_save.items():
                 getattr(db_obj, field_name).save(file_to_save['name'], file_to_save['contents'])
             for perm, user_list in permissions.items():
                 [assign_perm(perm, user, db_obj) for user in user_list]
+            db_obj.save()
+
             if model == User:
                 db_obj.set_password(password or DEFAULT_PASSWORD)
-            db_obj.save()
             if model == Job:
                 db_obj.spawn()
                 print('Successfully spawned job run!')
