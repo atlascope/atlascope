@@ -18,7 +18,11 @@ class VandyImporter(AtlascopeImporter):
 
         params = {"key": api_key}
         token_url = "https://styx.neurology.emory.edu/girder/api/v1/api_key/token"
-        token = requests.post(token_url, params=params).json()["authToken"]["token"]
+        token_res = requests.post(token_url, params=params).json()
+        if 'authToken' not in token_res:
+            return
+
+        token = token_res["authToken"]["token"]
         headers = {"girder-token": token}
 
         source_url = f"https://styx.neurology.emory.edu/girder/api/v1/file/{file_id}/download"
