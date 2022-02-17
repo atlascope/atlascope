@@ -129,7 +129,7 @@ export interface InvestigationDetail {
   pins: string[];
 }
 
-export interface JobRun {
+export interface Job {
   /**
    * Id
    * @format uuid
@@ -167,7 +167,7 @@ export interface JobRun {
   script: string;
 }
 
-export interface JobRunSpawn {
+export interface JobSpawn {
   /** Input image */
   input_image: string;
 
@@ -243,7 +243,7 @@ export interface InvestigationsPermissionsPayload {
   investigators?: string[];
 }
 
-export interface JobRunsListParams {
+export interface JobsListParams {
   /** Number of results to return per page. */
   limit?: number;
 
@@ -391,57 +391,57 @@ export namespace Investigations {
   }
 }
 
-export namespace JobRuns {
+export namespace Jobs {
   /**
    * No description
    * @tags job-runs
-   * @name JobRunsList
+   * @name JobsList
    * @request GET:/job-runs
-   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (JobRun)[] }`
+   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (Job)[] }`
    */
-  export namespace JobRunsList {
+  export namespace JobsList {
     export type RequestParams = {};
     export type RequestQuery = { limit?: number; offset?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = { count: number; next?: string | null; previous?: string | null; results: JobRun[] };
+    export type ResponseBody = { count: number; next?: string | null; previous?: string | null; results: Job[] };
   }
   /**
    * No description
    * @tags job-runs
-   * @name JobRunsSpawn
+   * @name JobsSpawn
    * @request POST:/job-runs/spawn
-   * @response `201` `JobRunSpawn`
+   * @response `201` `JobSpawn`
    */
-  export namespace JobRunsSpawn {
+  export namespace JobsSpawn {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = JobRunSpawn;
+    export type RequestBody = JobSpawn;
     export type RequestHeaders = {};
-    export type ResponseBody = JobRunSpawn;
+    export type ResponseBody = JobSpawn;
   }
   /**
    * No description
    * @tags job-runs
-   * @name JobRunsRead
+   * @name JobsRead
    * @request GET:/job-runs/{id}
-   * @response `200` `JobRun`
+   * @response `200` `Job`
    */
-  export namespace JobRunsRead {
+  export namespace JobsRead {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = JobRun;
+    export type ResponseBody = Job;
   }
   /**
    * No description
    * @tags job-runs
-   * @name JobRunsRerun
+   * @name JobsRerun
    * @request POST:/job-runs/{id}/rerun
    * @response `204` `void` Rerun spawned.
    */
-  export namespace JobRunsRerun {
+  export namespace JobsRerun {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;

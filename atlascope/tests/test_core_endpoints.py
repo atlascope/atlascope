@@ -1,6 +1,9 @@
+from inspect import Parameter, signature
+
 import pytest
 
 from atlascope.core import models
+from atlascope.core.job_types import available_job_types
 from atlascope.core.rest.additional_serializers import UserSerializer
 from atlascope.core.rest.permissions import has_read_perm
 
@@ -183,11 +186,11 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
 
 
 @pytest.mark.django_db
-def test_list_job_runs(least_perm_api_client, job_run_factory):
-    job_runs = [job_run_factory() for i in range(1)]
-    job_runs.sort(key=lambda jr: str(jr.id))
-    expected_results = [models.JobRunSerializer(job_run).data for job_run in job_runs]
-    resp = least_perm_api_client().get('/api/v1/job-runs')
+def test_list_jobs(least_perm_api_client, job_factory):
+    jobs = [job_factory() for i in range(1)]
+    jobs.sort(key=lambda jr: str(jr.id))
+    expected_results = [models.JobSerializer(job).data for job in jobs]
+    resp = least_perm_api_client().get('/api/v1/jobs')
     assert resp.status_code == 200
     assert resp.json() == {
         'count': len(expected_results),
@@ -198,42 +201,42 @@ def test_list_job_runs(least_perm_api_client, job_run_factory):
 
 
 @pytest.mark.django_db
-def test_retrieve_job_run(least_perm_api_client, job_run):
-    resp = least_perm_api_client().get(f'/api/v1/job-runs/{job_run.id}')
+def test_retrieve_job(least_perm_api_client, job):
+    resp = least_perm_api_client().get(f'/api/v1/jobs/{job.id}')
     assert resp.status_code == 200
-    assert resp.json() == models.JobRunSerializer(job_run).data
+    assert resp.json() == models.JobSerializer(job).data
 
 
 @pytest.mark.django_db
-def test_spawn_job_run(least_perm_api_client, job_script, green_cell_upload):
-    serializer = models.JobRunSpawnSerializer(
-        data={
-            'input_image': green_cell_upload,
-            'other_inputs': {},
-            'script': str(job_script.id),
-        }
-    )
-    assert serializer.is_valid()
-    resp = least_perm_api_client().post('/api/v1/job-runs/spawn', data=serializer.data)
+def test_spawn_job(least_perm_api_client, job, dataset):
+    serializer = models.JobSerializer(job)
+    resp = least_perm_api_client().post('/api/v1/jobs', data=serializer.data)
     assert resp.status_code == 201
 
 
 @pytest.mark.django_db
-def test_rerun_job_run(least_perm_api_client, job_run):
-    resp = least_perm_api_client().post(f'/api/v1/job-runs/{job_run.id}/rerun')
+def test_rerun_job(least_perm_api_client, job):
+    resp = least_perm_api_client().post(f'/api/v1/jobs/{job.id}/rerun')
     assert resp.status_code == 204
 
 
 @pytest.mark.django_db
-def test_list_job_scripts(least_perm_api_client, job_script_factory):
-    job_script = [job_script_factory() for i in range(1)]
-    job_script.sort(key=lambda js: js.name)
-    expected_results = [models.JobScriptSerializer(job_script).data for job_script in job_script]
-    resp = least_perm_api_client().get('/api/v1/job-scripts')
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'count': len(expected_results),
-        'next': None,
-        'previous': None,
-        'results': expected_results,
+def test_list_job_types(least_perm_api_client):
+    expected_results = {
+        key: {
+            'description': module.__doc__,
+            'additional_inputs': [
+                {
+                    "name": name,
+                    "class": param.annotation.__name__,
+                    "required": param.default == Parameter.empty,
+                }
+                for name, param in signature(module).parameters.items()
+                if name != 'original_dataset_id'
+            ],
+        }
+        for key, module in available_job_types.items()
     }
+    resp = least_perm_api_client().get('/api/v1/jobs/types')
+    assert resp.status_code == 200
+    assert resp.json() == expected_results

@@ -1,9 +1,10 @@
-from .base_importer import AtlascopeImporter
 from .upload import UploadImporter
 from .vandy import VandyImporter
 
-__all__ = [
-    'AtlascopeImporter',
-    'UploadImporter',
-    'VandyImporter',
-]
+available_importers = {
+    cls.__name__: cls
+    for cls in [
+        UploadImporter,
+        VandyImporter,
+    ]
+}

@@ -60,19 +60,11 @@ class InvestigationFactory(factory.django.DjangoModelFactory):
     notes = factory.Faker('sentence')
 
 
-class JobScriptFactory(factory.django.DjangoModelFactory):
+class JobFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.JobScript
+        model = models.Job
 
     id = factory.Faker('uuid4')
-    name = factory.Faker('word')
-
-
-class JobRunFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.JobRun
-
-    id = factory.Faker('uuid4')
-    script = factory.SubFactory(JobScriptFactory)
-    input_image = factory.django.FileField(data=factory.Faker('binary', length=100))
-    other_inputs = {}
+    job_type = 'average_color'
+    original_dataset = factory.SubFactory(DatasetFactory)
+    additional_inputs = {}
