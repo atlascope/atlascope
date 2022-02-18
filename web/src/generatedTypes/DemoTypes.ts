@@ -11,7 +11,14 @@ export interface JobResults {
 
 export interface JobInput {
     name: string;
-    type: 'string' | 'number' | 'boolean';
+    class: string;
+    required: boolean;
+}
+
+export interface JobType {
+    name: string;
+    description?: string;
+    additionalInputs: JobInput[];
 }
 
 export interface Job {

@@ -31,15 +31,44 @@ export interface Dataset {
    */
   content?: string | null;
 
-  /** Extension */
-  extension?: string;
-
   /** Metadata */
   metadata?: object | null;
 
   /** Dataset type */
   dataset_type?: "tile_source" | "tile_overlay" | "analytics";
-  derived_datasets?: string[];
+
+  /**
+   * Source dataset
+   * @format uuid
+   */
+  source_dataset?: string | null;
+  derived_datasets: string[];
+}
+
+export interface DatasetCreate {
+  /** Name */
+  name?: string;
+
+  /** Description */
+  description?: string;
+
+  /** Public */
+  public?: boolean;
+
+  /** Dataset type */
+  dataset_type?: "tile_source" | "tile_overlay" | "analytics";
+
+  /**
+   * Importer
+   * The importer module to invoke.            Must be one of ['UploadImporter', 'VandyImporter'].
+   */
+  importer?: string;
+
+  /**
+   * Import arguments
+   * Any arguments to supply to the selected importer function
+   */
+  import_arguments: object;
 }
 
 export interface TileMetadata {
@@ -129,6 +158,23 @@ export interface InvestigationDetail {
   pins: string[];
 }
 
+export interface Pin {
+  /**
+   * Id
+   * @format uuid
+   */
+  id?: string;
+
+  /** Dataset */
+  dataset?: string;
+
+  /** Color */
+  color?: "red" | "blue" | "green" | "orange" | "purple" | "black";
+
+  /** Note */
+  note?: string;
+}
+
 export interface Job {
   /**
    * Id
@@ -136,60 +182,17 @@ export interface Job {
    */
   id?: string;
 
-  /**
-   * Input image
-   * @format uri
-   */
-  input_image?: string | null;
+  /** Job type */
+  job_type?: string;
 
-  /** Other inputs */
-  other_inputs?: object | null;
-
-  /** Outputs */
-  outputs?: object | null;
+  /** Additional inputs */
+  additional_inputs?: object | null;
 
   /**
-   * Last run
-   * @format date-time
-   */
-  last_run?: string | null;
-
-  /**
-   * Preview visual
-   * @format uri
-   */
-  preview_visual?: string | null;
-
-  /**
-   * Script
+   * Original dataset
    * @format uuid
    */
-  script: string;
-}
-
-export interface JobSpawn {
-  /** Input image */
-  input_image: string;
-
-  /** Other inputs */
-  other_inputs?: object | null;
-
-  /**
-   * Script
-   * @format uuid
-   */
-  script: string;
-}
-
-export interface JobScript {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
-
-  /** Name */
-  name: string;
+  original_dataset: string;
 }
 
 export interface User {
@@ -251,7 +254,7 @@ export interface JobsListParams {
   offset?: number;
 }
 
-export interface JobScriptsListParams {
+export interface JobsTypesReadParams {
   /** Number of results to return per page. */
   limit?: number;
 
@@ -285,6 +288,20 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
+   * @name DatasetsCreate
+   * @request POST:/datasets
+   * @response `201` `DatasetCreate`
+   */
+  export namespace DatasetsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = DatasetCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = DatasetCreate;
+  }
+  /**
+   * No description
+   * @tags datasets
    * @name DatasetsRead
    * @request GET:/datasets/{id}
    * @response `200` `Dataset`
@@ -295,20 +312,6 @@ export namespace Datasets {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsPerformImport
-   * @request POST:/datasets/{id}/import
-   * @response `204` `void` Import successful.
-   */
-  export namespace DatasetsPerformImport {
-    export type RequestParams = { id: string };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
   }
   /**
    * No description
@@ -389,14 +392,28 @@ export namespace Investigations {
     export type RequestHeaders = {};
     export type ResponseBody = InvestigationDetail;
   }
+  /**
+   * No description
+   * @tags investigations
+   * @name InvestigationsPins
+   * @request GET:/investigations/{id}/pins
+   * @response `200` `(Pin)[]`
+   */
+  export namespace InvestigationsPins {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Pin[];
+  }
 }
 
 export namespace Jobs {
   /**
    * No description
-   * @tags job-runs
+   * @tags jobs
    * @name JobsList
-   * @request GET:/job-runs
+   * @request GET:/jobs
    * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (Job)[] }`
    */
   export namespace JobsList {
@@ -408,23 +425,37 @@ export namespace Jobs {
   }
   /**
    * No description
-   * @tags job-runs
-   * @name JobsSpawn
-   * @request POST:/job-runs/spawn
-   * @response `201` `JobSpawn`
+   * @tags jobs
+   * @name JobsCreate
+   * @request POST:/jobs
+   * @response `201` `Job`
    */
-  export namespace JobsSpawn {
+  export namespace JobsCreate {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = JobSpawn;
+    export type RequestBody = Job;
     export type RequestHeaders = {};
-    export type ResponseBody = JobSpawn;
+    export type ResponseBody = Job;
+  }
+  /**
+   * @description Retrieve a list of available options for job_type on Jobs
+   * @tags jobs
+   * @name JobsTypesRead
+   * @request GET:/jobs/types
+   * @response `200` `object`
+   */
+  export namespace JobsTypesRead {
+    export type RequestParams = {};
+    export type RequestQuery = { limit?: number; offset?: number };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = object;
   }
   /**
    * No description
-   * @tags job-runs
+   * @tags jobs
    * @name JobsRead
-   * @request GET:/job-runs/{id}
+   * @request GET:/jobs/{id}
    * @response `200` `Job`
    */
   export namespace JobsRead {
@@ -436,9 +467,9 @@ export namespace Jobs {
   }
   /**
    * No description
-   * @tags job-runs
+   * @tags jobs
    * @name JobsRerun
-   * @request POST:/job-runs/{id}/rerun
+   * @request POST:/jobs/{id}/rerun
    * @response `204` `void` Rerun spawned.
    */
   export namespace JobsRerun {
@@ -447,23 +478,6 @@ export namespace Jobs {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = void;
-  }
-}
-
-export namespace JobScripts {
-  /**
-   * No description
-   * @tags job-scripts
-   * @name JobScriptsList
-   * @request GET:/job-scripts
-   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (JobScript)[] }`
-   */
-  export namespace JobScriptsList {
-    export type RequestParams = {};
-    export type RequestQuery = { limit?: number; offset?: number };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = { count: number; next?: string | null; previous?: string | null; results: JobScript[] };
   }
 }
 

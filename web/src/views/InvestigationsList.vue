@@ -65,6 +65,7 @@ export default Vue.extend({
     onMounted(async () => {
       store.dispatch.unsetCurrentInvestigation();
       await store.dispatch.fetchInvestigations();
+      await store.dispatch.fetchJobTypes();
     });
 
     return {

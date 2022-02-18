@@ -56,20 +56,20 @@
 import {
   computed, defineComponent, ref, Ref,
 } from '@vue/composition-api';
+import { JobType } from '../generatedTypes/DemoTypes';
 import store from '../store';
-import { Job, JobResults } from '../generatedTypes/DemoTypes';
 
 export default defineComponent({
   setup() {
-    const jobs = computed(() => store.getters.jobs);
-    const selectedJob: Ref<Job | null> = ref(null);
+    const jobs = computed(() => store.state.jobTypes);
+    const selectedJob: Ref<JobType | null> = ref(null);
     const jobInputs = ref('');
     const snackbar = ref(false);
     const selectedJobInputs: Ref<string> = computed(() => {
-      if (!selectedJob.value || !selectedJob.value.inputs) {
+      if (!selectedJob.value || !selectedJob.value.additionalInputs) {
         return '';
       }
-      return JSON.stringify(selectedJob.value.inputs, undefined, 4);
+      return JSON.stringify(selectedJob.value.additionalInputs, undefined, 4);
     });
 
     function submitJobRun(): void {
@@ -79,14 +79,7 @@ export default defineComponent({
       // launch job, listen for results
       // jobRun = await store.dispatch.spawnJob({job, inputs});
       // pollForJobResults(jobRun)
-      const jobRun: JobResults = {
-        job: selectedJob.value,
-        status: 'success',
-        inputs: jobInputs.value,
-        results: 'dummy job results',
-        updated: new Date().toLocaleString(),
-      };
-      store.dispatch.addJobResults(jobRun);
+      console.log(jobInputs.value);
       // clear the form, maybe navigate to results tab?
       selectedJob.value = null;
       jobInputs.value = '';

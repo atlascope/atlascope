@@ -1,57 +1,51 @@
 <template>
-  <v-expansion-panels
-    accordian
-    flat
-  >
-    <v-expansion-panel
-      v-for="result in jobResults"
-      :key="result.id"
-    >
-      <v-expansion-panel-header>
-        <v-row>
-          <v-col cols="1">
-            <v-icon left>
-              {{ iconType(result.status) }}
-            </v-icon>
-          </v-col>
-          <v-col>
-            {{ result.job.name }}
-          </v-col>
-          <v-col align="end">
-            {{ result.updated }}
-          </v-col>
-        </v-row>
-        <v-spacer />
-      </v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <div
-          v-if="result.job.resultsType === 'image'"
-          class="show-white-space"
-        >
-          <img
-            :src="require(`@/assets/local/images/${result.results}`)"
-            alt="Job results"
-          >
-        </div>
-        <span v-if="result.job.resultsType === 'text'">{{ result.results || 'No results' }}</span>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
+  <div class="ma-2 pa-2">
+    <v-select
+      v-if="jobResults.length > 0"
+      v-model="currentJob"
+      label="View results of a job"
+      :items="jobResults"
+      item-value="id"
+      item-text="id"
+      return-object
+    />
+    <div v-if="currentJob">
+      <!--
+        Here is where we can display job results. We should consider what kind
+        of data each job has created, and use the correct component. For now,
+        just display a string representing the job
+      -->
+      <span class="show-white-space">{{ currentJobStringRep }}</span>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .show-white-space {
+  padding: 0px;
+  margin: 0px;
   white-space: pre;
+}
+
+.results-image-container {
+  width: 100%;
+  display: grid;
+  justify-content: center;
 }
 </style>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import {
+  computed, defineComponent, Ref, ref,
+} from '@vue/composition-api';
 import store from '../store';
+import { Job } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
   setup() {
-    const jobResults = computed(() => store.getters.jobResults);
+    const jobResults = computed(() => store.state.jobs);
+    const currentJob: Ref<Job | null> = ref(null);
+    const currentJobStringRep = computed(() => JSON.stringify(currentJob, undefined, 4));
 
     const iconType = (jobStatus: string) => {
       switch (jobStatus) {
@@ -65,7 +59,12 @@ export default defineComponent({
           return '';
       }
     };
-    return { jobResults, iconType };
+    return {
+      jobResults,
+      iconType,
+      currentJob,
+      currentJobStringRep,
+    };
   },
 });
 </script>

@@ -123,6 +123,7 @@ export default defineComponent({
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.activeDataset;
+      await store.dispatch.fetchJobs();
       loaded.value = true;
     });
 

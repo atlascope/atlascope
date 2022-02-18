@@ -4,13 +4,19 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  User, Investigation, InvestigationDetail, Dataset, TileMetadata,
+  User, Investigation, InvestigationDetail, Dataset, TileMetadata, Job,
 } from '../generatedTypes/AtlascopeTypes';
 import {
-  JobResults, Job,
+  JobResults, JobType,
 } from '../generatedTypes/DemoTypes';
 
 Vue.use(Vuex);
+
+export interface JobInput {
+  name: string;
+  class: string;
+  required: boolean;
+}
 
 export interface State {
     userInfo: User | null;
@@ -19,60 +25,9 @@ export interface State {
     currentInvestigation: InvestigationDetail | null;
     currentDatasets: Dataset[];
     activeDataset: Dataset | null;
-    jobResults: JobResults[];
+    jobTypes: JobType[];
+    jobs: Job[];
 }
-
-const jobs: Job[] = [
-  {
-    name: 'Brightest N Pixels',
-    id: '1',
-    inputs: [
-      { name: 'n', type: 'number' },
-    ],
-    resultsType: 'text',
-  },
-  {
-    name: 'Average Color',
-    id: '2',
-    resultsType: 'image',
-  },
-];
-
-const jobResultList: JobResults[] = [
-  {
-    id: '1',
-    job: jobs[0],
-    status: 'running',
-    updated: '1/1/2022 12:36:35',
-  },
-  {
-    id: '2',
-    job: jobs[0],
-    status: 'error',
-    updated: '1/7/2022 14:49:44',
-    errors: ['There was an error running this job.'],
-  },
-  {
-    id: '3',
-    job: jobs[0],
-    status: 'success',
-    updated: '1/18/2022 18:07:11',
-    results: `[
-      (4563, 890),
-      (28914, 44711)
-    ]`,
-    inputs: `[
-      { "name": "n", "value": 2 }
-    ]`,
-  },
-  {
-    id: '4',
-    job: jobs[1],
-    status: 'success',
-    updated: '2/14/2022 12:37:06',
-    results: 'test.png',
-  },
-];
 
 const {
   store,
@@ -88,7 +43,8 @@ const {
     currentInvestigation: null,
     currentDatasets: [],
     activeDataset: null,
-    jobResults: jobResultList || [],
+    jobTypes: [],
+    jobs: [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -109,9 +65,11 @@ const {
     setActiveDataset(state, dataset: Dataset | null) {
       state.activeDataset = dataset;
     },
-    // Demo/mock functions
-    addNewJobResults(state, results: JobResults) {
-      state.jobResults.push(results);
+    setJobTypes(state, jobTypes: JobType[]) {
+      state.jobTypes = jobTypes;
+    },
+    setJobs(state, jobs: Job[]) {
+      state.jobs = jobs;
     },
   },
   getters: {
@@ -133,18 +91,6 @@ const {
             note: 'I am also just a test pin.',
           },
         ];
-      }
-      return [];
-    },
-    jobs(state: State): Job[] {
-      if (state.userInfo !== null) {
-        return jobs;
-      }
-      return [];
-    },
-    jobResults(state: State): JobResults[] | undefined {
-      if (state.userInfo !== null) {
-        return state.jobResults;
       }
       return [];
     },
@@ -187,6 +133,25 @@ const {
         commit.setCurrentInvestigation(null);
       }
     },
+    async fetchJobTypes(context) {
+      const { commit } = rootActionContext(context);
+      if (store.state.axiosInstance) {
+        const jobTypesResponse = (await store.state.axiosInstance.get('/jobs/types')).data;
+        const jobTypes = Object.keys(jobTypesResponse).map((value: string) => ({
+          name: value,
+          description: jobTypesResponse[value].description || '',
+          additionalInputs: jobTypesResponse[value].additional_inputs || [],
+        }));
+        commit.setJobTypes(jobTypes);
+      }
+    },
+    async fetchJobs(context) {
+      const { commit } = rootActionContext(context);
+      if (store.state.axiosInstance) {
+        const jobs = (await store.state.axiosInstance.get('/jobs')).data;
+        commit.setJobs(jobs.results);
+      }
+    },
     unsetCurrentInvestigation(context) {
       const { commit } = rootActionContext(context);
       commit.setCurrentInvestigation(null);
@@ -220,12 +185,6 @@ const {
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
-    },
-
-    // Demo/mock functions
-    addJobResults(context, results: JobResults) {
-      const { commit } = rootActionContext(context);
-      commit.addNewJobResults(results);
     },
   },
 });
