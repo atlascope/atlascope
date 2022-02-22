@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 from django.contrib.auth.models import User
-from django.contrib.gis.db.models import PointField
-from django.contrib.gis.geos import Point
+from django.contrib.gis.db.models import PolygonField
+from django.contrib.gis.geos.polygon import Polygon
 import djclick as click
 from guardian.shortcuts import assign_perm
 from oauth2_provider.models import Application
@@ -46,8 +46,8 @@ def expand_references(obj, model):
                 'name': value,
                 'contents': target_file,
             }
-        elif isinstance(found_field, PointField):
-            obj[field_name] = Point(*value)
+        elif isinstance(found_field, PolygonField):
+            obj[field_name] = Polygon.from_bbox(tuple(value))
         found_many_to_many = [
             field for field in model._meta.many_to_many if field.name == field_name
         ]
@@ -116,6 +116,7 @@ def command(password):
 
             if model == User:
                 db_obj.set_password(password or DEFAULT_PASSWORD)
+                db_obj.save()
             if model == Job:
                 db_obj.spawn()
                 print('Successfully spawned job run!')

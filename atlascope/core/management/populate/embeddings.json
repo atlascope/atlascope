@@ -3,35 +3,30 @@
         "context": "Whole Team Investigation",
         "parent": "Blue Speckle",
         "child": "Red Speckle",
-        "child_upper_left": [64, 64],
-        "child_lower_right": [192, 192]
+        "child_bounding_box": [64, 64, 192, 192]
     },
     {
         "context": "Whole Team Investigation",
         "parent": "Red Speckle",
         "child": "Green Speckle",
-        "child_upper_left": [64, 64],
-        "child_lower_right": [192, 192]
+        "child_bounding_box": [64, 64, 192, 192]
     },
     {
         "context": "Whole Team Investigation",
         "parent": "Green Speckle",
         "child": "Yellow Speckle",
-        "child_upper_left": [64, 64],
-        "child_lower_right": [192, 192]
+        "child_bounding_box": [64, 64, 192, 192]
     },
     {
         "context": "Frontend Investigation",
         "parent": "Green Speckle",
         "child": "Blue Speckle",
-        "child_upper_left": [64, 64],
-        "child_lower_right": [192, 192]
+        "child_bounding_box": [64, 64, 192, 192]
     },
     {
         "context": "Backend Investigation",
         "parent": "Red Speckle",
         "child": "Yellow Speckle",
-        "child_upper_left": [64, 64],
-        "child_lower_right": [192, 192]
+        "child_bounding_box": [64, 64, 192, 192]
     }
 ]
