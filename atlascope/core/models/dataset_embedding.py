@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from django.contrib import admin
-from django.contrib.gis.db.models import PointField
+from django.contrib.gis.db.models import PolygonField
 from django.db import models
 from rest_framework import serializers
 
@@ -19,8 +19,7 @@ class DatasetEmbedding(models.Model):
         on_delete=models.CASCADE,
         related_name='parent_embeddings',
     )
-    child_upper_left = PointField()
-    child_lower_right = PointField()
+    child_bounding_box = PolygonField()
 
     def __str__(self):
         return f'Embedding {self.child.name} in {self.parent.name} ({self.context.name})'
