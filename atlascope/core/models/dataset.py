@@ -25,7 +25,10 @@ class Dataset(TimeStampedModel, models.Model):
         default=settings.DATASET_TYPES[0],
     )
     source_dataset = models.ForeignKey(
-        'Dataset', null=True, on_delete=models.PROTECT, related_name='derived_datasets'
+        'Dataset',
+        null=True,
+        on_delete=models.PROTECT,
+        related_name='derived_datasets',
     )
     # scale
     # applicable_heuristics

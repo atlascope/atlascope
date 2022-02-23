@@ -19,22 +19,49 @@ def validate_job_type(value):
 
 class Job(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    job_type = models.CharField(
-        default='average_color', max_length=100, validators=[validate_job_type]
+    context = models.ForeignKey(
+        'Investigation',
+        on_delete=models.CASCADE,
+        related_name='jobs',
     )
-    original_dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE)
+    job_type = models.CharField(
+        default='average_color',
+        max_length=100,
+        validators=[validate_job_type],
+    )
+    original_dataset = models.ForeignKey(
+        'Dataset',
+        on_delete=models.CASCADE,
+        related_name='jobs',
+    )
+    resulting_datasets = models.ManyToManyField(
+        'Dataset',
+        related_name='origin',
+    )
     additional_inputs = models.JSONField(null=True)
 
     def spawn(self):
         runner = available_job_types[self.job_type]
         runner.delay(
             # celery arguments must be serializable
+            self.id,
             self.original_dataset.id,
             **self.additional_inputs or {},
         )
 
 
-class JobSerializer(serializers.ModelSerializer):
+class JobSpawnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = [
+            'context',
+            'job_type',
+            'original_dataset',
+            'additional_inputs',
+        ]
+
+
+class JobDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = '__all__'

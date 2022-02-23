@@ -187,10 +187,24 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
 
 @pytest.mark.django_db
 def test_list_jobs(least_perm_api_client, job_factory):
-    jobs = [job_factory() for i in range(1)]
-    jobs.sort(key=lambda jr: str(jr.id))
-    expected_results = [models.JobSerializer(job).data for job in jobs]
+    jobs = [job_factory() for i in range(3)]
+    expected_results = [models.JobDetailSerializer(job).data for job in jobs]
     resp = least_perm_api_client().get('/api/v1/jobs')
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'count': len(expected_results),
+        'next': None,
+        'previous': None,
+        'results': expected_results,
+    }
+
+
+@pytest.mark.django_db
+def test_list_jobs_in_investigation(least_perm_api_client, job_factory, investigation):
+    jobs = [job_factory(context=investigation) for i in range(2)]
+    [job_factory() for i in range(3)]  # make some unrelated jobs that should not be returned
+    expected_results = [models.JobDetailSerializer(job).data for job in jobs]
+    resp = least_perm_api_client().get('/api/v1/jobs', {'context': investigation.id})
     assert resp.status_code == 200
     assert resp.json() == {
         'count': len(expected_results),
@@ -204,12 +218,12 @@ def test_list_jobs(least_perm_api_client, job_factory):
 def test_retrieve_job(least_perm_api_client, job):
     resp = least_perm_api_client().get(f'/api/v1/jobs/{job.id}')
     assert resp.status_code == 200
-    assert resp.json() == models.JobSerializer(job).data
+    assert resp.json() == models.JobDetailSerializer(job).data
 
 
 @pytest.mark.django_db
 def test_spawn_job(least_perm_api_client, job, dataset):
-    serializer = models.JobSerializer(job)
+    serializer = models.JobSpawnSerializer(job)
     resp = least_perm_api_client().post('/api/v1/jobs', data=serializer.data)
     assert resp.status_code == 201
 
