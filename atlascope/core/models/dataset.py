@@ -65,6 +65,12 @@ class DatasetSerializer(serializers.ModelSerializer):
             'dataset_type',
             'source_dataset',
             'derived_datasets',
+            'child_embeddings',
+            'parent_embeddings',
+            'jobs',
+            'origin',
+            'pins',
+            'locations',
         ]
 
 

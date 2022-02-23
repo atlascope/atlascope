@@ -84,6 +84,8 @@ class InvestigationDetailSerializer(serializers.ModelSerializer):
             'notes',
             'created',
             'modified',
+            'embeddings',
+            'jobs',
         ]
 
 
