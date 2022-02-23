@@ -28,26 +28,12 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     dataset_type = 'tile_source'
 
     @factory.post_generation
-    def derived_datasets(self, create, extracted, **kwargs):
+    def source_dataset(self, create, extracted, **kwargs):
         if not create:
-            # Simple build, do nothing.
             return
 
         if extracted:
-            # A list of derived_datasets were passed in, use them
-            for derived_dataset in extracted:
-                self.derived_datasets.add(derived_dataset)
-
-
-class PinFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Pin
-
-    id = factory.Faker('uuid4')
-    note = factory.Faker('sentence')
-    parent_dataset = factory.SubFactory(DatasetFactory)
-    child_dataset = factory.SubFactory(DatasetFactory)
-    location = Point(5, 5)
+            self.source_dataset = extracted
 
 
 class InvestigationFactory(factory.django.DjangoModelFactory):
@@ -56,11 +42,32 @@ class InvestigationFactory(factory.django.DjangoModelFactory):
 
     id = factory.Faker('uuid4')
     name = factory.Faker('word')
+    description = factory.Faker('sentence')
     owner = factory.SubFactory(UserFactory)
-    # datasets
-    # pins
-    # connections
     notes = factory.Faker('sentence')
+
+    @factory.post_generation
+    def datasets(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            # A list of groups were passed in, use them
+            for dataset in extracted:
+                self.datasets.add(dataset)
+
+
+class PinFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Pin
+
+    id = factory.Faker('uuid4')
+    context = factory.SubFactory(InvestigationFactory)
+    parent = factory.SubFactory(DatasetFactory)
+    child = factory.SubFactory(DatasetFactory)
+    child_location = Point(5, 5)
+    color = 'red'
+    note = factory.Faker('sentence')
 
 
 class JobFactory(factory.django.DjangoModelFactory):
@@ -68,6 +75,17 @@ class JobFactory(factory.django.DjangoModelFactory):
         model = models.Job
 
     id = factory.Faker('uuid4')
-    job_type = 'average_color'
+    context = factory.SubFactory(InvestigationFactory)
     original_dataset = factory.SubFactory(DatasetFactory)
     additional_inputs = {}
+    job_type = 'average_color'
+
+    @factory.post_generation
+    def resulting_datasets(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            # A list of groups were passed in, use them
+            for resulting_dataset in extracted:
+                self.resulting_datasets.add(resulting_dataset)

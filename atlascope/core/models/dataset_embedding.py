@@ -8,7 +8,11 @@ from rest_framework import serializers
 
 class DatasetEmbedding(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    context = models.ForeignKey('Investigation', on_delete=models.CASCADE)
+    context = models.ForeignKey(
+        'Investigation',
+        on_delete=models.CASCADE,
+        related_name='embeddings',
+    )
     parent = models.ForeignKey(
         'Dataset',
         on_delete=models.CASCADE,
