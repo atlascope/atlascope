@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.gis.geos import Point
 import factory
 
 from atlascope.core import models
@@ -44,7 +45,9 @@ class PinFactory(factory.django.DjangoModelFactory):
 
     id = factory.Faker('uuid4')
     note = factory.Faker('sentence')
-    dataset = factory.SubFactory(DatasetFactory)
+    parent_dataset = factory.SubFactory(DatasetFactory)
+    child_dataset = factory.SubFactory(DatasetFactory)
+    location = Point(5, 5)
 
 
 class InvestigationFactory(factory.django.DjangoModelFactory):
