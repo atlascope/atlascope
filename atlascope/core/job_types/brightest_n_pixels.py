@@ -2,12 +2,11 @@ import io
 
 from PIL import Image, ImageDraw
 from celery import shared_task
-from django.utils import timezone
 import numpy as np
 
 from atlascope.core.models import Dataset
 
-from .utils import to_saveable_image
+from .utils import save_output_dataset
 
 
 @shared_task
@@ -46,18 +45,9 @@ def run(original_dataset_id: str, n: int):
         )
         draw.ellipse(bounding_box, outline=(255, 0, 0), width=3)
 
-    new_dataset = Dataset(
-        name=f'{original_dataset.name} Brightest {n} Pixels',
-        description=f'Brightest Pixels in {original_dataset.name} as of {timezone.now()}',
-        public=original_dataset.public,
-        metadata={'origin': f'Job Spawned at {timezone.now()}', 'pixel_locations': brightest},
-        dataset_type='analytics',
-        source_dataset=original_dataset,
+    save_output_dataset(
+        original_dataset,
+        f'Brightest {n} Pixels',
+        output_image,
+        {'pixel_locations': brightest},
     )
-    new_dataset.content.save(
-        f'brightest_{n}_pixels.png',
-        to_saveable_image(output_image),
-    )
-    new_dataset.save()
-
-    original_dataset.derived_datasets.add(new_dataset)
