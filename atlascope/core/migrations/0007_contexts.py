@@ -33,7 +33,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='job',
             name='context',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='core.investigation'),
+            field=models.ForeignKey(
+                default=None,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='jobs',
+                to='core.investigation',
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -44,13 +49,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pin',
             name='context',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, related_name='pins', to='core.investigation'),
+            field=models.ForeignKey(
+                default=None,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='pins',
+                to='core.investigation',
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name='datasetembedding',
             name='context',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='embeddings', to='core.investigation'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='embeddings',
+                to='core.investigation',
+            ),
         ),
         migrations.AlterField(
             model_name='investigation',
@@ -60,6 +74,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='job',
             name='original_dataset',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='core.dataset'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='core.dataset'
+            ),
         ),
     ]
