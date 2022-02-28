@@ -201,10 +201,10 @@ def test_list_jobs(least_perm_api_client, job_factory):
 
 @pytest.mark.django_db
 def test_list_jobs_in_investigation(least_perm_api_client, job_factory, investigation):
-    jobs = [job_factory(context=investigation) for i in range(2)]
+    jobs = [job_factory(investigation=investigation) for i in range(2)]
     [job_factory() for i in range(3)]  # make some unrelated jobs that should not be returned
     expected_results = [models.JobDetailSerializer(job).data for job in jobs]
-    resp = least_perm_api_client().get('/api/v1/jobs', {'context': investigation.id})
+    resp = least_perm_api_client().get('/api/v1/jobs', {'investigation': investigation.id})
     assert resp.status_code == 200
     assert resp.json() == {
         'count': len(expected_results),

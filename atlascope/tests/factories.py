@@ -62,7 +62,7 @@ class PinFactory(factory.django.DjangoModelFactory):
         model = models.Pin
 
     id = factory.Faker('uuid4')
-    context = factory.SubFactory(InvestigationFactory)
+    investigation = factory.SubFactory(InvestigationFactory)
     parent = factory.SubFactory(DatasetFactory)
     child = factory.SubFactory(DatasetFactory)
     child_location = Point(5, 5)
@@ -75,7 +75,7 @@ class JobFactory(factory.django.DjangoModelFactory):
         model = models.Job
 
     id = factory.Faker('uuid4')
-    context = factory.SubFactory(InvestigationFactory)
+    investigation = factory.SubFactory(InvestigationFactory)
     original_dataset = factory.SubFactory(DatasetFactory)
     additional_inputs = {}
     job_type = 'average_color'

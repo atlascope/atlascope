@@ -27,7 +27,7 @@ def run(job_id: str, original_dataset_id: str):
     job.resulting_datasets.add(
         save_output_dataset(
             original_dataset,
-            job.context,
+            job.investigation,
             'Average Color',
             output_image,
             {'rgba': average_color},
