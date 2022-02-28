@@ -188,6 +188,7 @@ def test_retrieve_dataset(user_api_client, user, dataset_factory):
 @pytest.mark.django_db
 def test_list_jobs(least_perm_api_client, job_factory):
     jobs = [job_factory() for i in range(3)]
+    jobs.sort(key=lambda d: d.id)
     expected_results = [models.JobDetailSerializer(job).data for job in jobs]
     resp = least_perm_api_client().get('/api/v1/jobs')
     assert resp.status_code == 200
@@ -204,14 +205,9 @@ def test_list_jobs_in_investigation(least_perm_api_client, job_factory, investig
     jobs = [job_factory(investigation=investigation) for i in range(2)]
     [job_factory() for i in range(3)]  # make some unrelated jobs that should not be returned
     expected_results = [models.JobDetailSerializer(job).data for job in jobs]
-    resp = least_perm_api_client().get('/api/v1/jobs', {'investigation': investigation.id})
+    resp = least_perm_api_client().get(f'/api/v1/investigations/{investigation.id}/jobs')
     assert resp.status_code == 200
-    assert resp.json() == {
-        'count': len(expected_results),
-        'next': None,
-        'previous': None,
-        'results': expected_results,
-    }
+    assert resp.json() == expected_results
 
 
 @pytest.mark.django_db

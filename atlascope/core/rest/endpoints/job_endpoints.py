@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.job_types import available_job_types
-from atlascope.core.models import Investigation, Job, JobDetailSerializer, JobSpawnSerializer
+from atlascope.core.models import Job, JobDetailSerializer, JobSpawnSerializer
 
 
 class JobViewSet(
@@ -26,14 +26,6 @@ class JobViewSet(
         if self.action in ['create', 'rerun']:
             return JobSpawnSerializer
         return JobDetailSerializer
-
-    def get_queryset(self):
-        if 'investigation' in self.request.GET:
-            investigation = Investigation.objects.get(
-                id=self.request.GET['investigation'],
-            )
-            return investigation.jobs.all()
-        return Job.objects.all()
 
     def create(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)
