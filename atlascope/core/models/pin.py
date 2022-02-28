@@ -17,7 +17,7 @@ PIN_COLORS = [
 
 class Pin(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    context = models.ForeignKey(
+    investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
         related_name='pins',

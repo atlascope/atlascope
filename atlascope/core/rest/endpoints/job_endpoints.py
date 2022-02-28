@@ -28,9 +28,9 @@ class JobViewSet(
         return JobDetailSerializer
 
     def get_queryset(self):
-        if 'context' in self.request.GET:
+        if 'investigation' in self.request.GET:
             investigation = Investigation.objects.get(
-                id=self.request.GET['context'],
+                id=self.request.GET['investigation'],
             )
             return investigation.jobs.all()
         return Job.objects.all()

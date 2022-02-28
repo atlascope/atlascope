@@ -15,7 +15,7 @@ class Investigation(TimeStampedModel, models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
-    datasets = models.ManyToManyField('Dataset', related_name='contexts')
+    datasets = models.ManyToManyField('Dataset', related_name='investigations')
     notes = models.TextField(max_length=5000, blank=True)
 
     def get_read_permission_groups():

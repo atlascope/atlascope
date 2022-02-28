@@ -19,7 +19,7 @@ def validate_job_type(value):
 
 class Job(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    context = models.ForeignKey(
+    investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
         related_name='jobs',
@@ -54,7 +54,7 @@ class JobSpawnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = [
-            'context',
+            'investigation',
             'job_type',
             'original_dataset',
             'additional_inputs',

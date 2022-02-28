@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 class DatasetEmbedding(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    context = models.ForeignKey(
+    investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
         related_name='embeddings',
@@ -26,7 +26,7 @@ class DatasetEmbedding(models.Model):
     child_bounding_box = PolygonField()
 
     def __str__(self):
-        return f'Embedding {self.child.name} in {self.parent.name} ({self.context.name})'
+        return f'Embedding {self.child.name} in {self.parent.name} ({self.investigation.name})'
 
 
 class DatasetEmbeddingSerializer(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class DatasetEmbeddingSerializer(serializers.ModelSerializer):
 class DatasetEmbeddingAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'context',
+        'investigation',
         'parent',
         'child',
     )

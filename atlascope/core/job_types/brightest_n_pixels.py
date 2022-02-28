@@ -51,7 +51,7 @@ def run(job_id: str, original_dataset_id: str, n: int):
     job.resulting_datasets.add(
         save_output_dataset(
             original_dataset,
-            job.context,
+            job.investigation,
             f'Brightest {n} Pixels',
             output_image,
             {'pixel_locations': brightest},

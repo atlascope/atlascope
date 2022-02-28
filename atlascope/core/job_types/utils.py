@@ -16,7 +16,7 @@ def to_saveable_image(pil_image):
     return output_file
 
 
-def save_output_dataset(original_dataset, context, job_name, output_image, outputs_dict):
+def save_output_dataset(original_dataset, investigation, job_name, output_image, outputs_dict):
     outputs_dict['origin'] = f'Job Spawned at {timezone.now()}'
     new_dataset = Dataset(
         name=f'{original_dataset.name} {job_name}',
@@ -43,7 +43,7 @@ def save_output_dataset(original_dataset, context, job_name, output_image, outpu
             new_pin_location[1] += 5
 
     new_pin = Pin(
-        context=context,
+        investigation=investigation,
         parent=original_dataset,
         child=new_dataset,
         child_location=Point(new_pin_location),
