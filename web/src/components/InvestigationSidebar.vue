@@ -3,29 +3,27 @@
     max-width="33vw"
     min-width="33vw"
   >
-    <v-expansion-panels
-      accordian
-      flat
+    <v-tabs
+      centered
+      grow
     >
-      <v-expansion-panel>
-        <v-expansion-panel-header>
-          Pins
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <pin-list />
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-      <v-expansion-panel>
-        <v-expansion-panel-header>
-          Metadata
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+      <v-tab>
+        Pins
+      </v-tab>
+      <v-tab-item>
+        <pin-list />
+      </v-tab-item>
+      <v-tab>
+        Metadata
+      </v-tab>
+      <v-tab-item>
+        <div class="ma-2 pa-2">
           <span class="metadata">
             {{ investigationMetadata }}
           </span>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+        </div>
+      </v-tab-item>
+    </v-tabs>
   </v-sheet>
 </template>
 

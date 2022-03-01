@@ -82,9 +82,10 @@ import {
   ref, defineComponent, onMounted, PropType, computed, watch, Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
+import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
-import { Dataset } from '../generatedTypes/AtlascopeTypes';
+import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
   name: 'InvestigationDetail',
@@ -103,29 +104,24 @@ export default defineComponent({
   setup(props) {
     const map = ref(null);
     const {
-      zoom, exit, generatePixelCoordinateParams, createMap, createLayer,
+      clampBoundsX, exit, generatePixelCoordinateParams, createMap, createLayer, geoEvents,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
-    const selectedDataset: Ref<Dataset | null> = ref(null);
-    const activeDataset = computed(() => store.state.activeDataset);
-    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
     }
 
+    // #region datasets
+    const selectedDataset: Ref<Dataset | null> = ref(null);
+    const activeDataset = computed(() => store.state.activeDataset);
+    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
       store.dispatch.setActiveDataset(newActiveDataset);
     }
-
-    onMounted(async () => {
-      await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      selectedDataset.value = store.state.activeDataset;
-      loaded.value = true;
-      setTimeout(() => zoom(6), 2500);
-    });
 
     watch(activeDataset, async (newValue) => {
       exit(); // tear down the map
@@ -151,17 +147,70 @@ export default defineComponent({
       geojsParams.layer.crossDomain = 'use-credentials';
       createMap(geojsParams.map);
       createLayer('osm', geojsParams.layer);
+      clampBoundsX(false);
+    });
+    // #endregion datasets
+
+    // #region pin
+    const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    let featureLayer: any;
+    let pinFeature: any;
+    watch(selectedPins, (pinList) => {
+      if (!featureLayer) {
+        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+      }
+      const pinFeatureData = pinList.map((pin) => {
+        let pinLocation: Point | undefined = postGisToPoint(pin.child_location);
+        if (!pinLocation) {
+          pinLocation = { x: 0, y: 0 };
+        }
+        return {
+          ...pinLocation,
+          id: pin.id,
+          color: pin.color,
+          note: pin.note,
+        };
+      });
+      if (!pinFeature) {
+        pinFeature = featureLayer.createFeature('point')
+          .data(pinFeatureData)
+          .position((pin: any) => ({ x: pin.x, y: pin.y }))
+          .style({
+            // reasonable default?
+            radius: 10,
+            strokeColor: 'white',
+            fillColor: (pin: any) => pin.color,
+          })
+          .draw();
+        pinFeature.geoOn(geoEvents.feature.mouseon, (event: any) => {
+          console.log({ event, on: 'on' });
+          // show tooltip by mouse
+        });
+        pinFeature.geoOn(geoEvents.feature.mouseoff, (event: any) => {
+          console.log({ event, on: 'off' });
+          // remove tooltip
+        });
+      } else {
+        pinFeature.data(pinFeatureData).draw();
+      }
+    });
+    // #endregion pin
+    onMounted(async () => {
+      await store.dispatch.fetchCurrentInvestigation(props.investigation);
+      selectedDataset.value = store.state.activeDataset;
+      loaded.value = true;
     });
 
     return {
-      map,
-      tilesourceDatasets,
+      loaded,
       sidebarCollapsed,
       toggleSidebar,
+      map,
+      tilesourceDatasets,
       activeDataset,
       selectedDataset,
       activeDatasetChanged,
-      loaded,
+      selectedPins,
     };
   },
 });
