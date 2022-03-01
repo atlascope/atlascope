@@ -19,6 +19,7 @@ def validate_job_type(value):
 
 class Job(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    complete = models.BooleanField(default=False)
     investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
@@ -69,4 +70,4 @@ class JobDetailSerializer(serializers.ModelSerializer):
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
-    list_display = ('id', 'job_type')
+    list_display = ('id', 'job_type', 'complete')

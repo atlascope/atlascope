@@ -33,4 +33,5 @@ def run(job_id: str, original_dataset_id: str):
             {'rgba': average_color},
         )
     )
+    job.complete = True
     job.save()

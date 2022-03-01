@@ -75,6 +75,7 @@ class JobFactory(factory.django.DjangoModelFactory):
         model = models.Job
 
     id = factory.Faker('uuid4')
+    complete = False
     investigation = factory.SubFactory(InvestigationFactory)
     original_dataset = factory.SubFactory(DatasetFactory)
     additional_inputs = {}
