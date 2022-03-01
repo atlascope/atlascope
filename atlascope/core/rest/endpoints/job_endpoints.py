@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.job_types import available_job_types
-from atlascope.core.models import Job, JobSerializer
+from atlascope.core.models import Job, JobDetailSerializer, JobSpawnSerializer
 
 
 class JobViewSet(
@@ -20,8 +20,12 @@ class JobViewSet(
 ):
     model = Job
     queryset = Job.objects.all().order_by('id')
-    serializer_class = JobSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'rerun']:
+            return JobSpawnSerializer
+        return JobDetailSerializer
 
     def create(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)

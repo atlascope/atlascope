@@ -25,7 +25,10 @@ class Dataset(TimeStampedModel, models.Model):
         default=settings.DATASET_TYPES[0],
     )
     source_dataset = models.ForeignKey(
-        'Dataset', null=True, on_delete=models.PROTECT, related_name='derived_datasets'
+        'Dataset',
+        null=True,
+        on_delete=models.PROTECT,
+        related_name='derived_datasets',
     )
     # scale
     # applicable_heuristics
@@ -62,6 +65,12 @@ class DatasetSerializer(serializers.ModelSerializer):
             'dataset_type',
             'source_dataset',
             'derived_datasets',
+            'child_embeddings',
+            'parent_embeddings',
+            'jobs',
+            'origin',
+            'pins',
+            'locations',
         ]
 
 
