@@ -37,6 +37,13 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     }
   };
 
+  const clampBoundsX = (value: boolean): boolean | undefined => {
+    if (map.value) {
+      return map.value.clampBoundsX(value);
+    }
+    return undefined;
+  };
+
   const exit = () => {
     map.value.exit();
   };
@@ -50,6 +57,8 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     const layer = map.value.createLayer(layerType, layerParams);
     return layer;
   };
+
+  const geoEvents = geo.event;
 
   const generatePixelCoordinateParams = (
     width: number,
@@ -75,5 +84,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     createMap,
     createLayer,
     generatePixelCoordinateParams,
+    geoEvents,
+    clampBoundsX,
   };
 }

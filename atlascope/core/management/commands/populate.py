@@ -2,12 +2,14 @@ import json
 import os
 from pathlib import Path
 
-from django.contrib.gis.db.models import PolygonField
+from django.contrib.auth.models import User
+from django.contrib.gis.db.models import PointField, PolygonField
 from django.contrib.gis.geos.polygon import Polygon
+from django.contrib.gis.geos import Point
 import djclick as click
 from rest_framework.serializers import ValidationError
 
-from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job
+from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin
 
 POPULATE_DIR = 'atlascope/core/management/populate/'
 
@@ -16,6 +18,7 @@ MODEL_JSON_MAPPING = [
     (Investigation, 'investigations.json'),
     (DatasetEmbedding, 'embeddings.json'),
     (Job, 'jobs.json'),
+    (Pin, 'pins.json'),
 ]
 
 
@@ -36,6 +39,8 @@ def expand_references(obj, model):
             }
         elif isinstance(found_field, PolygonField):
             obj[field_name] = Polygon.from_bbox(tuple(value))
+        elif isinstance(found_field, PointField):
+            obj[field_name] = Point((value['x'], value['y']))
         found_many_to_many = [
             field for field in model._meta.many_to_many if field.name == field_name
         ]
