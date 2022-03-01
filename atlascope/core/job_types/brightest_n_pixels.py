@@ -57,4 +57,5 @@ def run(job_id: str, original_dataset_id: str, n: int):
             {'pixel_locations': brightest},
         )
     )
+    job.complete = True
     job.save()
