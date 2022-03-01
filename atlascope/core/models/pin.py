@@ -17,14 +17,26 @@ PIN_COLORS = [
 
 class Pin(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    investigation = models.ForeignKey(
+        'Investigation',
+        on_delete=models.CASCADE,
+        related_name='pins',
+    )
+    parent = models.ForeignKey(
+        'Dataset',
+        on_delete=models.CASCADE,
+        related_name='pins',
+    )
+    child = models.ForeignKey(
+        'Dataset',
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='locations',
+    )
+    child_location = PointField()
     color = models.CharField(
         max_length=15, choices=PIN_COLORS, default='red', null=False, blank=False
     )
-    parent_dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE, related_name='pins')
-    child_dataset = models.ForeignKey(
-        'Dataset', on_delete=models.CASCADE, null=True, related_name='locations'
-    )
-    location = PointField()
     note = models.TextField(max_length=1000, blank=True)
 
 

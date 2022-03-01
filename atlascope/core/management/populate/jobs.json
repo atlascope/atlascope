@@ -1,10 +1,12 @@
 [
     {
         "job_type": "average_color",
+        "investigation": "Whole Team Investigation",
         "original_dataset": "Cells Subimage"
     },
     {
         "job_type": "brightest_n_pixels",
+        "investigation": "Whole Team Investigation",
         "original_dataset": "Cells Subimage",
         "additional_inputs": {
             "n": 5

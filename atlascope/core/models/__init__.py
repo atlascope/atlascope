@@ -4,7 +4,7 @@ from .investigation import Investigation, InvestigationDetailSerializer, Investi
 from .pin import Pin, PinSerializer
 
 # this must be done last to prevent circular imports via the job_types module
-from .job import Job, JobSerializer  # isort: skip
+from .job import Job, JobSpawnSerializer, JobDetailSerializer  # isort: skip
 
 __all__ = [
     Investigation,
@@ -16,7 +16,8 @@ __all__ = [
     DatasetSerializer,
     DatasetCreateSerializer,
     Job,
-    JobSerializer,
+    JobSpawnSerializer,
+    JobDetailSerializer,
     Pin,
     PinSerializer,
 ]

@@ -11,14 +11,11 @@ from rest_framework import serializers
 
 
 class Investigation(TimeStampedModel, models.Model):
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
-    datasets = models.ManyToManyField('Dataset', related_name='context_datasets')
-    pins = models.ManyToManyField('Pin', related_name='connection_pins')
-    # connections
+    datasets = models.ManyToManyField('Dataset', related_name='investigations')
     notes = models.TextField(max_length=5000, blank=True)
 
     def get_read_permission_groups():
@@ -75,7 +72,21 @@ class InvestigationDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Investigation
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'description',
+            'owner',
+            'investigators',
+            'observers',
+            'datasets',
+            'pins',
+            'notes',
+            'created',
+            'modified',
+            'embeddings',
+            'jobs',
+        ]
 
 
 @admin.register(Investigation)

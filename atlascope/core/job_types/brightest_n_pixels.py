@@ -10,9 +10,12 @@ from .utils import save_output_dataset
 
 
 @shared_task
-def run(original_dataset_id: str, n: int):
+def run(job_id: str, original_dataset_id: str, n: int):
     """Return the locations of the N pixels with the greatest RGB values in the input dataset."""
+    from atlascope.core.models import Job
+
     original_dataset = Dataset.objects.get(id=original_dataset_id)
+    job = Job.objects.get(id=job_id)
     # TODO: we need a module to parse dataset type and return an image from it
     #   This is currently only tolerant to Green Cell Image dataset,
     #   which has PNG content
@@ -45,9 +48,13 @@ def run(original_dataset_id: str, n: int):
         )
         draw.ellipse(bounding_box, outline=(255, 0, 0), width=3)
 
-    save_output_dataset(
-        original_dataset,
-        f'Brightest {n} Pixels',
-        output_image,
-        {'pixel_locations': brightest},
+    job.resulting_datasets.add(
+        save_output_dataset(
+            original_dataset,
+            job.investigation,
+            f'Brightest {n} Pixels',
+            output_image,
+            {'pixel_locations': brightest},
+        )
     )
+    job.save()
