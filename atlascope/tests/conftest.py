@@ -17,19 +17,9 @@ register(factories.JobFactory)
 
 
 @pytest.fixture()
-def user_api_client(request) -> APIClient:
+def api_client(request) -> APIClient:
     def _method(**kwargs):
-        api_client = APIClient()
-        return api_client
-
-    return _method
-
-
-@pytest.fixture()
-def least_perm_api_client(request) -> APIClient:
-    def _method(**kwargs):
-        api_client = APIClient()
-        return api_client
+        return APIClient()
 
     return _method
 
