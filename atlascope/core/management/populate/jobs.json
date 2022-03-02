@@ -11,5 +11,10 @@
         "additional_inputs": {
             "n": 5
         }
+    },
+    {
+        "job_type": "tiff_split",
+        "investigation": "Whole Team Investigation",
+        "original_dataset": "Local Vandy Dataset"
     }
 ]
