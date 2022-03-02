@@ -43,6 +43,9 @@ class Dataset(TimeStampedModel, models.Model):
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
+    # def create_sub_image_DS(self):
+    #     self.content.save(self.)
+
 
 class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -103,6 +106,18 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
         required=True,
         help_text="Any arguments to supply to the selected importer function",
     )
+
+
+class DatasetSubImageSerializer(serializers.Serializer):
+
+    original_dataset_id = serializers.UUIDField(required=True)
+    x0 = serializers.IntegerField(required=True)
+    y0 = serializers.IntegerField(required=True)
+    x1 = serializers.IntegerField(required=True)
+    y1 = serializers.IntegerField(required=True)
+
+    def validate_original_dataset_id(self, value):
+        return str(value)
 
 
 @admin.register(Dataset)
