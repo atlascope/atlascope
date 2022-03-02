@@ -19,6 +19,7 @@ class JobViewSet(
 ):
     model = Job
     queryset = Job.objects.all().order_by('id')
+    permission_classes = []
 
     def get_serializer_class(self):
         if self.action in ['create', 'rerun']:
