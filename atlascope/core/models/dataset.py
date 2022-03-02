@@ -16,7 +16,6 @@ class Dataset(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
-    public = models.BooleanField(default=True)
     content = S3FileField(null=True)
     metadata = models.JSONField(null=True)
     dataset_type = models.CharField(
@@ -32,12 +31,6 @@ class Dataset(TimeStampedModel, models.Model):
     )
     # scale
     # applicable_heuristics
-
-    def get_read_permission_groups():
-        return ['view_dataset', 'change_dataset']
-
-    def get_write_permission_groups():
-        return ['change_dataset']
 
     def perform_import(self, importer="UploadImporter", **kwargs):
         importer_obj = available_importers[importer]()
@@ -59,7 +52,6 @@ class DatasetSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'description',
-            'public',
             'content',
             'metadata',
             'dataset_type',
@@ -80,7 +72,6 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
         fields = [
             'name',
             'description',
-            'public',
             'dataset_type',
             'importer',
             'import_arguments',

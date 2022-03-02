@@ -21,7 +21,6 @@ def save_output_dataset(original_dataset, investigation, job_name, output_image,
     new_dataset = Dataset(
         name=f'{original_dataset.name} {job_name}',
         description=f'{job_name} for {original_dataset.name} as of {timezone.now()}',
-        public=original_dataset.public,
         metadata=outputs_dict,
         dataset_type='analytics',
         source_dataset=original_dataset,
