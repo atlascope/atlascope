@@ -1,6 +1,6 @@
 <script lang="ts">
 import {
-  ref, defineComponent, inject, onMounted,
+  ref, defineComponent, onMounted,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 

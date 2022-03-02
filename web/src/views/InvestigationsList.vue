@@ -48,15 +48,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import { computed, onMounted } from '@vue/composition-api';
-import LoginBanner from '../components/LoginBanner.vue';
 
 import store from '../store';
 
 export default Vue.extend({
-  components: {
-    LoginBanner,
-  },
-
   setup() {
     const investigations = computed(() => store.state.investigations);
 
