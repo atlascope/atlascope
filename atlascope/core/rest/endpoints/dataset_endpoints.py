@@ -1,5 +1,4 @@
 from drf_yasg.utils import swagger_auto_schema
-from guardian.shortcuts import get_objects_for_user
 from rest_framework import mixins, status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet

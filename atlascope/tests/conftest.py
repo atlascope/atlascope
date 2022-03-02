@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from django.core.files import File
-from guardian.shortcuts import assign_perm
 import pytest
 from pytest_factoryboy import register
 from rest_framework.test import APIClient

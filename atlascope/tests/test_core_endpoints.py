@@ -20,9 +20,7 @@ def test_list_investigations(api_client, investigation_factory):
             'name': i.name,
             'description': i.description,
         }
-        for i in (
-            investigations
-        )
+        for i in (investigations)
     ]
     resp = api_client.get('/api/v1/investigations')
     assert resp.status_code == 200
@@ -37,9 +35,7 @@ def test_list_investigations(api_client, investigation_factory):
 @pytest.mark.django_db
 def test_retrieve_investigation(api_client, investigation_factory):
     investigation = investigation_factory()
-    resp = api_client().get(
-        f'/api/v1/investigations/{investigation.id}'
-    )
+    resp = api_client().get(f'/api/v1/investigations/{investigation.id}')
     assert resp.status_code == 200
     assert resp.json() == models.InvestigationDetailSerializer(investigation).data
 
@@ -64,10 +60,7 @@ def test_list_datasets(api_client, dataset_factory):
     datasets = [dataset_factory() for i in range(3)]
     datasets.sort(key=lambda d: d.name)
     api_client = api_client(dataset=datasets[0])
-    expected_results = [
-        models.DatasetSerializer(d).data
-        for d in datasets
-    ]
+    expected_results = [models.DatasetSerializer(d).data for d in datasets]
     resp = api_client.get('/api/v1/datasets')
 
     assert resp.status_code == 200
@@ -83,9 +76,7 @@ def test_list_datasets(api_client, dataset_factory):
 def test_retrieve_dataset(api_client, dataset_factory):
     dataset = dataset_factory()
 
-    resp = api_client(dataset=dataset).get(
-        f'/api/v1/datasets/{dataset.id}'
-    )
+    resp = api_client(dataset=dataset).get(f'/api/v1/datasets/{dataset.id}')
     assert resp.status_code == 200
     assert resp.data == models.DatasetSerializer(dataset).data
 
