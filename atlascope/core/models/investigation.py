@@ -17,12 +17,6 @@ class Investigation(TimeStampedModel, models.Model):
 class InvestigationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Investigation
-        fields = ('id', 'name', 'description')
-
-
-class InvestigationDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Investigation
         fields = [
             'id',
             'name',

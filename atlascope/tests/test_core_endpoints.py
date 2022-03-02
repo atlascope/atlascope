@@ -15,11 +15,7 @@ def test_list_investigations(api_client, investigation_factory):
     investigations.sort(key=lambda i: i.name)
     api_client = api_client(investigation=investigations[0])
     expected_results = [
-        {
-            'id': i.id,
-            'name': i.name,
-            'description': i.description,
-        }
+        models.InvestigationSerializer(i).data
         for i in (investigations)
     ]
     resp = api_client.get('/api/v1/investigations')
@@ -37,7 +33,7 @@ def test_retrieve_investigation(api_client, investigation_factory):
     investigation = investigation_factory()
     resp = api_client().get(f'/api/v1/investigations/{investigation.id}')
     assert resp.status_code == 200
-    assert resp.json() == models.InvestigationDetailSerializer(investigation).data
+    assert resp.json() == models.InvestigationSerializer(investigation).data
 
 
 @pytest.mark.django_db
