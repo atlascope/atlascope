@@ -18,8 +18,6 @@ MODEL_JSON_MAPPING = [
     (Job, 'jobs.json'),
 ]
 
-DEFAULT_CLIENT_URI = 'http://localhost:8080/'
-
 
 def expand_references(obj, model):
     many_to_many_values = {}
