@@ -3,9 +3,8 @@
     class="pa-6"
     fluid
   >
-    <login-banner v-if="!userInfo" />
     <v-banner
-      v-else-if="investigations.length === 0"
+      v-if="investigations.length === 0"
       single-line
     >
       <v-icon left>
@@ -60,7 +59,6 @@ export default Vue.extend({
 
   setup() {
     const investigations = computed(() => store.state.investigations);
-    const userInfo = computed(() => store.state.userInfo);
 
     onMounted(async () => {
       store.dispatch.unsetCurrentInvestigation();
@@ -69,7 +67,6 @@ export default Vue.extend({
 
     return {
       investigations,
-      userInfo,
     };
   },
 });

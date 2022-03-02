@@ -4,13 +4,12 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  User, Investigation, InvestigationDetail, Dataset, TileMetadata,
+  Investigation, InvestigationDetail, Dataset, TileMetadata,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
 
 export interface State {
-    userInfo: User | null;
     investigations: Investigation[];
     axiosInstance: AxiosInstance | null;
     currentInvestigation: InvestigationDetail | null;
@@ -26,7 +25,6 @@ const {
   moduleGetterContext,
 } = createDirectStore({
   state: {
-    userInfo: null,
     investigations: [],
     axiosInstance: null,
     currentInvestigation: null,
@@ -39,9 +37,6 @@ const {
     },
     setCurrentInvestigation(state, currentInvestigation: InvestigationDetail | null) {
       state.currentInvestigation = currentInvestigation;
-    },
-    setUserInfo(state, userInfo: User | null) {
-      state.userInfo = userInfo;
     },
     setAxiosInstance(state, axiosInstance: AxiosInstance | null) {
       state.axiosInstance = axiosInstance;
@@ -130,18 +125,6 @@ const {
         return metadata;
       }
       return null;
-    },
-    async fetchUserInfo(context) {
-      const { commit } = rootActionContext(context);
-      if (store.state.axiosInstance) {
-        const userInfo = (await store.state.axiosInstance.get('/users/me')).data;
-        commit.setUserInfo(userInfo);
-      }
-    },
-    logout(context) {
-      const { commit } = rootActionContext(context);
-      commit.setUserInfo(null);
-      commit.setInvestigations([]);
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);

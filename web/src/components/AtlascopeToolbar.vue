@@ -15,21 +15,6 @@
       </v-toolbar-title>
       <v-spacer />
       <v-toolbar-title> {{ investigationName }}</v-toolbar-title>
-      <v-spacer />
-      <v-btn
-        v-if="userInfo"
-        text
-        @click="logInOrOut"
-      >
-        Logout
-      </v-btn>
-      <v-btn
-        v-if="!userInfo"
-        text
-        @click="logInOrOut"
-      >
-        Login
-      </v-btn>
     </v-app-bar>
   </div>
 </template>
@@ -38,38 +23,13 @@
 import {
   defineComponent, inject, computed, onMounted,
 } from '@vue/composition-api';
-import OAuthClient from '@girder/oauth-client';
 import store from '../store';
 
 export default defineComponent({
   setup() {
-    const oauthClient = inject<OAuthClient>('oauthClient');
-    const userInfo = computed(() => store.state.userInfo);
     const investigationName = computed(() => store.state.currentInvestigation?.name);
 
-    if (oauthClient === undefined) {
-      throw new Error('Must provide "oauthClient" into component.');
-    }
-
-    onMounted(async () => {
-      await store.dispatch.fetchUserInfo();
-    });
-
-    return { oauthClient, userInfo, investigationName };
-  },
-
-  methods: {
-    async logInOrOut(): Promise<void> {
-      if (this.oauthClient.isLoggedIn) {
-        await this.oauthClient.logout();
-        store.dispatch.logout();
-        if (this.$router.currentRoute.name !== 'investigationsList') {
-          this.$router.push({ name: 'investigationsList' });
-        }
-      } else {
-        this.oauthClient.redirectToLogin();
-      }
-    },
+    return { investigationName };
   },
 });
 </script>

@@ -10,20 +10,17 @@ from atlascope.core.rest.endpoints import (
     InvestigationViewSet,
     JobViewSet,
     PinViewSet,
-    UserViewSet,
 )
 
 # OpenAPI generation
 schema_view = get_schema_view(
     openapi.Info(title='Atlascope', default_version='v1', description=''),
     public=True,
-    permission_classes=(permissions.AllowAny,),
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
 
 for model_name, viewset in [
-    ('user', UserViewSet),
     ('investigation', InvestigationViewSet),
     ('dataset', DatasetViewSet),
     ('pin', PinViewSet),
@@ -33,7 +30,6 @@ for model_name, viewset in [
 
 urlpatterns = [
     path('accounts/', include('allauth.urls')),
-    path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('admin/', admin.site.urls),
     path('api/v1/s3-upload/', include('s3_file_field.urls')),
     path('api/v1/', include(router.urls)),
