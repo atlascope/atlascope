@@ -1,4 +1,3 @@
-from guardian.shortcuts import get_objects_for_user
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import Investigation, Pin, PinSerializer
