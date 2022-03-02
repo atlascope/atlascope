@@ -48,6 +48,7 @@ setup(
         'django-click',
         'importlib_metadata>=3.6',
         'large-image[gdal]',
+        'tifftools',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'django-s3-file-field[boto3]',
