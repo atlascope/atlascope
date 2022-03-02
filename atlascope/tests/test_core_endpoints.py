@@ -10,10 +10,10 @@ from atlascope.core.job_types import available_job_types
 
 
 @pytest.mark.django_db
-def test_list_investigations(user_api_client, investigation_factory):
+def test_list_investigations(api_client, investigation_factory):
     investigations = [investigation_factory() for i in range(3)]
     investigations.sort(key=lambda i: i.name)
-    user_api_client = user_api_client(investigation=investigations[0])
+    api_client = api_client(investigation=investigations[0])
     expected_results = [
         {
             'id': i.id,
@@ -24,7 +24,7 @@ def test_list_investigations(user_api_client, investigation_factory):
             investigations
         )
     ]
-    resp = user_api_client.get('/api/v1/investigations')
+    resp = api_client.get('/api/v1/investigations')
     assert resp.status_code == 200
     assert resp.json() == {
         'count': len(expected_results),
@@ -35,9 +35,9 @@ def test_list_investigations(user_api_client, investigation_factory):
 
 
 @pytest.mark.django_db
-def test_retrieve_investigation(user_api_client, investigation_factory):
+def test_retrieve_investigation(api_client, investigation_factory):
     investigation = investigation_factory()
-    resp = user_api_client().get(
+    resp = api_client().get(
         f'/api/v1/investigations/{investigation.id}'
     )
     assert resp.status_code == 200
@@ -45,10 +45,10 @@ def test_retrieve_investigation(user_api_client, investigation_factory):
 
 
 @pytest.mark.django_db
-def test_get_investigation_pins(user_api_client, investigation, pin_factory):
+def test_get_investigation_pins(api_client, investigation, pin_factory):
     pin_set = [pin_factory() for i in range(5)]
     investigation.pins.set(pin_set)
-    resp = user_api_client(investigation=investigation).get(
+    resp = api_client(investigation=investigation).get(
         f'/api/v1/investigations/{investigation.id}/pins'
     )
     assert resp.status_code == 200
@@ -60,15 +60,15 @@ def test_get_investigation_pins(user_api_client, investigation, pin_factory):
 
 
 @pytest.mark.django_db
-def test_list_datasets(user_api_client, dataset_factory):
+def test_list_datasets(api_client, dataset_factory):
     datasets = [dataset_factory() for i in range(3)]
     datasets.sort(key=lambda d: d.name)
-    user_api_client = user_api_client(dataset=datasets[0])
+    api_client = api_client(dataset=datasets[0])
     expected_results = [
         models.DatasetSerializer(d).data
         for d in datasets
     ]
-    resp = user_api_client.get('/api/v1/datasets')
+    resp = api_client.get('/api/v1/datasets')
 
     assert resp.status_code == 200
     assert resp.json() == {
@@ -80,10 +80,10 @@ def test_list_datasets(user_api_client, dataset_factory):
 
 
 @pytest.mark.django_db
-def test_retrieve_dataset(user_api_client, dataset_factory):
+def test_retrieve_dataset(api_client, dataset_factory):
     dataset = dataset_factory()
 
-    resp = user_api_client(dataset=dataset).get(
+    resp = api_client(dataset=dataset).get(
         f'/api/v1/datasets/{dataset.id}'
     )
     assert resp.status_code == 200
@@ -95,11 +95,11 @@ def test_retrieve_dataset(user_api_client, dataset_factory):
 
 
 @pytest.mark.django_db
-def test_list_jobs(least_perm_api_client, job_factory):
+def test_list_jobs(api_client, job_factory):
     jobs = [job_factory() for i in range(3)]
     jobs.sort(key=lambda d: d.id)
     expected_results = [models.JobDetailSerializer(job).data for job in jobs]
-    resp = least_perm_api_client().get('/api/v1/jobs')
+    resp = api_client().get('/api/v1/jobs')
     assert resp.status_code == 200
     assert resp.json() == {
         'count': len(expected_results),
@@ -110,37 +110,37 @@ def test_list_jobs(least_perm_api_client, job_factory):
 
 
 @pytest.mark.django_db
-def test_list_jobs_in_investigation(least_perm_api_client, job_factory, investigation):
+def test_list_jobs_in_investigation(api_client, job_factory, investigation):
     jobs = [job_factory(investigation=investigation) for i in range(2)]
     [job_factory() for i in range(3)]  # make some unrelated jobs that should not be returned
     expected_results = [models.JobDetailSerializer(job).data for job in jobs]
-    resp = least_perm_api_client().get(f'/api/v1/investigations/{investigation.id}/jobs')
+    resp = api_client().get(f'/api/v1/investigations/{investigation.id}/jobs')
     assert resp.status_code == 200
     assert resp.json() == expected_results
 
 
 @pytest.mark.django_db
-def test_retrieve_job(least_perm_api_client, job):
-    resp = least_perm_api_client().get(f'/api/v1/jobs/{job.id}')
+def test_retrieve_job(api_client, job):
+    resp = api_client().get(f'/api/v1/jobs/{job.id}')
     assert resp.status_code == 200
     assert resp.json() == models.JobDetailSerializer(job).data
 
 
 @pytest.mark.django_db
-def test_spawn_job(least_perm_api_client, job, dataset):
+def test_spawn_job(api_client, job, dataset):
     serializer = models.JobSpawnSerializer(job)
-    resp = least_perm_api_client().post('/api/v1/jobs', data=serializer.data)
+    resp = api_client().post('/api/v1/jobs', data=serializer.data)
     assert resp.status_code == 201
 
 
 @pytest.mark.django_db
-def test_rerun_job(least_perm_api_client, job):
-    resp = least_perm_api_client().post(f'/api/v1/jobs/{job.id}/rerun')
+def test_rerun_job(api_client, job):
+    resp = api_client().post(f'/api/v1/jobs/{job.id}/rerun')
     assert resp.status_code == 204
 
 
 @pytest.mark.django_db
-def test_list_job_types(least_perm_api_client):
+def test_list_job_types(api_client):
     expected_results = {
         key: {
             'description': module.__doc__,
@@ -156,6 +156,6 @@ def test_list_job_types(least_perm_api_client):
         }
         for key, module in available_job_types.items()
     }
-    resp = least_perm_api_client().get('/api/v1/jobs/types')
+    resp = api_client().get('/api/v1/jobs/types')
     assert resp.status_code == 200
     assert resp.json() == expected_results
