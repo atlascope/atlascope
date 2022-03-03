@@ -46,7 +46,6 @@ setup(
         'djangorestframework',
         'drf-yasg',
         'django-click',
-        'django-guardian',
         'importlib_metadata>=3.6',
         'large-image[gdal]',
         # Production-only

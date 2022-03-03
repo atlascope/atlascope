@@ -6,7 +6,6 @@ from large_image_source_gdal import GDALFileTileSource
 from rest_framework import mixins
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 
@@ -16,7 +15,6 @@ from atlascope.core.rest.additional_serializers import TileMetadataSerializer
 
 class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
-    permission_classes = [IsAuthenticated]
     serializer_class = TileMetadataSerializer
 
     def get(self, *args, **kwargs):
@@ -37,7 +35,6 @@ class LargeImageRenderer(BaseRenderer):
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     model = Dataset
-    permission_classes = [IsAuthenticated]
     renderer_classes = [LargeImageRenderer]
 
     @swagger_auto_schema(

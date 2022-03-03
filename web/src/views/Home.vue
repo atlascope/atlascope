@@ -1,39 +1,20 @@
 <script lang="ts">
 import {
-  ref, defineComponent, inject, onMounted,
+  ref, defineComponent, onMounted,
 } from '@vue/composition-api';
-import OAuthClient from '@girder/oauth-client';
 import useGeoJS from '../utilities/useGeoJS';
 
 export default defineComponent({
   setup() {
     const map = ref(null);
 
-    const oauthClient = inject<OAuthClient>('oauthClient');
-    if (oauthClient === undefined) {
-      throw new Error('Must provide "oauthClient" into component.');
-    }
     const { zoom, center } = useGeoJS(map);
 
     onMounted(() => {
       setTimeout(() => center(-0.1704, 51.5047), 2000);
       setTimeout(() => zoom(14), 4000);
     });
-    return { oauthClient, map };
-  },
-  computed: {
-    loginText(): string {
-      return this.oauthClient.isLoggedIn ? 'Logout' : 'Login';
-    },
-  },
-  methods: {
-    logInOrOut(): void {
-      if (this.oauthClient.isLoggedIn) {
-        this.oauthClient.logout();
-      } else {
-        this.oauthClient.redirectToLogin();
-      }
-    },
+    return { map };
   },
 });
 </script>
