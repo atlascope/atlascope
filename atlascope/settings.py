@@ -48,16 +48,8 @@ class AtlascopeMixin(ConfigMixin):
         # Install additional apps
         configuration.INSTALLED_APPS += [
             's3_file_field',
-            'guardian',
             'django.contrib.gis',
         ]
-        # guardian's authentication backend
-        configuration.AUTHENTICATION_BACKENDS += [
-            'guardian.backends.ObjectPermissionBackend',
-        ]
-
-        # disable guardian anonymous user
-        configuration.ANONYMOUS_USER_NAME = None
 
         # Allow CORS requests to use credentials. Necessary for geojs on the client
         configuration.CORS_ALLOW_CREDENTIALS = True
