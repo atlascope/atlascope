@@ -62,6 +62,10 @@ class AtlascopeMixin(ConfigMixin):
         # Allow CORS requests to use credentials. Necessary for geojs on the client
         configuration.CORS_ALLOW_CREDENTIALS = True
 
+        # Remove permission controls
+        drf_config = configuration.REST_FRAMEWORK
+        drf_config['DEFAULT_PERMISSION_CLASSES'] = []
+
 
 class DevelopmentConfiguration(AtlascopeMixin, DevelopmentBaseConfiguration):
     pass
