@@ -13,6 +13,15 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='dataset',
             name='dataset_type',
-            field=models.CharField(choices=[('tile_source', 'tile_source'), ('tile_overlay', 'tile_overlay'), ('analytics', 'analytics'), ('sub_image', 'sub_image')], default='tile_source', max_length=20),
+            field=models.CharField(
+                choices=[
+                    ('tile_source', 'tile_source'),
+                    ('tile_overlay', 'tile_overlay'),
+                    ('analytics', 'analytics'),
+                    ('sub_image', 'sub_image'),
+                ],
+                default='tile_source',
+                max_length=20,
+            ),
         ),
     ]
