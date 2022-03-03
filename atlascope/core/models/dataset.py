@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from guardian.admin import GuardedModelAdmin
 from rest_framework import serializers
 from s3_file_field import S3FileField
 
@@ -107,5 +106,5 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
 
 
 @admin.register(Dataset)
-class DatasetAdmin(GuardedModelAdmin):
+class DatasetAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
