@@ -45,11 +45,11 @@ class DatasetViewSet(
         serializer = DatasetSubImageSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         original_dataset = Dataset.objects.get(id=serializer.validated_data["original_dataset_id"])
-        meta = serializer.validated_data
+        meta = serializer.validated_data.copy()
         meta.pop("original_dataset_id")
         new_dataset_obj = Dataset(
             name=f'{original_dataset.name} Sub Image',
-            metadata=serializer.validated_data,
+            metadata=meta,
             source_dataset=original_dataset,
             dataset_type="sub_image"
         )
