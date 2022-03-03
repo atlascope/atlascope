@@ -10,7 +10,7 @@ from atlascope.core.models import (
     DatasetCreateSerializer,
     DatasetSerializer,
     DatasetSubImageSerializer,
-    )
+)
 
 
 class DatasetViewSet(
@@ -51,7 +51,7 @@ class DatasetViewSet(
             name=f'{original_dataset.name} Sub Image',
             metadata=meta,
             source_dataset=original_dataset,
-            dataset_type="sub_image"
+            dataset_type="sub_image",
         )
         new_dataset_obj.save()
 
