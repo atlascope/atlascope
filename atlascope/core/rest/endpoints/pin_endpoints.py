@@ -6,7 +6,4 @@ from atlascope.core.models import Investigation, Pin, PinSerializer
 class PinViewSet(GenericViewSet):
     model = Pin
     serializer_class = PinSerializer
-
-    def get_queryset(self):
-        investigations = Investigation.objects.all()
-        return Pin.objects.filter(connection_pins__investigation__in=investigations)
+    queryset = Pin.objects.all().order_by('id')
