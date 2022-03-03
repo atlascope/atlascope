@@ -14,10 +14,7 @@ def test_list_investigations(api_client, investigation_factory):
     investigations = [investigation_factory() for i in range(3)]
     investigations.sort(key=lambda i: i.name)
     api_client = api_client(investigation=investigations[0])
-    expected_results = [
-        models.InvestigationSerializer(i).data
-        for i in (investigations)
-    ]
+    expected_results = [models.InvestigationSerializer(i).data for i in (investigations)]
     resp = api_client.get('/api/v1/investigations')
     assert resp.status_code == 200
     assert resp.json() == {

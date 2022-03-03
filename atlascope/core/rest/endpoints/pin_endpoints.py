@@ -1,6 +1,6 @@
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import Investigation, Pin, PinSerializer
+from atlascope.core.models import Pin, PinSerializer
 
 
 class PinViewSet(GenericViewSet):
