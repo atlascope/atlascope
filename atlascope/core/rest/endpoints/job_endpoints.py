@@ -4,7 +4,6 @@ from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -20,7 +19,6 @@ class JobViewSet(
 ):
     model = Job
     queryset = Job.objects.all().order_by('id')
-    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action in ['create', 'rerun']:

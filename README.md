@@ -5,9 +5,9 @@ This is the simplest configuration for developers to start with.
 
 ### Initial Setup
 1. Run `docker-compose run --rm django ./manage.py migrate`
-2. Populate the database with sample data using `docker-compose run --rm django ./manage.py populate --password=[USERS_PASSWORD]`. If you do not specify a password, the default password for all created users will be `letmein`.
-3. OR run `docker-compose run --rm django ./manage.py createsuperuser`
-   and follow the prompts to create your own user
+2. Populate the database with sample data using `docker-compose run --rm django ./manage.py populate`.
+3. Run `docker-compose run --rm django ./manage.py createsuperuser`
+   and follow the prompts to create a user and enable use of the admin console.
 
 ### Run Application
 1. Run `docker-compose up`

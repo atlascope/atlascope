@@ -1,14 +1,6 @@
 [
     {
         "name": "Whole Team Investigation",
-        "owner": "roni.choudhury@kitware.com",
-        "investigators": [
-            "anne.haley@kitware.com",
-            "mary.salvi@kitware.com",
-            "matt.covalt@kitware.com",
-            "mike.nagler@kitware.com"
-        ],
-        "observers": [],
         "datasets": [
             "Local Vandy Dataset",
             "Remote Vandy Dataset"
@@ -16,30 +8,12 @@
     },
     {
         "name": "Backend Investigation",
-        "owner": "anne.haley@kitware.com",
-        "investigators": [
-            "roni.choudhury@kitware.com",
-            "mary.salvi@kitware.com"
-        ],
-        "observers": [
-            "matt.covalt@kitware.com",
-            "mike.nagler@kitware.com"
-        ],
         "datasets": [
             "Local Vandy Dataset"
         ]
     },
     {
         "name": "Frontend Investigation",
-        "owner": "matt.covalt@kitware.com",
-        "investigators": [
-            "roni.choudhury@kitware.com",
-            "mike.nagler@kitware.com"
-        ],
-        "observers": [
-            "anne.haley@kitware.com",
-            "mary.salvi@kitware.com"
-        ],
         "datasets": [
             "Remote Vandy Dataset"
         ]

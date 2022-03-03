@@ -3,9 +3,8 @@
     class="pa-6"
     fluid
   >
-    <login-banner v-if="!userInfo" />
     <v-banner
-      v-else-if="investigations.length === 0"
+      v-if="investigations.length === 0"
       single-line
     >
       <v-icon left>
@@ -49,18 +48,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import { computed, onMounted } from '@vue/composition-api';
-import LoginBanner from '../components/LoginBanner.vue';
 
 import store from '../store';
 
 export default Vue.extend({
-  components: {
-    LoginBanner,
-  },
-
   setup() {
     const investigations = computed(() => store.state.investigations);
-    const userInfo = computed(() => store.state.userInfo);
 
     onMounted(async () => {
       store.dispatch.unsetCurrentInvestigation();
@@ -69,7 +62,6 @@ export default Vue.extend({
 
     return {
       investigations,
-      userInfo,
     };
   },
 });

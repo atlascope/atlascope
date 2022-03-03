@@ -10,7 +10,6 @@
     "generateTypes": "node src/generateTypesFromSchema.js"
   },
   "dependencies": {
-    "@girder/oauth-client": "^0.7.6",
     "@sentry/vue": "^6.2.0",
     "@vue/composition-api": "^1.0.0-rc.2",
     "axios": "^0.21.1",

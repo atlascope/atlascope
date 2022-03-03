@@ -1,5 +1,4 @@
 import axios from 'axios';
-import OauthClient from '@girder/oauth-client';
 import * as Sentry from '@sentry/vue';
 import Vue from 'vue';
 import VueCompositionAPI from '@vue/composition-api';
@@ -14,27 +13,17 @@ const axiosInstance = axios.create({
   baseURL: process.env.VUE_APP_API_ROOT,
 });
 
-const oauthClient = new OauthClient(
-  process.env.VUE_APP_OAUTH_API_ROOT,
-  process.env.VUE_APP_OAUTH_CLIENT_ID,
-);
-
 Sentry.init({
   Vue,
   dsn: process.env.VUE_APP_SENTRY_DSN,
 });
 
-oauthClient.maybeRestoreLogin().then(async () => {
-  Object.assign(axiosInstance.defaults.headers.common, oauthClient.authHeaders);
-
-  store.dispatch.storeAxiosInstance(axiosInstance);
-  new Vue({
-    provide: {
-      axios: axiosInstance,
-      oauthClient,
-    },
-    router,
-    vuetify,
-    render: (h) => h(App),
-  }).$mount('#app');
-});
+store.dispatch.storeAxiosInstance(axiosInstance);
+new Vue({
+  provide: {
+    axios: axiosInstance,
+  },
+  router,
+  vuetify,
+  render: (h) => h(App),
+}).$mount('#app');
