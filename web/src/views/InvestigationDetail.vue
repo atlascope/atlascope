@@ -39,7 +39,19 @@
           <div
             ref="map"
             class="map"
-          />
+          >
+            <v-menu
+              v-model="showNote"
+              :position-x="noteX"
+              :position-y="noteY"
+              absolute
+              offset-y
+            >
+              <v-card class="pin-hover-card">
+                {{ hoverText }}
+              </v-card>
+            </v-menu>
+          </div>
         </v-sheet>
       </v-col>
       <v-col
@@ -75,6 +87,10 @@
     padding: 0;
     margin: 0;
 }
+
+.pin-hover-card {
+  width: 500px;
+}
 </style>
 
 <script lang="ts">
@@ -102,12 +118,21 @@ export default defineComponent({
   },
 
   setup(props) {
-    const map = ref(null);
+    const map: Ref<null | HTMLElement> = ref(null);
     const {
-      clampBoundsX, exit, generatePixelCoordinateParams, createMap, createLayer, geoEvents,
+      clampBoundsX,
+      exit,
+      generatePixelCoordinateParams,
+      createMap,
+      createLayer,
+      geoEvents,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
+    const showNote = ref(false);
+    const noteX = ref(0);
+    const noteY = ref(0);
+    const hoverText = ref('');
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
@@ -183,12 +208,16 @@ export default defineComponent({
           })
           .draw();
         pinFeature.geoOn(geoEvents.feature.mouseon, (event: any) => {
-          console.log({ event, on: 'on' });
-          // show tooltip by mouse
+          if (!map.value) { return; }
+          showNote.value = true;
+          noteX.value = event.mouse.page.x;
+          noteY.value = event.mouse.page.y;
+          hoverText.value = event.data.note;
         });
         pinFeature.geoOn(geoEvents.feature.mouseoff, (event: any) => {
-          console.log({ event, on: 'off' });
-          // remove tooltip
+          if (!map.value) { return; }
+          showNote.value = false;
+          hoverText.value = '';
         });
       } else {
         pinFeature.data(pinFeatureData).draw();
@@ -204,6 +233,10 @@ export default defineComponent({
     return {
       loaded,
       sidebarCollapsed,
+      showNote,
+      noteX,
+      noteY,
+      hoverText,
       toggleSidebar,
       map,
       tilesourceDatasets,
