@@ -178,8 +178,10 @@ export default defineComponent({
 
     // #region pin
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    /* eslint-disable */
     let featureLayer: any;
     let pinFeature: any;
+    /* eslint-enable */
     watch(selectedPins, (pinList) => {
       if (!featureLayer) {
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
@@ -197,6 +199,7 @@ export default defineComponent({
         };
       });
       if (!pinFeature) {
+        /* eslint-disable */
         pinFeature = featureLayer.createFeature('point')
           .data(pinFeatureData)
           .position((pin: any) => ({ x: pin.x, y: pin.y }))
@@ -222,6 +225,7 @@ export default defineComponent({
       } else {
         pinFeature.data(pinFeatureData).draw();
       }
+      /* eslint-enable */
     });
     // #endregion pin
     onMounted(async () => {

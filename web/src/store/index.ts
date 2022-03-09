@@ -4,7 +4,7 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  User, Investigation, InvestigationDetail, Dataset, TileMetadata, Pin,
+  Investigation, InvestigationDetail, Dataset, TileMetadata, Pin,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
