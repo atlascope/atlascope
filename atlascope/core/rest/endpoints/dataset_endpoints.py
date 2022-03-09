@@ -41,17 +41,17 @@ class DatasetViewSet(
 
     @swagger_auto_schema(request_body=DatasetSubImageSerializer())
     @action(detail=False, methods=['POST'])
-    def create_sub_image(self, request):
+    def subimage(self, request):
         serializer = DatasetSubImageSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         original_dataset = Dataset.objects.get(id=serializer.validated_data["original_dataset_id"])
         meta = serializer.validated_data.copy()
         meta.pop("original_dataset_id")
         new_dataset_obj = Dataset(
-            name=f'{original_dataset.name} Sub Image',
+            name=f'{original_dataset.name} Subimage',
             metadata=meta,
             source_dataset=original_dataset,
-            dataset_type="sub_image",
+            dataset_type="subimage",
         )
         new_dataset_obj.save()
 

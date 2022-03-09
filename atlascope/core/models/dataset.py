@@ -43,9 +43,6 @@ class Dataset(TimeStampedModel, models.Model):
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
-    # def create_sub_image_DS(self):
-    #     self.content.save(self.)
-
 
 class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -117,6 +114,8 @@ class DatasetSubImageSerializer(serializers.Serializer):
     y1 = serializers.IntegerField(required=True)
 
     def validate_original_dataset_id(self, value):
+        if not Dataset.objects.filter(id=value).exists():
+            raise ValidationError(f'{value} does not exist. Must use existing dataset')
         return str(value)
 
 
