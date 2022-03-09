@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 from django.contrib.gis.db.models import PointField, PolygonField
-from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.geos import Point
+from django.contrib.gis.geos.polygon import Polygon
 import djclick as click
 from rest_framework.serializers import ValidationError
 
