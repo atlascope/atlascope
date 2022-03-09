@@ -2,7 +2,6 @@ import json
 import os
 from pathlib import Path
 
-from django.contrib.auth.models import User
 from django.contrib.gis.db.models import PointField, PolygonField
 from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.geos import Point
