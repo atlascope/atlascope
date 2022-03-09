@@ -204,7 +204,6 @@ export default defineComponent({
           .data(pinFeatureData)
           .position((pin: any) => ({ x: pin.x, y: pin.y }))
           .style({
-            // reasonable default?
             radius: 10,
             strokeColor: 'white',
             fillColor: (pin: any) => pin.color,
