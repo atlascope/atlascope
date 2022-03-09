@@ -124,7 +124,6 @@ export default defineComponent({
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.activeDataset;
       loaded.value = true;
-      setTimeout(() => zoom(6), 2500);
     });
 
     watch(activeDataset, async (newValue) => {
