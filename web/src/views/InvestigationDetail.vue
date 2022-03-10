@@ -138,7 +138,6 @@ export default defineComponent({
       sidebarCollapsed.value = !sidebarCollapsed.value;
     }
 
-    // #region datasets
     const selectedDataset: Ref<Dataset | null> = ref(null);
     const activeDataset = computed(() => store.state.activeDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
@@ -174,9 +173,7 @@ export default defineComponent({
       createLayer('osm', geojsParams.layer);
       clampBoundsX(false);
     });
-    // #endregion datasets
 
-    // #region pin
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
     /* eslint-disable */
     let featureLayer: any;
@@ -223,7 +220,7 @@ export default defineComponent({
       }
       /* eslint-enable */
     });
-    // #endregion pin
+
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.activeDataset;
