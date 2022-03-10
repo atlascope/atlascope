@@ -39,7 +39,19 @@
           <div
             ref="map"
             class="map"
-          />
+          >
+            <v-menu
+              v-model="showNote"
+              :position-x="noteX"
+              :position-y="noteY"
+              absolute
+              offset-y
+            >
+              <v-card class="pin-hover-card">
+                {{ hoverText }}
+              </v-card>
+            </v-menu>
+          </div>
         </v-sheet>
       </v-col>
       <v-col
@@ -75,6 +87,10 @@
     padding: 0;
     margin: 0;
 }
+
+.pin-hover-card {
+  width: 500px;
+}
 </style>
 
 <script lang="ts">
@@ -82,9 +98,10 @@ import {
   ref, defineComponent, onMounted, PropType, computed, watch, Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
+import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
-import { Dataset } from '../generatedTypes/AtlascopeTypes';
+import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
   name: 'InvestigationDetail',
@@ -101,31 +118,34 @@ export default defineComponent({
   },
 
   setup(props) {
-    const map = ref(null);
+    const map: Ref<null | HTMLElement> = ref(null);
     const {
-      zoom, exit, generatePixelCoordinateParams, createMap, createLayer,
+      clampBoundsX,
+      exit,
+      generatePixelCoordinateParams,
+      createMap,
+      createLayer,
+      geoEvents,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
-    const selectedDataset: Ref<Dataset | null> = ref(null);
-    const activeDataset = computed(() => store.state.activeDataset);
-    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+    const showNote = ref(false);
+    const noteX = ref(0);
+    const noteY = ref(0);
+    const hoverText = ref('');
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
     }
 
+    const selectedDataset: Ref<Dataset | null> = ref(null);
+    const activeDataset = computed(() => store.state.activeDataset);
+    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
       store.dispatch.setActiveDataset(newActiveDataset);
     }
-
-    onMounted(async () => {
-      await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      selectedDataset.value = store.state.activeDataset;
-      loaded.value = true;
-      setTimeout(() => zoom(6), 2500);
-    });
 
     watch(activeDataset, async (newValue) => {
       exit(); // tear down the map
@@ -151,17 +171,76 @@ export default defineComponent({
       geojsParams.layer.crossDomain = 'use-credentials';
       createMap(geojsParams.map);
       createLayer('osm', geojsParams.layer);
+      clampBoundsX(false);
+    });
+
+    const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    /* eslint-disable */
+    let featureLayer: any;
+    let pinFeature: any;
+    /* eslint-enable */
+    watch(selectedPins, (pinList) => {
+      if (!featureLayer) {
+        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+      }
+      const pinFeatureData = pinList.map((pin) => {
+        const pinLocation: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+        return {
+          ...pinLocation,
+          id: pin.id,
+          color: pin.color,
+          note: pin.note,
+        };
+      });
+      if (!pinFeature) {
+        /* eslint-disable */
+        pinFeature = featureLayer.createFeature('point')
+          .data(pinFeatureData)
+          .position((pin: any) => ({ x: pin.x, y: pin.y }))
+          .style({
+            radius: 10,
+            strokeColor: 'white',
+            fillColor: (pin: any) => pin.color,
+          })
+          .draw();
+        pinFeature.geoOn(geoEvents.feature.mouseon, (event: any) => {
+          if (!map.value) { return; }
+          showNote.value = true;
+          noteX.value = event.mouse.page.x;
+          noteY.value = event.mouse.page.y;
+          hoverText.value = event.data.note;
+        });
+        pinFeature.geoOn(geoEvents.feature.mouseoff, (event: any) => {
+          if (!map.value) { return; }
+          showNote.value = false;
+          hoverText.value = '';
+        });
+      } else {
+        pinFeature.data(pinFeatureData).draw();
+      }
+      /* eslint-enable */
+    });
+
+    onMounted(async () => {
+      await store.dispatch.fetchCurrentInvestigation(props.investigation);
+      selectedDataset.value = store.state.activeDataset;
+      loaded.value = true;
     });
 
     return {
+      loaded,
+      sidebarCollapsed,
+      showNote,
+      noteX,
+      noteY,
+      hoverText,
+      toggleSidebar,
       map,
       tilesourceDatasets,
-      sidebarCollapsed,
-      toggleSidebar,
       activeDataset,
       selectedDataset,
       activeDatasetChanged,
-      loaded,
+      selectedPins,
     };
   },
 });
