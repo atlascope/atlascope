@@ -56,7 +56,7 @@ class Dataset(TimeStampedModel, models.Model):
             metadata=metadata,
             source_dataset=self,
             content=self.content,
-            dataset_type="subimage"
+            dataset_type="subimage",
         )
 
         return dataset
