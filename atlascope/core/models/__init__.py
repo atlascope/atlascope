@@ -1,4 +1,4 @@
-from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer
+from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer, DatasetSubImageSerializer
 from .dataset_embedding import DatasetEmbedding, DatasetEmbeddingSerializer
 from .investigation import Investigation, InvestigationSerializer
 from .pin import Pin, PinSerializer
@@ -14,6 +14,7 @@ __all__ = [
     Dataset,
     DatasetSerializer,
     DatasetCreateSerializer,
+    DatasetSubImageSerializer,
     Job,
     JobSpawnSerializer,
     JobDetailSerializer,

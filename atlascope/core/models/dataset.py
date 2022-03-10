@@ -105,6 +105,20 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
     )
 
 
+class DatasetSubImageSerializer(serializers.Serializer):
+
+    original_dataset_id = serializers.UUIDField(required=True)
+    x0 = serializers.IntegerField(required=True)
+    y0 = serializers.IntegerField(required=True)
+    x1 = serializers.IntegerField(required=True)
+    y1 = serializers.IntegerField(required=True)
+
+    def validate_original_dataset_id(self, value):
+        if not Dataset.objects.filter(id=value).exists():
+            raise ValidationError(f'{value} does not exist. Must use existing dataset')
+        return str(value)
+
+
 @admin.register(Dataset)
 class DatasetAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
