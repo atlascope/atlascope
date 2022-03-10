@@ -43,15 +43,11 @@ class DatasetViewSet(
     def subimage(self, request):
         serializer = DatasetSubImageSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
-        original_dataset = Dataset.objects.get(id=serializer.validated_data["original_dataset_id"])
-        meta = serializer.validated_data.copy()
-        meta.pop("original_dataset_id")
-        new_dataset_obj = Dataset(
-            name=f'{original_dataset.name} Subimage',
-            metadata=meta,
-            source_dataset=original_dataset,
-            dataset_type="subimage",
-        )
+
+        original_dataset = serializer.validated_data["original_dataset_id"]
+        serializer.validated_data.pop("original_dataset_id")
+
+        new_dataset_obj = original_dataset.subimage(**serializer.validated_data)
         new_dataset_obj.save()
 
         return Response(DatasetSerializer(new_dataset_obj).data, status=status.HTTP_201_CREATED)
