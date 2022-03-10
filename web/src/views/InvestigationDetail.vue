@@ -187,10 +187,7 @@ export default defineComponent({
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
       }
       const pinFeatureData = pinList.map((pin) => {
-        let pinLocation: Point | undefined = postGisToPoint(pin.child_location);
-        if (!pinLocation) {
-          pinLocation = { x: 0, y: 0 };
-        }
+        const pinLocation: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         return {
           ...pinLocation,
           id: pin.id,
