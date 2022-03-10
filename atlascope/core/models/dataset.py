@@ -43,6 +43,24 @@ class Dataset(TimeStampedModel, models.Model):
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
+    def subimage(self, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
+        metadata = {
+            'x0': x0,
+            'x1': x1,
+            'y0': y0,
+            'y1': y1,
+        }
+
+        dataset = Dataset(
+            name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
+            metadata=metadata,
+            source_dataset=self,
+            content=self.content,
+            dataset_type="subimage"
+        )
+
+        return dataset
+
 
 class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
