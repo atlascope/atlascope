@@ -124,15 +124,10 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
 
 
 class DatasetSubImageSerializer(serializers.Serializer):
-
-    original_dataset_id = serializers.UUIDField(required=True)
     x0 = serializers.IntegerField(required=True)
     y0 = serializers.IntegerField(required=True)
     x1 = serializers.IntegerField(required=True)
     y1 = serializers.IntegerField(required=True)
-
-    def validate_original_dataset_id(self, value):
-        return Dataset.objects.get(id=value)
 
 
 @admin.register(Dataset)
