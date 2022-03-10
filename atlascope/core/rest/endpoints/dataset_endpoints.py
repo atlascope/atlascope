@@ -44,7 +44,7 @@ class DatasetViewSet(
         serializer = DatasetSubImageSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
-        original = Dataset.objects.get(id=pk)
+        original = self.get_object()
         subimage = original.subimage(**serializer.validated_data)
         subimage.save()
 
