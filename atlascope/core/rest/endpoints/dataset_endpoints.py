@@ -39,19 +39,13 @@ class DatasetViewSet(
         return Response(DatasetSerializer(new_dataset_obj).data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(request_body=DatasetSubImageSerializer())
-    @action(detail=False, methods=['POST'])
-    def subimage(self, request):
+    @action(detail=True, methods=['POST'])
+    def subimage(self, request, pk):
         serializer = DatasetSubImageSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
-        original_dataset = Dataset.objects.get(id=serializer.validated_data["original_dataset_id"])
-        meta = serializer.validated_data.copy()
-        meta.pop("original_dataset_id")
-        new_dataset_obj = Dataset(
-            name=f'{original_dataset.name} Subimage',
-            metadata=meta,
-            source_dataset=original_dataset,
-            dataset_type="subimage",
-        )
-        new_dataset_obj.save()
 
-        return Response(DatasetSerializer(new_dataset_obj).data, status=status.HTTP_201_CREATED)
+        original = self.get_object()
+        subimage = original.subimage(**serializer.validated_data)
+        subimage.save()
+
+        return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)

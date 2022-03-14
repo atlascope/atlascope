@@ -43,6 +43,24 @@ class Dataset(TimeStampedModel, models.Model):
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
+    def subimage(self, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
+        metadata = {
+            'x0': x0,
+            'x1': x1,
+            'y0': y0,
+            'y1': y1,
+        }
+
+        dataset = Dataset(
+            name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
+            metadata=metadata,
+            source_dataset=self,
+            content=self.content,
+            dataset_type="subimage",
+        )
+
+        return dataset
+
 
 class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -106,17 +124,10 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
 
 
 class DatasetSubImageSerializer(serializers.Serializer):
-
-    original_dataset_id = serializers.UUIDField(required=True)
     x0 = serializers.IntegerField(required=True)
     y0 = serializers.IntegerField(required=True)
     x1 = serializers.IntegerField(required=True)
     y1 = serializers.IntegerField(required=True)
-
-    def validate_original_dataset_id(self, value):
-        if not Dataset.objects.filter(id=value).exists():
-            raise ValidationError(f'{value} does not exist. Must use existing dataset')
-        return str(value)
 
 
 @admin.register(Dataset)
