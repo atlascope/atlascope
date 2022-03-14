@@ -76,8 +76,10 @@ def test_retrieve_dataset(api_client, dataset_factory):
 
 @pytest.mark.django_db
 def test_subimage(api_client, dataset_factory):
-    test_data = {"original_dataset_id": dataset_factory().id, "x0": 1, "x1": 2, "y0": 3, "y1": 4}
-    resp = api_client().post('/api/v1/datasets/subimage', data=test_data)
+    test_data = {"x0": 1, "x1": 2, "y0": 3, "y1": 4}
+    id = dataset_factory().id
+
+    resp = api_client().post(f'/api/v1/datasets/{id}/subimage', data=test_data)
     assert resp.status_code == 201
 
 
