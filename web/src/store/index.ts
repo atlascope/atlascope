@@ -4,7 +4,7 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  Investigation, InvestigationDetail, Dataset, TileMetadata, Pin,
+  Investigation, Dataset, TileMetadata, Pin, DatasetEmbedding,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
@@ -12,11 +12,13 @@ Vue.use(Vuex);
 export interface State {
     investigations: Investigation[];
     axiosInstance: AxiosInstance | null;
-    currentInvestigation: InvestigationDetail | null;
+    currentInvestigation: Investigation | null;
     currentDatasets: Dataset[];
     activeDataset: Dataset | null;
     currentPins: Pin[];
     selectedPins: Pin[];
+    datasetEmbeddings: DatasetEmbedding[];
+    datasetTileMetadata: { [key: string]: TileMetadata };
 }
 
 const {
@@ -34,12 +36,14 @@ const {
     activeDataset: null,
     currentPins: [],
     selectedPins: [],
+    datasetEmbeddings: [],
+    datasetTileMetadata: {},
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
       state.investigations = investigations;
     },
-    setCurrentInvestigation(state, currentInvestigation: InvestigationDetail | null) {
+    setCurrentInvestigation(state, currentInvestigation: Investigation | null) {
       state.currentInvestigation = currentInvestigation;
     },
     setAxiosInstance(state, axiosInstance: AxiosInstance | null) {
@@ -56,6 +60,14 @@ const {
     },
     setSelectedPins(state, pins: Pin[]) {
       state.selectedPins = pins;
+    },
+    setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
+      state.datasetEmbeddings = embeddings;
+    },
+    setTileMetadataForDataset(state, { dataset, tileMetadata }) {
+      if (dataset.id) {
+        state.datasetTileMetadata[dataset.id] = tileMetadata;
+      }
     },
   },
   getters: {
@@ -93,6 +105,24 @@ const {
           const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
           const activeDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
           commit.setActiveDataset(activeDataset);
+
+          const metadataPromises: Promise<{ dataset: Dataset; result: AxiosResponse }>[] = [];
+          tileSourceDatasets.forEach((dataset) => {
+            const promise = store.state.axiosInstance?.get(`/datasets/${dataset.id}/tiles/metadata`).then((result) => ({
+              dataset,
+              result,
+            }));
+            if (promise) {
+              metadataPromises.push(promise);
+            }
+          });
+          const metadataResponses = await Promise.all(metadataPromises);
+          metadataResponses.forEach((resp) => {
+            commit.setTileMetadataForDataset({
+              dataset: resp.dataset,
+              tileMetadata: resp.result.data,
+            });
+          });
 
           const pins = (await store.state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
           commit.setCurrentPins(pins);
