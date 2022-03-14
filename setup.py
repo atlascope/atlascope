@@ -36,6 +36,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
+        'aiohttp',
         'celery',
         'django>=3.2,<4.0',
         'django-allauth',
@@ -46,14 +47,16 @@ setup(
         'djangorestframework',
         'drf-yasg',
         'django-click',
+        'fsspec',
         'importlib_metadata>=3.6',
-        'large-image[gdal]',
+        'large-image[gdal,ometiff]',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'django-s3-file-field[boto3]',
         'gunicorn',
         'numpy',
         'pillow',
+        'requests',
     ],
     extras_require={
         'dev': [
