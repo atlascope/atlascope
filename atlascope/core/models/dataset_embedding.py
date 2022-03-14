@@ -30,6 +30,14 @@ class DatasetEmbedding(models.Model):
 
 
 class DatasetEmbeddingSerializer(serializers.ModelSerializer):
+    child_bounding_box = serializers.ListField(
+        source='child_bounding_box.extent',
+        child=serializers.FloatField(),
+        min_length=4,
+        max_length=4,
+        read_only=True,
+    )
+
     class Meta:
         model = DatasetEmbedding
         fields = '__all__'

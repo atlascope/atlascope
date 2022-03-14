@@ -7,6 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 from atlascope.core.models import (
     Dataset,
     DatasetCreateSerializer,
+    DatasetEmbeddingSerializer,
     DatasetSerializer,
     DatasetSubImageSerializer,
 )
@@ -49,3 +50,9 @@ class DatasetViewSet(
         subimage.save()
 
         return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(responses={200: DatasetEmbeddingSerializer(many=True)})
+    @action(detail=True, methods=['GET'])
+    def embeddings(self, request, pk=None):
+        payload = DatasetEmbeddingSerializer(self.get_object().embeddings.all(), many=True).data
+        return Response(payload, status=status.HTTP_200_OK)
