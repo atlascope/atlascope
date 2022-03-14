@@ -145,14 +145,6 @@ const {
       const { commit } = rootActionContext(context);
       commit.setSelectedPins(pins);
     },
-    async fetchDatasetMetadata(_context, datasetId: string): Promise<TileMetadata | null> {
-      if (store.state.axiosInstance) {
-        const url = `/datasets/${datasetId}/tiles/metadata`;
-        const metadata = (await store.state.axiosInstance.get(url)).data;
-        return metadata;
-      }
-      return null;
-    },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
