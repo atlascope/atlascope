@@ -1,8 +1,7 @@
-import fsspec
-
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+import fsspec
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
 from rest_framework import mixins
