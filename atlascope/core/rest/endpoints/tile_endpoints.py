@@ -1,8 +1,10 @@
+import fsspec
+
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from large_image.exceptions import TileSourceError
-from large_image_source_gdal import GDALFileTileSource
+from large_image_source_ometiff import OMETiffFileTileSource
 from rest_framework import mixins
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
@@ -19,7 +21,11 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
 
     def get(self, *args, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(f'/vsicurl/use_head=no&url={dataset.content.url}')
+        cached = fsspec.open_local(
+            f'simplecache::{dataset.content.url}',
+            filecache={'cache_storage': '/tmp/files'},
+        )
+        tile_source = OMETiffFileTileSource(cached[0])
         serializer = self.get_serializer(tile_source)
         return Response(serializer.data)
 
@@ -73,11 +79,13 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(
-            f'/vsicurl/use_head=no&url={dataset.content.url}', encoding='PNG'
+        cached = fsspec.open_local(
+            f'simplecache::{dataset.content.url}',
+            filecache={'cache_storage': '/tmp/files'},
         )
+        tile_source = OMETiffFileTileSource(cached[0])
         try:
-            tile = tile_source.getTile(x, y, z)
+            tile = tile_source.getTile(x, y, z, frame=kwargs.get('channel'))
         except TileSourceError as e:
             error_msg = str(e)
             for missing_msg in (
