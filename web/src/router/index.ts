@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import InvestigationsList from '../views/InvestigationsList.vue';
 import InvestigationDetail from '../views/InvestigationDetail.vue';
+import MapProjection from '../views/MapProjection.vue';
 
 Vue.use(VueRouter);
 
@@ -16,6 +17,11 @@ const routes: Array<RouteConfig> = [
     name: 'investigationDetail',
     component: InvestigationDetail,
     props: true,
+  },
+  {
+    path: '/demo',
+    name: 'mapProjection',
+    component: MapProjection,
   },
 ];
 
