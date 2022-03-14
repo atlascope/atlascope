@@ -57,7 +57,9 @@ jobs:
             `# PROJ development files and binary (GeoDjango)` \
             libproj-dev proj-bin proj-data \
             `# GEOS library development files (GeoDjango)` \
-            libgeos-dev
+            libgeos-dev \
+            `# TIFF reading` \
+            libtiff5-dev
         shell: bash
       - uses: actions/checkout@v2
       - name: Install tox
