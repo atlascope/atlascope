@@ -124,6 +124,9 @@ const {
             });
           });
 
+          const embeddings = (await store.state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
+          commit.setDatasetEmbeddings(embeddings);
+
           const pins = (await store.state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
           commit.setCurrentPins(pins);
         }
