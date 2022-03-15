@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import (
+    DatasetEmbeddingSerializer,
     Investigation,
     InvestigationSerializer,
     JobDetailSerializer,
