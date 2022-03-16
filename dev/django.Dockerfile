@@ -15,6 +15,8 @@ RUN apt-get update \
         libproj-dev proj-bin proj-data \
         # GEOS library development files (GeoDjango)
         libgeos-dev \
+        # TIFF reading
+        libtiff-dev \
         # Nginx to proxy localhost
         nginx \
  && pip install --upgrade pip \
