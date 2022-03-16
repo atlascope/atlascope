@@ -59,7 +59,7 @@ jobs:
             `# GEOS library development files (GeoDjango)` \
             libgeos-dev \
             `# TIFF reading` \
-            libtiff5-dev
+            libtiff-dev
         shell: bash
       - uses: actions/checkout@v2
       - name: Install tox
