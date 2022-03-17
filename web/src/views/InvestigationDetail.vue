@@ -166,8 +166,9 @@ export default defineComponent({
       if (!geojsParams || !geojsParams.map || !geojsParams.layer) {
         return;
       }
+      // console.log(tileSourceMetadata.additional_metadata.frames);
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      const queryString = '?channels=0,1,2&colors=eb4034,33a61c,1c6aa6';
+      const queryString = '?channels=1,2,3&colors=cf1dae,33a61c,58cf1d';
       geojsParams.layer.url = `${apiRoot}/datasets/${newValue.id}/tiles/{z}/{x}/{y}.png${queryString}`;
       geojsParams.layer.crossDomain = 'use-credentials';
 

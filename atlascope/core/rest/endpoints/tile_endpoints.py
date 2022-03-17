@@ -102,7 +102,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
         channels = self.request.query_params.get('channels').split(',') or range(
             len(tile_source.getMetadata()['frames'])
         )
-        colors = self.request.query_params.get('colors').split(',') or range(default_colors)
+        colors = self.request.query_params.get('colors').split(',') or range(self.default_colors)
         try:
             composite = None
             for channel, color in list(zip(channels, colors)):
