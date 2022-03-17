@@ -1,7 +1,11 @@
+import fsspec
+import io
+import numpy
+import PIL
+
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-import fsspec
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
 from rest_framework import mixins
@@ -41,6 +45,18 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     model = Dataset
     renderer_classes = [LargeImageRenderer]
+
+    default_colors = [
+        '#a61e1c',
+        '#cf641d',
+        '#cfba1d',
+        '#58cf1d',
+        '#1dcfab',
+        '#1d88cf',
+        '#201dcf',
+        '#a81dcf',
+        '#cf1dae',
+    ]
 
     @swagger_auto_schema(
         responses={200: 'Image file', 404: 'Image tile not found'},
@@ -83,8 +99,29 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
             filecache={'cache_storage': '/tmp/files'},
         )
         tile_source = OMETiffFileTileSource(cached[0])
+        channels = self.request.query_params.get('channels').split(',') or range(
+            len(tile_source.getMetadata()['frames'])
+        )
+        colors = self.request.query_params.get('colors').split(',') or range(default_colors)
         try:
-            tile = tile_source.getTile(x, y, z, frame=kwargs.get('channel'))
+            composite = None
+            for channel, color in list(zip(channels, colors)):
+                tile = tile_source.getTile(
+                    x,
+                    y,
+                    z,
+                    frame=channel,
+                )
+                tile_data = numpy.array(PIL.Image.open(io.BytesIO(tile)))
+                if not composite:
+                    composite = PIL.Image.new('RGBA', tile_data.shape)
+                mask_color = PIL.Image.new('RGBA', tile_data.shape, f'#{color}')
+                mask = PIL.Image.fromarray(tile_data)
+                composite = PIL.Image.composite(mask_color, composite, mask)
+            print(composite)
+            buf = io.BytesIO()
+            composite.save(buf, format="PNG")
+            return Response(buf.getvalue())
         except TileSourceError as e:
             error_msg = str(e)
             for missing_msg in (
@@ -95,7 +132,6 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 if missing_msg in error_msg:
                     raise NotFound()
             raise APIException(error_msg)
-        return Response(tile)
 
 
 urlpatterns = [

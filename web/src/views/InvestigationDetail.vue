@@ -167,8 +167,10 @@ export default defineComponent({
         return;
       }
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      geojsParams.layer.url = `${apiRoot}/datasets/${newValue.id}/tiles/{z}/{x}/{y}.png`;
+      const queryString = '?channels=0,1,2&colors=eb4034,33a61c,1c6aa6';
+      geojsParams.layer.url = `${apiRoot}/datasets/${newValue.id}/tiles/{z}/{x}/{y}.png${queryString}`;
       geojsParams.layer.crossDomain = 'use-credentials';
+
       createMap(geojsParams.map);
       createLayer('osm', geojsParams.layer);
       clampBoundsX(false);
