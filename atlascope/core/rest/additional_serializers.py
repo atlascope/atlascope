@@ -26,7 +26,7 @@ class TileMetadataSerializer(serializers.Serializer):
         read_only=True,
         source='tileWidth',
     )
-    metadata = serializers.JSONField(
+    additional_metadata = serializers.JSONField(
         help_text='Any additional metadata on the tile source.',
         read_only=True,
         source='getMetadata',
