@@ -57,6 +57,10 @@ setup(
         'numpy',
         'pillow',
         'requests',
+        # manual override until https://github.com/girder/large_image/pull/799
+        'pylibtiff',
+        # pylibtiff depends on this but it is not listed in its dependencies
+        'bitarray',
     ],
     extras_require={
         'dev': [
