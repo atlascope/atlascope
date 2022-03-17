@@ -1,13 +1,13 @@
-import fsspec
 import io
-import numpy
-import PIL
 
+import PIL
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+import fsspec
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
+import numpy
 from rest_framework import mixins
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
