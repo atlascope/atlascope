@@ -68,12 +68,31 @@ export default defineComponent({
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       const apiRoot = process.env.VUE_APP_API_ROOT;
       const embeddings = store.state.datasetEmbeddings;
-      const rootDatasetID = embeddings.find(
+      const firstPossibleEdgeToRoot = embeddings.find(
         (e) => embeddings.every(
           (x) => x.child !== e.parent,
         ),
-      ).parent;
+      );
+
+      if (firstPossibleEdgeToRoot === undefined) {
+        console.log("Couldn't find root");
+        return;
+      }
+
+      const rootDatasetID = firstPossibleEdgeToRoot.parent;
       const rootTileMetadata = store.state.datasetTileMetadata[rootDatasetID];
+
+      if (
+        rootTileMetadata === undefined
+        || rootTileMetadata.size_x === undefined
+        || rootTileMetadata.size_y === undefined
+        || rootTileMetadata.tile_size === undefined
+        || rootTileMetadata.levels === undefined
+      ) {
+        console.log("Couldn't load root metadata");
+        return;
+      }
+
       const rootPixelParams = generatePixelCoordinateParams(
         rootTileMetadata.size_x || 0,
         rootTileMetadata.size_y || 0,
@@ -106,8 +125,34 @@ export default defineComponent({
 
       while (stack.length > 0) {
         const { embedding, parent, treeDepth } = stack.shift()!;
+
+        if (embedding === undefined) {
+          console.log('Embedding is undefined');
+          return;
+        }
+        if (embedding.child_bounding_box === undefined) {
+          console.log("Embedding didn't include bounding box");
+          return;
+        }
+        if (embedding.child_bounding_box.length !== 4) {
+          console.log('child_bounding_box is incorrect dimension');
+          return;
+        }
+
         const datasetID = embedding.child;
         const tileMetadata = store.state.datasetTileMetadata[datasetID];
+
+        if (
+          tileMetadata === undefined
+          || tileMetadata.size_x === undefined
+          || tileMetadata.size_y === undefined
+          || tileMetadata.tile_size === undefined
+          || tileMetadata.levels === undefined
+        ) {
+          console.log(`Couldn't load tile metadata for ${datasetID}`);
+          return;
+        }
+
         const boundingBox = {
           x: {
             min: embedding.child_bounding_box[0],
