@@ -106,10 +106,31 @@ const {
           const activeDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
           commit.setActiveDataset(activeDataset);
 
+          const embeddings: DatasetEmbedding[] = (await store.state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
+          commit.setDatasetEmbeddings(embeddings);
+
           const metadataPromises: Promise<{ datasetId: string; result: AxiosResponse }>[] = [];
           tileSourceDatasets.forEach((dataset) => {
             const promise = store.state.axiosInstance?.get(`/datasets/${dataset.id}/tiles/metadata`).then((result) => ({
               datasetId: dataset.id,
+              result,
+            }));
+            if (promise) {
+              metadataPromises.push(promise);
+            }
+          });
+          embeddings.forEach((embedding) => {
+            const promise = store.state.axiosInstance?.get(`/datasets/${embedding.child}/tiles/metadata`).then((result) => ({
+              datasetID: embedding.child,
+              result,
+            }));
+            if (promise) {
+              metadataPromises.push(promise);
+            }
+          });
+          embeddings.forEach((embedding) => {
+            const promise = store.state.axiosInstance?.get(`/datasets/${embedding.parent}/tiles/metadata`).then((result) => ({
+              datasetId: embedding.parent,
               result,
             }));
             if (promise) {
@@ -123,9 +144,6 @@ const {
               tileMetadata: resp.result.data,
             });
           });
-
-          const embeddings = (await store.state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
-          commit.setDatasetEmbeddings(embeddings);
 
           const pins = (await store.state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
           commit.setCurrentPins(pins);
