@@ -4,14 +4,14 @@
     fill-height
   >
     <div
-      id="map"
-      ref="mapElement"
+      class="map"
+      ref="map"
     />
   </v-container>
 </template>
 
 <style scoped>
-#map {
+.map {
   width: 500px;
   height: 500px;
   padding: 0;
@@ -21,11 +21,12 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType, computed,
+  ref, defineComponent, onMounted, PropType, computed, Ref,
 } from '@vue/composition-api';
 import geo from 'geojs';
-import { getEmbeddings, getTileMetadata } from '../datasets';
-import type { DatasetEmbedding, DatasetID } from '../datasets';
+import type { DatasetEmbedding } from '../generatedTypes/AtlascopeTypes';
+import store from '../store';
+import useGeoJS from '../utilities/useGeoJS';
 
 interface RootDatasetEmbedding {
   id: null;
@@ -49,91 +50,46 @@ interface StackFrame {
 export default defineComponent({
   name: 'EmbeddingsDetail',
 
-  setup() {
-    const mapElement = ref(null);
+  props: {
+    investigation: {
+      type: String as PropType<string>,
+      required: true,
+    },
+  },
+
+  setup(props) {
+    const map: Ref<null | HTMLElement> = ref(null);
+    const {
+      generatePixelCoordinateParams,
+      createMap,
+      createLayer,
+      geoEvents,
+    } = useGeoJS(map);
 
     onMounted(async () => {
-      const embeddings: Array<DatasetEmbedding> = getEmbeddings(2);
-      const rootDatasetID: DatasetID = embeddings.find((e) => embeddings.every((x) => x.child !== e.parent)).parent;
-      const rootTileMetadata = getTileMetadata(rootDatasetID);
-      const rootMinLevel = Math.min(
-        0,
-        Math.floor(
-          Math.log2(Math.min(500 / rootTileMetadata.tile_size, 500 / rootTileMetadata.tile_size)),
-        ),
+      await store.dispatch.fetchCurrentInvestigation(props.investigation);
+      const apiRoot = process.env.VUE_APP_API_ROOT;
+      const embeddings = store.state.datasetEmbeddings;
+      const rootDatasetID = embeddings.find((e) => embeddings.every((x) => x.child !== e.parent)).parent;
+      const rootTileMetadata = store.state.datasetTileMetadata[rootDatasetID];
+      const pixelParams = generatePixelCoordinateParams(
+        rootTileMetadata.size_x || 0,
+        rootTileMetadata.size_y || 0,
+        rootTileMetadata.tile_size || 0,
+        rootTileMetadata.tile_size || 0,
       );
-      const rootMaxLevel = Math.ceil(
-        Math.log2(
-          Math.max(
-            rootTileMetadata.size_x / rootTileMetadata.tile_size,
-            rootTileMetadata.size_y / rootTileMetadata.tile_size,
-          ),
-        ),
-      );
-
-      console.log('datasetID', rootDatasetID);
-      console.log('treeDepth', 0);
-      console.log('tileMetadata', rootTileMetadata);
-      console.log('embedding', null);
-      console.log('minLevel', rootMinLevel);
-      console.log('maxLevel', rootMaxLevel);
-      console.log('scale', 1);
-      console.log('offset', { x: 0, y: 0 });
-
-      const map = geo.map({
-        node: mapElement.value,
-        ingcs: '+proj=longlat +axis=esu',
-        gcs: '+proj=longlat +axis=enu',
-        maxBounds: {
-          left: 0,
-          top: 0,
-          right: rootTileMetadata.size_x,
-          bottom: rootTileMetadata.size_y,
-        },
-        unitsPerPixel: 2 ** rootMaxLevel,
-        center: {
-          x: rootTileMetadata.size_x / 2,
-          y: rootTileMetadata.size_y / 2,
-        },
-        min: rootMinLevel,
-        max: rootMaxLevel + 10,
-        zoom: rootMinLevel,
-        clampBoundsX: true,
-        clampBoundsY: true,
-        clampZoom: true,
-      });
-
-      map.createLayer('osm', {
-        url: (x: number, y: number, z: number) => `http://localhost:9005/${rootDatasetID}/${z}/${y}/${x}.png`,
+      const mapParams = {
+        ...pixelParams.map,
+        max: 40,
+      };
+      const layerParams = {
+        ...pixelParams.layer,
         zIndex: 0,
-        minLevel: rootMinLevel,
-        maxLevel: rootMaxLevel,
-        wrapX: false,
-        wrapY: false,
-        tileOffset(level: number) {
-          return { x: 0, y: 0 };
-        },
-        attribution: '',
-        tileWidth: rootTileMetadata.tile_size,
-        tileHeight: rootTileMetadata.tile_size,
-        tileRounding: Math.ceil,
-        tilesAtZoom(level: number) {
-          return {
-            x: Math.ceil(
-              rootTileMetadata.size_x / rootTileMetadata.tile_size / 2 ** (rootMaxLevel - level),
-            ),
-            y: Math.ceil(
-              rootTileMetadata.size_y / rootTileMetadata.tile_size / 2 ** (rootMaxLevel - level),
-            ),
-          };
-        },
-        tilesMaxBounds(level: number) {
-          return {
-            x: Math.floor(rootTileMetadata.size_x / 2 ** (rootMaxLevel - level)),
-            y: Math.floor(rootTileMetadata.size_y / 2 ** (rootMaxLevel - level)),
-          };
-        },
-      });
+        url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
+        crossDomain: 'use-credentials',
+      };
+      createMap(mapParams);
+      createLayer('osm', layerParams);
 
       const stack: Array<StackFrame> = [];
       stack.unshift(
@@ -149,77 +105,52 @@ export default defineComponent({
       while (stack.length > 0) {
         const { embedding, parent, treeDepth } = stack.shift()!;
         const datasetID = embedding.child;
-        const tileMetadata = getTileMetadata(datasetID);
-
+        const tileMetadata = store.state.datasetTileMetadata[datasetID];
+        console.log(embedding);
+        const boundingBox = {
+          x: {
+            min: embedding.child_bounding_box[0],
+            max: embedding.child_bounding_box[2],
+          },
+          y: {
+            min: embedding.child_bounding_box[1],
+            max: embedding.child_bounding_box[3],
+          },
+        }
         const scale = Math.min(
-          (parent.scale * (embedding.child_bounding_box[0] - embedding.child_bounding_box[2]))
-            / tileMetadata.size_x,
-          (parent.scale * (embedding.child_bounding_box[1] - embedding.child_bounding_box[3]))
-            / tileMetadata.size_y,
+          (parent.scale * (boundingBox.x.max - boundingBox.x.min)) / tileMetadata.size_x,
+          (parent.scale * (boundingBox.y.max - boundingBox.y.min)) / tileMetadata.size_y,
         );
         const offset = {
-          x: (parent.scale / scale) * (parent.offset.x + embedding.child_bounding_box[2]),
-          y: (parent.scale / scale) * (parent.offset.y + embedding.child_bounding_box[3]),
+          x: (parent.scale / scale) * (parent.offset.x + boundingBox.x.min),
+          y: (parent.scale / scale) * (parent.offset.y + boundingBox.y.min),
         };
-
         const minLevel = Math.min(
           Math.log2(rootTileMetadata.size_x / (scale * tileMetadata.size_x)),
           Math.log2(rootTileMetadata.size_y / (scale * tileMetadata.size_y)),
         );
-        const maxLevel = tileMetadata.levels
-          + Math.min(
-            Math.log2(rootTileMetadata.size_x / (scale * tileMetadata.size_x)),
-            Math.log2(rootTileMetadata.size_y / (scale * tileMetadata.size_y)),
-          );
-
-        console.log('datasetID', datasetID);
-        console.log('treeDepth', treeDepth);
-        console.log('tileMetadata', tileMetadata);
-        console.log('embedding', embedding);
-        console.log('minLevel', minLevel);
-        console.log('maxLevel', maxLevel);
-        console.log('scale', scale);
-        console.log('offset', offset);
-
-        const layer = map.createLayer('osm', {
-          url: (x: number, y: number, z: number) => `http://localhost:9005/${datasetID}/${z}/${y}/${x}.png`,
-          zIndex: treeDepth,
-          minLevel: 0,
-          maxLevel: Math.ceil(rootMaxLevel),
-          wrapX: false,
-          wrapY: false,
-          tileOffset(level: number) {
-            return {
-              x: 0,
-              y: 0,
-            };
-          },
-          attribution: '',
-          tileWidth: tileMetadata.tile_size,
-          tileHeight: tileMetadata.tile_size,
-          tileRounding: Math.ceil,
-          tilesAtZoom(level: number) {
-            return {
-              x: Math.ceil(
-                tileMetadata.size_x / tileMetadata.tile_size / 2 ** (rootMaxLevel - level),
-              ),
-              y: Math.ceil(
-                tileMetadata.size_y / tileMetadata.tile_size / 2 ** (rootMaxLevel - level),
-              ),
-            };
-          },
-          tilesMaxBounds(level: number) {
-            return {
-              x: Math.floor(tileMetadata.size_x / 2 ** (rootMaxLevel - level)),
-              y: Math.floor(tileMetadata.size_y / 2 ** (rootMaxLevel - level)),
-            };
-          },
-        });
-        layer.gcs(
-          `+proj=longlat +axis=enu +xoff=-${offset.x} +yoff=${offset.y} +s11=${1 / scale} +s22=${
-            1 / scale
-          }`,
+        const maxLevel = tileMetadata.levels + Math.min(
+          Math.log2(rootTileMetadata.size_x / (scale * tileMetadata.size_x)),
+          Math.log2(rootTileMetadata.size_y / (scale * tileMetadata.size_y)),
         );
+        const pixelParams = generatePixelCoordinateParams(
+          tileMetadata.size_x || 0,
+          tileMetadata.size_y || 0,
+          tileMetadata.tile_size || 0,
+          tileMetadata.tile_size || 0,
+        );
+        const layerParams = {
+          ...pixelParams.layer,
+          zIndex: treeDepth,
+          url: `${apiRoot}/datasets/${datasetID}/tiles/{z}/{x}/{y}.png`,
+          crossDomain: 'use-credentials',
+        };
+        createLayer(
+          'osm',
+          layerParams,
+          `+proj=longlat +axis=enu +xoff=-${offset.x} +yoff=${offset.y} +s11=${1 / scale} +s22=${1 / scale}`
+        );
+
         const frontier = embeddings.filter((e) => e.parent === datasetID);
         stack.unshift(
           ...frontier.map((e) => ({
@@ -230,7 +161,8 @@ export default defineComponent({
         );
       }
     });
-    return { mapElement };
+
+    return { map };
   },
 });
 </script>
