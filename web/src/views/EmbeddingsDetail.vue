@@ -29,10 +29,9 @@ import type { DatasetEmbedding, DatasetID } from '../datasets';
 
 interface RootDatasetEmbedding {
   id: null;
-  child_bounding_box: [number, number, number, number];
+  child_bounding_box: number[];
   parent: null;
-  child: DatasetID;
-  [key: string]: any;
+  child: string;
 }
 
 interface StackFrame {
