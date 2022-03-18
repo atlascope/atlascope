@@ -19,9 +19,10 @@ const routes: Array<RouteConfig> = [
     props: true,
   },
   {
-    path: '/demo',
+    path: '/investigations/:investigation/embeddings',
     name: 'embeddingsDetail',
     component: EmbeddingsDetail,
+    props: true,
   },
 ];
 
