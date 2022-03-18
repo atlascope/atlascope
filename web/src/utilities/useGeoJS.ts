@@ -57,7 +57,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     const layer = map.value.createLayer(layerType, layerParams);
     if (gcs !== undefined) {
       layer.gcs(gcs);
-    };
+    }
     return layer;
   };
 

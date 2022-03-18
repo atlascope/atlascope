@@ -4,8 +4,8 @@
     fill-height
   >
     <div
-      class="map"
       ref="map"
+      class="map"
     />
   </v-container>
 </template>
@@ -21,9 +21,8 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType, computed, Ref,
+  ref, defineComponent, onMounted, PropType, Ref,
 } from '@vue/composition-api';
-import geo from 'geojs';
 import type { DatasetEmbedding } from '../generatedTypes/AtlascopeTypes';
 import store from '../store';
 import useGeoJS from '../utilities/useGeoJS';
@@ -63,33 +62,36 @@ export default defineComponent({
       generatePixelCoordinateParams,
       createMap,
       createLayer,
-      geoEvents,
     } = useGeoJS(map);
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       const apiRoot = process.env.VUE_APP_API_ROOT;
       const embeddings = store.state.datasetEmbeddings;
-      const rootDatasetID = embeddings.find((e) => embeddings.every((x) => x.child !== e.parent)).parent;
+      const rootDatasetID = embeddings.find(
+        (e) => embeddings.every(
+          (x) => x.child !== e.parent,
+        ),
+      ).parent;
       const rootTileMetadata = store.state.datasetTileMetadata[rootDatasetID];
-      const pixelParams = generatePixelCoordinateParams(
+      const rootPixelParams = generatePixelCoordinateParams(
         rootTileMetadata.size_x || 0,
         rootTileMetadata.size_y || 0,
         rootTileMetadata.tile_size || 0,
         rootTileMetadata.tile_size || 0,
       );
       const mapParams = {
-        ...pixelParams.map,
+        ...rootPixelParams.map,
         max: 40,
       };
-      const layerParams = {
-        ...pixelParams.layer,
+      const rootLayerParams = {
+        ...rootPixelParams.layer,
         zIndex: 0,
         url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
       createMap(mapParams);
-      createLayer('osm', layerParams);
+      createLayer('osm', rootLayerParams);
 
       const stack: Array<StackFrame> = [];
       stack.unshift(
@@ -106,7 +108,6 @@ export default defineComponent({
         const { embedding, parent, treeDepth } = stack.shift()!;
         const datasetID = embedding.child;
         const tileMetadata = store.state.datasetTileMetadata[datasetID];
-        console.log(embedding);
         const boundingBox = {
           x: {
             min: embedding.child_bounding_box[0],
@@ -116,7 +117,7 @@ export default defineComponent({
             min: embedding.child_bounding_box[1],
             max: embedding.child_bounding_box[3],
           },
-        }
+        };
         const scale = Math.min(
           (parent.scale * (boundingBox.x.max - boundingBox.x.min)) / tileMetadata.size_x,
           (parent.scale * (boundingBox.y.max - boundingBox.y.min)) / tileMetadata.size_y,
@@ -148,7 +149,7 @@ export default defineComponent({
         createLayer(
           'osm',
           layerParams,
-          `+proj=longlat +axis=enu +xoff=-${offset.x} +yoff=${offset.y} +s11=${1 / scale} +s22=${1 / scale}`
+          `+proj=longlat +axis=enu +xoff=-${offset.x} +yoff=${offset.y} +s11=${1 / scale} +s22=${1 / scale}`,
         );
 
         const frontier = embeddings.filter((e) => e.parent === datasetID);
