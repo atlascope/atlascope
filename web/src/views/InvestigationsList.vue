@@ -38,6 +38,14 @@
                 Investigate
               </v-btn>
             </router-link>
+            <router-link :to="`/investigations/${investigation.id}/embeddings`">
+              <v-btn
+                color="blue"
+                text
+              >
+                Embeddings
+              </v-btn>
+            </router-link>
           </v-card-actions>
         </v-card>
       </v-col>
