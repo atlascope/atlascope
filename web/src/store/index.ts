@@ -121,7 +121,7 @@ const {
           });
           embeddings.forEach((embedding) => {
             const promise = store.state.axiosInstance?.get(`/datasets/${embedding.child}/tiles/metadata`).then((result) => ({
-              datasetID: embedding.child,
+              datasetId: embedding.child,
               result,
             }));
             if (promise) {
