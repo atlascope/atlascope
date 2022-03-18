@@ -64,9 +64,9 @@ const {
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
       state.datasetEmbeddings = embeddings;
     },
-    setTileMetadataForDataset(state, { dataset, tileMetadata }) {
-      if (dataset.id) {
-        state.datasetTileMetadata[dataset.id] = tileMetadata;
+    setTileMetadataForDataset(state, { datasetId, tileMetadata }) {
+      if (datasetId) {
+        state.datasetTileMetadata[datasetId] = tileMetadata;
       }
     },
   },
@@ -106,10 +106,10 @@ const {
           const activeDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
           commit.setActiveDataset(activeDataset);
 
-          const metadataPromises: Promise<{ dataset: Dataset; result: AxiosResponse }>[] = [];
+          const metadataPromises: Promise<{ datasetId: string; result: AxiosResponse }>[] = [];
           tileSourceDatasets.forEach((dataset) => {
             const promise = store.state.axiosInstance?.get(`/datasets/${dataset.id}/tiles/metadata`).then((result) => ({
-              dataset,
+              datasetId: dataset.id,
               result,
             }));
             if (promise) {
@@ -119,7 +119,7 @@ const {
           const metadataResponses = await Promise.all(metadataPromises);
           metadataResponses.forEach((resp) => {
             commit.setTileMetadataForDataset({
-              dataset: resp.dataset,
+              datasetId: resp.datasetId,
               tileMetadata: resp.result.data,
             });
           });
