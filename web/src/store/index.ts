@@ -21,6 +21,11 @@ export interface State {
     datasetTileMetadata: { [key: string]: TileMetadata };
 }
 
+interface TileMetadataForDataset {
+    datasetId: string;
+    tileMetadata: TileMetadata;
+}
+
 const {
   store,
   rootActionContext,
@@ -64,10 +69,8 @@ const {
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
       state.datasetEmbeddings = embeddings;
     },
-    setTileMetadataForDataset(state, { datasetId, tileMetadata }) {
-      if (datasetId) {
-        state.datasetTileMetadata[datasetId] = tileMetadata;
-      }
+    setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
+      state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
     },
   },
   getters: {
