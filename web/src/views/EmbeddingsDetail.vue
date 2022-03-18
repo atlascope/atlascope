@@ -48,7 +48,7 @@ interface StackFrame {
 }
 
 export default defineComponent({
-  name: 'MapProjection',
+  name: 'EmbeddingsDetail',
 
   setup() {
     const mapElement = ref(null);

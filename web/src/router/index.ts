@@ -2,7 +2,7 @@ import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import InvestigationsList from '../views/InvestigationsList.vue';
 import InvestigationDetail from '../views/InvestigationDetail.vue';
-import MapProjection from '../views/MapProjection.vue';
+import EmbeddingsDetail from '../views/EmbeddingsDetail.vue';
 
 Vue.use(VueRouter);
 
@@ -20,8 +20,8 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/demo',
-    name: 'mapProjection',
-    component: MapProjection,
+    name: 'embeddingsDetail',
+    component: EmbeddingsDetail,
   },
 ];
 
