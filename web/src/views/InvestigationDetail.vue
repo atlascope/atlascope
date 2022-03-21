@@ -31,6 +31,64 @@
           </v-icon>
           No tilesource datasets found for this investigation.
         </v-banner>
+        <v-spacer />
+      </v-col>
+      <v-col v-if="frameInfo.length > 0">
+        <v-menu
+          v-model="showFrames"
+          :close-on-content-click="false"
+          offset-y
+          max-height="500px"
+        >
+          <template
+            v-slot:activator="{ on, attrs }"
+          >
+            <v-btn
+              color="blue"
+              dark
+              v-bind="attrs"
+              v-on="on"
+            >
+              Frames
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-text>
+              <v-list>
+                <v-list-item
+                  v-for="frame in frameInfo"
+                  :key="frame.frame"
+                  :value="frame"
+                >
+                  <v-list-item-action>
+                    <v-switch
+                      v-model="frame.displayed"
+                    />
+                  </v-list-item-action>
+                  <v-list-item>
+                    <div class="frame-row ma-0 pa-0">
+                      <v-text-field
+                        v-model="frame.color"
+                        :hint="frame.name"
+                        persistent-hint
+                        maxlength="6"
+                      />
+                    </div>
+                  </v-list-item>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="primary"
+                text
+                @click="updateFrameInfo"
+              >
+                Save
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -46,6 +104,7 @@
               :position-y="noteY"
               absolute
               offset-y
+              allow-overflow
             >
               <v-card class="pin-hover-card">
                 {{ hoverText }}
@@ -90,6 +149,10 @@
 
 .pin-hover-card {
   width: 500px;
+}
+
+.frame-row {
+  display: inline;
 }
 </style>
 
@@ -140,16 +203,43 @@ export default defineComponent({
 
     const selectedDataset: Ref<Dataset | null> = ref(null);
     const activeDataset = computed(() => store.state.activeDataset);
+    const activeDatasetMetadata = computed(() => store.state.activeDatasetMetadata);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     /* eslint-disable */
     let featureLayer: any;
     let pinFeature: any;
     /* eslint-enable */
+    const frameInfo: Ref<any[]> = ref([]);
+    const showFrames: Ref<boolean> = ref(false);
+    const activeDatasetLayer: Ref<any> = ref(null);
 
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
       store.dispatch.updateSelectedPins([]);
       store.dispatch.setActiveDataset(newActiveDataset);
+    }
+
+    function buildUrlQueryArgs() {
+      const channels: number[] = [];
+      const colors: string[] = [];
+      const selectedFrames = frameInfo.value.filter((frame) => frame.displayed);
+      if (selectedFrames.length === 0) {
+        return '';
+      }
+      selectedFrames.forEach((frame) => {
+        channels.push(frame.frame);
+        colors.push(frame.color);
+      });
+      return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
+    }
+
+    function updateFrameInfo() {
+      showFrames.value = false;
+      if (activeDataset.value && activeDatasetLayer.value) {
+        const apiRoot = process.env.VUE_APP_API_ROOT;
+        const newUrl = `${apiRoot}/datasets/${activeDataset.value.id}/tiles/{z}/{x}/{y}.png${buildUrlQueryArgs()}`;
+        activeDatasetLayer.value.url(newUrl).draw();
+      }
     }
 
     function tearDownMap() {
@@ -167,7 +257,14 @@ export default defineComponent({
       if (!tileSourceMetadata) {
         return;
       }
-
+      if (tileSourceMetadata.additional_metadata.frames) {
+        frameInfo.value = tileSourceMetadata.additional_metadata.frames.map((frame) => ({
+          name: frame.Name || 'no name',
+          frame: frame.Frame,
+          displayed: true,
+          color: '000000',
+        }));
+      }
       const geojsParams = generatePixelCoordinateParams(
         tileSourceMetadata.size_x || 0,
         tileSourceMetadata.size_y || 0,
@@ -177,13 +274,13 @@ export default defineComponent({
       if (!geojsParams || !geojsParams.map || !geojsParams.layer) {
         return;
       }
-      // console.log(tileSourceMetadata.additional_metadata.frames);
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png`;
+      const queryString = buildUrlQueryArgs();
+      geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png${queryString}`;
       geojsParams.layer.crossDomain = 'use-credentials';
 
       createMap(geojsParams.map);
-      createLayer('osm', geojsParams.layer);
+      activeDatasetLayer.value = createLayer('osm', geojsParams.layer);
       clampBoundsX(false);
     }
 
@@ -263,8 +360,12 @@ export default defineComponent({
       map,
       tilesourceDatasets,
       activeDataset,
+      activeDatasetMetadata,
       selectedDataset,
       activeDatasetChanged,
+      updateFrameInfo,
+      showFrames,
+      frameInfo,
       selectedPins,
     };
   },
