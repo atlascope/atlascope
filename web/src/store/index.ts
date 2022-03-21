@@ -19,6 +19,7 @@ export interface State {
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
     datasetTileMetadata: { [key: string]: TileMetadata };
+    activeDatasetMetadata: TileMetadata | null;
 }
 
 interface TileMetadataForDataset {
@@ -43,6 +44,7 @@ const {
     selectedPins: [],
     datasetEmbeddings: [],
     datasetTileMetadata: {},
+    activeDatasetMetadata: null,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -71,6 +73,9 @@ const {
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
+    },
+    setActiveDatasetMetadata(state, metadata: TileMetadata | null) {
+      state.activeDatasetMetadata = metadata;
     },
   },
   getters: {
@@ -168,6 +173,17 @@ const {
     updateSelectedPins(context, pins: Pin[]) {
       const { commit } = rootActionContext(context);
       commit.setSelectedPins(pins);
+    },
+    async fetchDatasetMetadata(context, datasetId: string): Promise<TileMetadata | null> {
+      const { commit } = rootActionContext(context);
+      if (store.state.axiosInstance) {
+        const url = `/datasets/${datasetId}/tiles/metadata`;
+        const metadata = (await store.state.axiosInstance.get(url)).data;
+        commit.setActiveDatasetMetadata(metadata);
+        return metadata;
+      }
+      commit.setActiveDatasetMetadata(null);
+      return null;
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
