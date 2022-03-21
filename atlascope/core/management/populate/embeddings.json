@@ -1,32 +1,14 @@
 [
     {
         "investigation": "Whole Team Investigation",
-        "parent": "Blue Speckle",
-        "child": "Red Speckle",
-        "child_bounding_box": [64, 64, 192, 192]
+        "parent": "Remote Vandy Dataset",
+        "child": "Local Vandy Dataset",
+        "child_bounding_box": [100, 100, 200, 200]
     },
     {
         "investigation": "Whole Team Investigation",
-        "parent": "Red Speckle",
-        "child": "Green Speckle",
-        "child_bounding_box": [64, 64, 192, 192]
-    },
-    {
-        "investigation": "Whole Team Investigation",
-        "parent": "Green Speckle",
-        "child": "Yellow Speckle",
-        "child_bounding_box": [64, 64, 192, 192]
-    },
-    {
-        "investigation": "Frontend Investigation",
-        "parent": "Green Speckle",
-        "child": "Blue Speckle",
-        "child_bounding_box": [64, 64, 192, 192]
-    },
-    {
-        "investigation": "Backend Investigation",
-        "parent": "Red Speckle",
-        "child": "Yellow Speckle",
-        "child_bounding_box": [64, 64, 192, 192]
+        "parent": "Local Vandy Dataset",
+        "child": "Local Vandy Dataset (Copy)",
+        "child_bounding_box": [100, 100, 200, 200]
     }
 ]
