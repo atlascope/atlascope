@@ -33,62 +33,8 @@
         </v-banner>
         <v-spacer />
       </v-col>
-      <v-col v-if="frameInfo.length > 0">
-        <v-menu
-          v-model="showFrames"
-          :close-on-content-click="false"
-          offset-y
-          max-height="500px"
-        >
-          <template
-            v-slot:activator="{ on, attrs }"
-          >
-            <v-btn
-              color="blue"
-              dark
-              v-bind="attrs"
-              v-on="on"
-            >
-              Frames
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-text>
-              <v-list>
-                <v-list-item
-                  v-for="frame in frameInfo"
-                  :key="frame.frame"
-                  :value="frame"
-                >
-                  <v-list-item-action>
-                    <v-switch
-                      v-model="frame.displayed"
-                    />
-                  </v-list-item-action>
-                  <v-list-item>
-                    <div class="frame-row ma-0 pa-0">
-                      <v-text-field
-                        v-model="frame.color"
-                        :hint="frame.name"
-                        persistent-hint
-                        maxlength="6"
-                      />
-                    </div>
-                  </v-list-item>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn
-                color="primary"
-                text
-                @click="updateFrameInfo"
-              >
-                Save
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-menu>
+      <v-col>
+        <investigation-detail-frame-menu />
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -164,6 +110,7 @@ import useGeoJS from '../utilities/useGeoJS';
 import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
+import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
@@ -171,6 +118,7 @@ export default defineComponent({
 
   components: {
     InvestigationSidebar,
+    InvestigationDetailFrameMenu,
   },
 
   props: {
@@ -209,9 +157,8 @@ export default defineComponent({
     let featureLayer: any;
     let pinFeature: any;
     /* eslint-enable */
-    const frameInfo: Ref<any[]> = ref([]);
-    const showFrames: Ref<boolean> = ref(false);
     const activeDatasetLayer: Ref<any> = ref(null);
+    const frames = computed(() => store.state.activeDatasetFrames);
 
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
@@ -222,7 +169,7 @@ export default defineComponent({
     function buildUrlQueryArgs() {
       const channels: number[] = [];
       const colors: string[] = [];
-      const selectedFrames = frameInfo.value.filter((frame) => frame.displayed);
+      const selectedFrames = frames.value.filter((frame) => frame.displayed);
       if (selectedFrames.length === 0) {
         return '';
       }
@@ -231,15 +178,6 @@ export default defineComponent({
         colors.push(frame.color);
       });
       return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
-    }
-
-    function updateFrameInfo() {
-      showFrames.value = false;
-      if (activeDataset.value && activeDatasetLayer.value) {
-        const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/${activeDataset.value.id}/tiles/{z}/{x}/{y}.png${buildUrlQueryArgs()}`;
-        activeDatasetLayer.value.url(newUrl).draw();
-      }
     }
 
     function tearDownMap() {
@@ -256,14 +194,6 @@ export default defineComponent({
       const tileSourceMetadata = store.state.datasetTileMetadata[dataset.id];
       if (!tileSourceMetadata) {
         return;
-      }
-      if (tileSourceMetadata.additional_metadata.frames) {
-        frameInfo.value = tileSourceMetadata.additional_metadata.frames.map((frame) => ({
-          name: frame.Name || 'no name',
-          frame: frame.Frame,
-          displayed: true,
-          color: '000000',
-        }));
       }
       const geojsParams = generatePixelCoordinateParams(
         tileSourceMetadata.size_x || 0,
@@ -287,6 +217,15 @@ export default defineComponent({
     watch(activeDataset, (newValue) => {
       drawMap(newValue);
     });
+
+    watch(frames, () => {
+      if (activeDataset.value && activeDatasetLayer) {
+        const queryString = buildUrlQueryArgs();
+        const apiRoot = process.env.VUE_APP_API_ROOT;
+        const newUrl = `${apiRoot}/datasets/${activeDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        activeDatasetLayer.value.url(newUrl).draw();
+      }
+    }, { deep: true });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
     function getPinsToDisplay() {
@@ -363,9 +302,6 @@ export default defineComponent({
       activeDatasetMetadata,
       selectedDataset,
       activeDatasetChanged,
-      updateFrameInfo,
-      showFrames,
-      frameInfo,
       selectedPins,
     };
   },

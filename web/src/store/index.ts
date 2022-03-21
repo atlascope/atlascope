@@ -9,6 +9,13 @@ import {
 
 Vue.use(Vuex);
 
+interface TiffFrame {
+  name: string;
+  frame: number;
+  displayed: boolean;
+  color: string;
+}
+
 export interface State {
     investigations: Investigation[];
     axiosInstance: AxiosInstance | null;
@@ -20,6 +27,7 @@ export interface State {
     datasetEmbeddings: DatasetEmbedding[];
     datasetTileMetadata: { [key: string]: TileMetadata };
     activeDatasetMetadata: TileMetadata | null;
+    activeDatasetFrames: TiffFrame[];
 }
 
 interface TileMetadataForDataset {
@@ -45,6 +53,7 @@ const {
     datasetEmbeddings: [],
     datasetTileMetadata: {},
     activeDatasetMetadata: null,
+    activeDatasetFrames: [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -76,6 +85,9 @@ const {
     },
     setActiveDatasetMetadata(state, metadata: TileMetadata | null) {
       state.activeDatasetMetadata = metadata;
+    },
+    setActiveDatasetFrames(state, frames: TiffFrame[]) {
+      state.activeDatasetFrames = frames;
     },
   },
   getters: {
@@ -173,6 +185,10 @@ const {
     updateSelectedPins(context, pins: Pin[]) {
       const { commit } = rootActionContext(context);
       commit.setSelectedPins(pins);
+    },
+    updateFrames(context, frames: TiffFrame[]) {
+      const { commit } = rootActionContext(context);
+      commit.setActiveDatasetFrames(frames);
     },
     async fetchDatasetMetadata(context, datasetId: string): Promise<TileMetadata | null> {
       const { commit } = rootActionContext(context);

@@ -71,6 +71,33 @@ export interface DatasetCreate {
   import_arguments: object;
 }
 
+export interface DatasetEmbedding {
+  /**
+   * Id
+   * @format uuid
+   */
+  id?: string;
+  child_bounding_box?: number[];
+
+  /**
+   * Investigation
+   * @format uuid
+   */
+  investigation: string;
+
+  /**
+   * Parent
+   * @format uuid
+   */
+  parent: string;
+
+  /**
+   * Child
+   * @format uuid
+   */
+  child: string;
+}
+
 export interface DatasetSubImage {
   /** X0 */
   x0: number;
@@ -116,11 +143,9 @@ export interface TileMetadata {
 
   /**
    * Additional metadata
-   * Any additional metadata from the tile source.
+   * Any additional metadata on the tile source.
    */
-  additional_metadata: {
-    frames: Array<Record<string, string>>;
-  }
+  additional_metadata?: object;
 }
 
 export interface Investigation {
@@ -346,6 +371,20 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
+   * @name DatasetsEmbeddings
+   * @request GET:/datasets/{id}/embeddings
+   * @response `200` `(DatasetEmbedding)[]`
+   */
+  export namespace DatasetsEmbeddings {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DatasetEmbedding[];
+  }
+  /**
+   * No description
+   * @tags datasets
    * @name DatasetsSubimage
    * @request POST:/datasets/{id}/subimage
    * @response `201` `DatasetSubImage`
@@ -453,11 +492,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsPins
+   * @name InvestigationsPinsRead
    * @request GET:/investigations/{id}/pins
    * @response `200` `(Pin)[]`
    */
-  export namespace InvestigationsPins {
+  export namespace InvestigationsPinsRead {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
