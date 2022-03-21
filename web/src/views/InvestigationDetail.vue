@@ -141,14 +141,24 @@ export default defineComponent({
     const selectedDataset: Ref<Dataset | null> = ref(null);
     const activeDataset = computed(() => store.state.activeDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+    /* eslint-disable */
+    let featureLayer: any;
+    let pinFeature: any;
+    /* eslint-enable */
 
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
       store.dispatch.setActiveDataset(newActiveDataset);
     }
 
-    function drawMap(dataset: Dataset | null) {
+    function tearDownMap() {
       exit();
+      featureLayer = null;
+      pinFeature = null;
+    }
+
+    function drawMap(dataset: Dataset | null) {
+      tearDownMap();
       if (!dataset || !dataset.id) {
         return;
       }
@@ -179,10 +189,6 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
-    /* eslint-disable */
-    let featureLayer: any;
-    let pinFeature: any;
-    /* eslint-enable */
     watch(selectedPins, (pinList) => {
       if (!featureLayer) {
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
