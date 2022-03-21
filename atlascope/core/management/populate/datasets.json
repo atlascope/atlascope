@@ -7,6 +7,13 @@
         }
     },
     {
+        "name": "Local Vandy Dataset (Copy)",
+        "description": "This is the test dataset from the VANDY Explorer",
+        "kwargs": {
+            "content": "HTA9_1_BA_F_ROI02.ome.tif"
+        }
+    },
+    {
         "name": "Remote Vandy Dataset",
         "description": "This is the test dataset from the VANDY Explorer",
         "kwargs": {
@@ -19,34 +26,6 @@
         "description": "This is a screenshot of some green cells",
         "kwargs": {
             "content": "green_cell_dataset_selection.png"
-        }
-    },
-    {
-        "name": "Blue Speckle",
-        "description": "A simple blue image with generated speckling",
-        "kwargs": {
-            "content": "blue.png"
-        }
-    },
-    {
-        "name": "Red Speckle",
-        "description": "A simple red image with generated speckling",
-        "kwargs": {
-            "content": "red.png"
-        }
-    },
-    {
-        "name": "Green Speckle",
-        "description": "A simple green image with generated speckling",
-        "kwargs": {
-            "content": "green.png"
-        }
-    },
-    {
-        "name": "Yellow Speckle",
-        "description": "A simple yellow image with generated speckling",
-        "kwargs": {
-            "content": "yellow.png"
         }
     }
 ]
