@@ -112,9 +112,11 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 channels = channels.split(',')
             else:
                 channels = range(len(tile_source.getMetadata()['frames']))
-            colors = self.request.query_params.get('colors').split(',') or range(
-                self.default_colors
-            )
+            colors = self.request.query_params.get('colors')
+            if colors:
+                colors = [f'#{color}' for color in colors.split(',')]
+            else:
+                colors = self.default_colors
             composite = None
             for channel, color in list(zip(channels, colors)):
                 tile = tile_source.getTile(
@@ -126,7 +128,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 tile_data = numpy.array(PIL.Image.open(io.BytesIO(tile)))
                 if not composite:
                     composite = PIL.Image.new('RGBA', tile_data.shape, '#000000')
-                mask_color = PIL.Image.new('RGBA', tile_data.shape, f'#{color}')
+                mask_color = PIL.Image.new('RGBA', tile_data.shape, color)
                 mask = PIL.Image.fromarray(tile_data)
                 composite = PIL.Image.composite(mask_color, composite, mask)
             buf = io.BytesIO()
