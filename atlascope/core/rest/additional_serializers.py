@@ -24,5 +24,10 @@ class TileMetadataSerializer(serializers.Serializer):
         help_text='Size of the square tiles the image is composed of.',
         min_value=1,
         read_only=True,
-        source='tileSize',
+        source='tileWidth',
+    )
+    additional_metadata = serializers.JSONField(
+        help_text='Any additional metadata on the tile source.',
+        read_only=True,
+        source='getMetadata',
     )
