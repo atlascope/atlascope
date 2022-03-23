@@ -14,10 +14,14 @@
         v-for="pin in pins"
         :key="pin.id"
         :value="pin"
+        :disabled="pin.parent !== activeDataset.id"
       >
         <template v-slot:default="{ active }">
           <v-list-item-action>
-            <v-checkbox :input-value="active" />
+            <v-checkbox
+              :input-value="active"
+              :disabled="pin.parent !== activeDataset.id"
+            />
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ pinDisplayTitle(pin) }}</v-list-item-title>
@@ -62,6 +66,7 @@ export default defineComponent({
 
     return {
       pins,
+      activeDataset,
       selectionChanged,
       selectedPins,
       pinDisplayTitle,
