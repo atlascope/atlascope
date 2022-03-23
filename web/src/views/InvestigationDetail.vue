@@ -166,9 +166,11 @@ export default defineComponent({
       if (!geojsParams || !geojsParams.map || !geojsParams.layer) {
         return;
       }
+      // console.log(tileSourceMetadata.additional_metadata.frames);
       const apiRoot = process.env.VUE_APP_API_ROOT;
       geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png`;
       geojsParams.layer.crossDomain = 'use-credentials';
+
       createMap(geojsParams.map);
       createLayer('osm', geojsParams.layer);
       clampBoundsX(false);

@@ -113,6 +113,14 @@ export interface TileMetadata {
    * @min 1
    */
   tile_size?: number;
+
+  /**
+   * Additional metadata
+   * Any additional metadata from the tile source.
+   */
+  additional_metadata: {
+    frames: Array<Record<string, string>>;
+  }
 }
 
 export interface Investigation {

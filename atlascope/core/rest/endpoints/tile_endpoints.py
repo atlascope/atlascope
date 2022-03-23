@@ -1,8 +1,14 @@
+import io
+
+import PIL
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+import fsspec
 from large_image.exceptions import TileSourceError
-from large_image_source_gdal import GDALFileTileSource
+from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_source_tiff import TiffFileTileSource
+import numpy
 from rest_framework import mixins
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.generics import GenericAPIView
@@ -19,7 +25,14 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
 
     def get(self, *args, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(f'/vsicurl/use_head=no&url={dataset.content.url}')
+        cached = fsspec.open_local(
+            f'simplecache::{dataset.content.url}',
+            filecache={'cache_storage': '/tmp/files'},
+        )
+        try:
+            tile_source = OMETiffFileTileSource(cached[0])
+        except TileSourceError:
+            tile_source = TiffFileTileSource(cached[0])
         serializer = self.get_serializer(tile_source)
         return Response(serializer.data)
 
@@ -36,6 +49,18 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
     model = Dataset
     renderer_classes = [LargeImageRenderer]
+
+    default_colors = [
+        '#a61e1c',
+        '#cf641d',
+        '#cfba1d',
+        '#58cf1d',
+        '#1dcfab',
+        '#1d88cf',
+        '#201dcf',
+        '#a81dcf',
+        '#cf1dae',
+    ]
 
     @swagger_auto_schema(
         responses={200: 'Image file', 404: 'Image tile not found'},
@@ -73,11 +98,42 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        tile_source = GDALFileTileSource(
-            f'/vsicurl/use_head=no&url={dataset.content.url}', encoding='PNG'
+        cached = fsspec.open_local(
+            f'simplecache::{dataset.content.url}',
+            filecache={'cache_storage': '/tmp/files'},
         )
         try:
-            tile = tile_source.getTile(x, y, z)
+            try:
+                tile_source = OMETiffFileTileSource(cached[0])
+            except TileSourceError:
+                tile_source = TiffFileTileSource(cached[0])
+            channels = self.request.query_params.get('channels')
+            if channels:
+                channels = channels.split(',')
+            else:
+                channels = range(len(tile_source.getMetadata()['frames']))
+            colors = self.request.query_params.get('colors')
+            if colors:
+                colors = [f'#{color}' for color in colors.split(',')]
+            else:
+                colors = self.default_colors
+            composite = None
+            for channel, color in list(zip(channels, colors)):
+                tile = tile_source.getTile(
+                    x,
+                    y,
+                    z,
+                    frame=channel,
+                )
+                tile_data = numpy.array(PIL.Image.open(io.BytesIO(tile)))
+                if not composite:
+                    composite = PIL.Image.new('RGBA', tile_data.shape, '#000000')
+                mask_color = PIL.Image.new('RGBA', tile_data.shape, color)
+                mask = PIL.Image.fromarray(tile_data)
+                composite = PIL.Image.composite(mask_color, composite, mask)
+            buf = io.BytesIO()
+            composite.save(buf, format="PNG")
+            return Response(buf.getvalue())
         except TileSourceError as e:
             error_msg = str(e)
             for missing_msg in (
@@ -88,7 +144,6 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 if missing_msg in error_msg:
                     raise NotFound()
             raise APIException(error_msg)
-        return Response(tile)
 
 
 urlpatterns = [
