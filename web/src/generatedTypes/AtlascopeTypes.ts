@@ -22,9 +22,6 @@ export interface Dataset {
   /** Description */
   description?: string;
 
-  /** Public */
-  public?: boolean;
-
   /**
    * Content
    * @format uri
@@ -35,7 +32,7 @@ export interface Dataset {
   metadata?: object | null;
 
   /** Dataset type */
-  dataset_type?: "tile_source" | "tile_overlay" | "analytics";
+  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage";
 
   /**
    * Source dataset
@@ -58,11 +55,8 @@ export interface DatasetCreate {
   /** Description */
   description?: string;
 
-  /** Public */
-  public?: boolean;
-
   /** Dataset type */
-  dataset_type?: "tile_source" | "tile_overlay" | "analytics";
+  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage";
 
   /**
    * Importer
@@ -75,6 +69,20 @@ export interface DatasetCreate {
    * Any arguments to supply to the selected importer function
    */
   import_arguments: object;
+}
+
+export interface DatasetSubImage {
+  /** X0 */
+  x0: number;
+
+  /** Y0 */
+  y0: number;
+
+  /** X1 */
+  x1: number;
+
+  /** Y1 */
+  y1: number;
 }
 
 export interface TileMetadata {
@@ -127,32 +135,6 @@ export interface Investigation {
 
   /** Description */
   description?: string;
-
-  /** Owner */
-  owner?: string;
-}
-
-export interface InvestigationDetail {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
-
-  /** Name */
-  name: string;
-
-  /** Description */
-  description?: string;
-
-  /** Owner */
-  owner?: string;
-
-  /** Investigators */
-  investigators?: string;
-
-  /** Observers */
-  observers?: string;
   datasets: string[];
   pins: string[];
 
@@ -174,12 +156,42 @@ export interface InvestigationDetail {
   jobs: string[];
 }
 
+export interface DatasetEmbedding {
+  /**
+   * Id
+   * @format uuid
+   */
+  id?: string;
+  child_bounding_box?: number[];
+
+  /**
+   * Investigation
+   * @format uuid
+   */
+  investigation: string;
+
+  /**
+   * Parent
+   * @format uuid
+   */
+  parent: string;
+
+  /**
+   * Child
+   * @format uuid
+   */
+  child: string;
+}
+
 export interface JobDetail {
   /**
    * Id
    * @format uuid
    */
   id?: string;
+
+  /** Complete */
+  complete?: boolean;
 
   /** Job type */
   job_type?: string;
@@ -256,30 +268,6 @@ export interface JobSpawn {
   additional_inputs?: object | null;
 }
 
-export interface User {
-  /** ID */
-  id?: number;
-
-  /**
-   * Username
-   * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-   * @pattern ^[\w.@+-]+$
-   */
-  username: string;
-
-  /**
-   * Email address
-   * @format email
-   */
-  email?: string;
-
-  /** First name */
-  first_name?: string;
-
-  /** Last name */
-  last_name?: string;
-}
-
 export interface DatasetsListParams {
   /** Number of results to return per page. */
   limit?: number;
@@ -296,17 +284,6 @@ export interface InvestigationsListParams {
   offset?: number;
 }
 
-export interface InvestigationsPermissionsPayload {
-  /** the username of the owner of this investigation */
-  owner?: string;
-
-  /** a list of the usernames of users who should have only read access on this investigation */
-  observers?: string[];
-
-  /** a list of the usernames of users who should have write access on this investigation */
-  investigators?: string[];
-}
-
 export interface JobsListParams {
   /** Number of results to return per page. */
   limit?: number;
@@ -316,14 +293,6 @@ export interface JobsListParams {
 }
 
 export interface JobsTypesParams {
-  /** Number of results to return per page. */
-  limit?: number;
-
-  /** The initial index from which to return the results. */
-  offset?: number;
-}
-
-export interface UsersListParams {
   /** Number of results to return per page. */
   limit?: number;
 
@@ -373,6 +342,20 @@ export namespace Datasets {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsSubimage
+   * @request POST:/datasets/{id}/subimage
+   * @response `201` `DatasetSubImage`
+   */
+  export namespace DatasetsSubimage {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = DatasetSubImage;
+    export type RequestHeaders = {};
+    export type ResponseBody = DatasetSubImage;
   }
   /**
    * No description
@@ -430,14 +413,28 @@ export namespace Investigations {
    * @tags investigations
    * @name InvestigationsRead
    * @request GET:/investigations/{id}
-   * @response `200` `InvestigationDetail`
+   * @response `200` `Investigation`
    */
   export namespace InvestigationsRead {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = InvestigationDetail;
+    export type ResponseBody = Investigation;
+  }
+  /**
+   * No description
+   * @tags investigations
+   * @name InvestigationsEmbeddings
+   * @request GET:/investigations/{id}/embeddings
+   * @response `200` `(DatasetEmbedding)[]`
+   */
+  export namespace InvestigationsEmbeddings {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DatasetEmbedding[];
   }
   /**
    * No description
@@ -452,20 +449,6 @@ export namespace Investigations {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = JobDetail[];
-  }
-  /**
-   * @description Update the lists of users that have permissions on this Investigation.
-   * @tags investigations
-   * @name InvestigationsPermissions
-   * @request POST:/investigations/{id}/permissions
-   * @response `200` `InvestigationDetail`
-   */
-  export namespace InvestigationsPermissions {
-    export type RequestParams = { id: string };
-    export type RequestQuery = {};
-    export type RequestBody = InvestigationsPermissionsPayload;
-    export type RequestHeaders = {};
-    export type ResponseBody = InvestigationDetail;
   }
   /**
    * No description
@@ -598,50 +581,5 @@ export namespace S3Upload {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = void;
-  }
-}
-
-export namespace Users {
-  /**
-   * No description
-   * @tags users
-   * @name UsersList
-   * @request GET:/users
-   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (User)[] }`
-   */
-  export namespace UsersList {
-    export type RequestParams = {};
-    export type RequestQuery = { limit?: number; offset?: number };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = { count: number; next?: string | null; previous?: string | null; results: User[] };
-  }
-  /**
-   * @description Return the currently logged in user's information.
-   * @tags users
-   * @name UsersMeRead
-   * @request GET:/users/me
-   * @response `200` `(User)[]`
-   */
-  export namespace UsersMeRead {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = User[];
-  }
-  /**
-   * No description
-   * @tags users
-   * @name UsersRead
-   * @request GET:/users/{id}
-   * @response `200` `User`
-   */
-  export namespace UsersRead {
-    export type RequestParams = { id: number };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = User;
   }
 }

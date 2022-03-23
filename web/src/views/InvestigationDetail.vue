@@ -147,12 +147,12 @@ export default defineComponent({
       store.dispatch.setActiveDataset(newActiveDataset);
     }
 
-    watch(activeDataset, async (newValue) => {
-      exit(); // tear down the map
-      if (!newValue || !newValue.id) {
+    function drawMap(dataset: Dataset | null) {
+      exit();
+      if (!dataset || !dataset.id) {
         return;
       }
-      const tileSourceMetadata = await store.dispatch.fetchDatasetMetadata(newValue.id);
+      const tileSourceMetadata = store.state.datasetTileMetadata[dataset.id];
       if (!tileSourceMetadata) {
         return;
       }
@@ -168,13 +168,16 @@ export default defineComponent({
       }
       // console.log(tileSourceMetadata.additional_metadata.frames);
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      const queryString = '?channels=1,2,3&colors=cf1dae,33a61c,58cf1d';
-      geojsParams.layer.url = `${apiRoot}/datasets/${newValue.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+      geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png`;
       geojsParams.layer.crossDomain = 'use-credentials';
 
       createMap(geojsParams.map);
       createLayer('osm', geojsParams.layer);
       clampBoundsX(false);
+    }
+
+    watch(activeDataset, (newValue) => {
+      drawMap(newValue);
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
@@ -227,6 +230,7 @@ export default defineComponent({
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.activeDataset;
+      drawMap(store.state.activeDataset);
       loaded.value = true;
     });
 
