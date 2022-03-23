@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 import fsspec
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_source_tiff import TiffFileTileSource
 import numpy
 from rest_framework import mixins
 from rest_framework.exceptions import APIException, NotFound
@@ -28,7 +29,10 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
             f'simplecache::{dataset.content.url}',
             filecache={'cache_storage': '/tmp/files'},
         )
-        tile_source = OMETiffFileTileSource(cached[0])
+        try:
+            tile_source = OMETiffFileTileSource(cached[0])
+        except TileSourceError:
+            tile_source = TiffFileTileSource(cached[0])
         serializer = self.get_serializer(tile_source)
         return Response(serializer.data)
 
@@ -98,12 +102,19 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
             f'simplecache::{dataset.content.url}',
             filecache={'cache_storage': '/tmp/files'},
         )
-        tile_source = OMETiffFileTileSource(cached[0])
-        channels = self.request.query_params.get('channels').split(',') or range(
-            len(tile_source.getMetadata()['frames'])
-        )
-        colors = self.request.query_params.get('colors').split(',') or range(self.default_colors)
         try:
+            try:
+                tile_source = OMETiffFileTileSource(cached[0])
+            except TileSourceError:
+                tile_source = TiffFileTileSource(cached[0])
+            channels = self.request.query_params.get('channels')
+            if channels:
+                channels = channels.split(',')
+            else:
+                channels = range(len(tile_source.getMetadata()['frames']))
+            colors = self.request.query_params.get('colors').split(',') or range(
+                self.default_colors
+            )
             composite = None
             for channel, color in list(zip(channels, colors)):
                 tile = tile_source.getTile(
@@ -114,11 +125,10 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                 )
                 tile_data = numpy.array(PIL.Image.open(io.BytesIO(tile)))
                 if not composite:
-                    composite = PIL.Image.new('RGBA', tile_data.shape)
+                    composite = PIL.Image.new('RGBA', tile_data.shape, '#000000')
                 mask_color = PIL.Image.new('RGBA', tile_data.shape, f'#{color}')
                 mask = PIL.Image.fromarray(tile_data)
                 composite = PIL.Image.composite(mask_color, composite, mask)
-            print(composite)
             buf = io.BytesIO()
             composite.save(buf, format="PNG")
             return Response(buf.getvalue())
