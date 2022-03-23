@@ -3,6 +3,7 @@
         "name": "Whole Team Investigation",
         "datasets": [
             "Local Vandy Dataset",
+            "Local Vandy Dataset (Copy)",
             "Remote Vandy Dataset"
         ]
     },
