@@ -53,14 +53,26 @@ def expand_references(obj, model):
     return obj, many_to_many_values, files_to_save
 
 
+def delete_all():
+    print("Deleting...")
+
+    # Delete dataset objects.
+    print("  Dataset objects...", end="", flush=True)
+    Dataset.objects.filter(source_dataset__isnull=False).delete()
+    Dataset.objects.all().delete()
+    print("done")
+
+    # Delete the other objects. Go in reverse order of model creation.
+    for Model in [Investigation, DatasetEmbedding, Job, Pin]:
+        print(f"  {Model.__name__} objects...", end="", flush=True)
+        Model.objects.all().delete()
+        print("done")
+
+
 @click.command()
 def command():
-    # delete in reverse order because of dependency protections
-    for model, _ in reversed(MODEL_JSON_MAPPING):
-        if model == Dataset:
-            model.objects.filter(source_dataset__isnull=False).delete()
-        model.objects.all().delete()
-        print(f'Deleted all existing {model.__name__}s.')
+    delete_all()
+
     for model, filename in MODEL_JSON_MAPPING:
         print('-----')
         objects = json.load(open(POPULATE_DIR + filename))
