@@ -25,7 +25,7 @@ class Tour(models.Model):
 
 class TourSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InvestigationTour
+        model = Tour
         fields = '__all__'
 
 
