@@ -10,6 +10,9 @@ from atlascope.core.models import (
     InvestigationSerializer,
     JobDetailSerializer,
     PinSerializer,
+    TourSerializer,
+    TourCreateSerializer,
+    Tour,
 )
 
 
@@ -38,3 +41,16 @@ class InvestigationViewSet(
     def embeddings(self, request, pk=None):
         payload = DatasetEmbeddingSerializer(self.get_object().embeddings.all(), many=True).data
         return Response(payload, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(request_body=TourCreateSerializer())
+    @action(detail=True, methods=['POST'])
+    def tour(self, request, pk=None):
+        serializer = TourCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        print(serializer.validated_data['way_points'])
+
+        tour = Tour(investigation=self.get_object(), way_points=serializer.validated_data['way_points'])
+        tour.save()
+
+        return Response(TourSerializer(tour).data, status=status.HTTP_201_CREATED)
