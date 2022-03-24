@@ -183,6 +183,28 @@ def populate_jobs(jsonfile):
     print("")
 
 
+def populate_pins(jsonfile):
+    print("Populating pins...")
+
+    # Read in the spec.
+    specs = json.load(open(jsonfile))
+
+    for spec in specs:
+        # Pull in foreign models and other objects.
+        spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
+        spec["parent"] = Dataset.objects.get(name=spec["parent"])
+        if "child" in spec:
+            spec["child"] = Dataset.objects.get(name=spec["child"])
+        spec["child_location"] = Point(spec["child_location"])
+
+        # Build and save the Pin object.
+        print(f"""  Pin '{spec["parent"].name}' ({spec["investigation"].name})""")
+        pin = Pin(**spec)
+        pin.save()
+
+    print("")
+
+
 @click.command()
 def command():
     delete_all()
@@ -191,8 +213,9 @@ def command():
     populate_investigations(POPULATE_DIR / 'investigations.json')
     populate_embeddings(POPULATE_DIR / 'embeddings.json')
     populate_jobs(POPULATE_DIR / 'jobs.json')
+    populate_pins(POPULATE_DIR / 'pins.json')
 
-    for model, filename in MODEL_JSON_MAPPING[4:]:
+    for model, filename in MODEL_JSON_MAPPING[5:]:
         print('-----')
         objects = json.load(open(POPULATE_DIR / filename))
         for obj in objects:
