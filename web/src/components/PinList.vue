@@ -14,10 +14,14 @@
         v-for="pin in pins"
         :key="pin.id"
         :value="pin"
+        :disabled="pin.parent !== activeDataset.id"
       >
         <template v-slot:default="{ active }">
           <v-list-item-action>
-            <v-checkbox :input-value="active" />
+            <v-checkbox
+              :input-value="active"
+              :disabled="pin.parent !== activeDataset.id"
+            />
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ pinDisplayTitle(pin) }}</v-list-item-title>
@@ -31,7 +35,7 @@
 
 <script lang="ts">
 import {
-  computed, defineComponent, onMounted, Ref, ref,
+  computed, defineComponent, onMounted, Ref, ref, watch,
 } from '@vue/composition-api';
 import store from '../store';
 import { Pin } from '../generatedTypes/AtlascopeTypes';
@@ -39,6 +43,7 @@ import { Pin } from '../generatedTypes/AtlascopeTypes';
 export default defineComponent({
   setup() {
     const pins: Ref<Pin[]> = computed(() => store.state.currentPins);
+    const activeDataset = computed(() => store.state.activeDataset);
     const selectedPins: Ref<Pin[]> = ref([]);
     function selectionChanged(pinList: Pin[]) {
       store.dispatch.updateSelectedPins(pinList);
@@ -47,6 +52,10 @@ export default defineComponent({
     function pinDisplayTitle(pin: Pin) {
       return (!pin.child) ? `Note pin: ${pin.note?.substring(0, 25)}...` : `Child dataset: ${pin.child}`;
     }
+
+    watch(activeDataset, () => {
+      selectedPins.value = [];
+    });
 
     onMounted(() => {
       // reset selectedPins
@@ -57,6 +66,7 @@ export default defineComponent({
 
     return {
       pins,
+      activeDataset,
       selectionChanged,
       selectedPins,
       pinDisplayTitle,

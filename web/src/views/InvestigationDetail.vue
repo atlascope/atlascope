@@ -141,14 +141,25 @@ export default defineComponent({
     const selectedDataset: Ref<Dataset | null> = ref(null);
     const activeDataset = computed(() => store.state.activeDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+    /* eslint-disable */
+    let featureLayer: any;
+    let pinFeature: any;
+    /* eslint-enable */
 
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
+      store.dispatch.updateSelectedPins([]);
       store.dispatch.setActiveDataset(newActiveDataset);
     }
 
-    function drawMap(dataset: Dataset | null) {
+    function tearDownMap() {
       exit();
+      featureLayer = null;
+      pinFeature = null;
+    }
+
+    function drawMap(dataset: Dataset | null) {
+      tearDownMap();
       if (!dataset || !dataset.id) {
         return;
       }
@@ -181,23 +192,30 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
-    /* eslint-disable */
-    let featureLayer: any;
-    let pinFeature: any;
-    /* eslint-enable */
-    watch(selectedPins, (pinList) => {
-      if (!featureLayer) {
-        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
-      }
-      const pinFeatureData = pinList.map((pin) => {
-        const pinLocation: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+    function getPinsToDisplay() {
+      // TODO: as we move towards embedding multiple datasets into the view,
+      // we will need a more sophisticated way to determine which pins to render
+      // and determining where they should be rendered
+      const selectedPinsForActiveDataset = selectedPins.value.filter(
+        (pin) => pin.parent === activeDataset.value?.id,
+      );
+      const pinFeatureData = selectedPinsForActiveDataset.map((pin) => {
+        const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         return {
-          ...pinLocation,
+          ...location,
           id: pin.id,
           color: pin.color,
           note: pin.note,
         };
       });
+      return pinFeatureData;
+    }
+
+    watch(selectedPins, () => {
+      if (!featureLayer) {
+        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+      }
+      const pinFeatureData = getPinsToDisplay();
       if (!pinFeature) {
         /* eslint-disable */
         pinFeature = featureLayer.createFeature('point')
