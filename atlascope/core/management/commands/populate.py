@@ -2,7 +2,6 @@ import json
 import os
 from pathlib import Path
 
-from django.contrib.gis.db.models import PointField, PolygonField
 from django.contrib.gis.geos import Point
 from django.contrib.gis.geos.polygon import Polygon
 import djclick as click
@@ -21,6 +20,7 @@ def announce(msg):
             print("")
 
         return wrapped
+
     return decorator
 
 
@@ -33,9 +33,9 @@ def delete_all():
     print("done")
 
     # Delete the other objects. Go in reverse order of model creation.
-    for Model in [Investigation, DatasetEmbedding, Job, Pin]:
-        print(f"  {Model.__name__} objects...", end="", flush=True)
-        Model.objects.all().delete()
+    for model in [Investigation, DatasetEmbedding, Job, Pin]:
+        print(f"  {model.__name__} objects...", end="", flush=True)
+        model.objects.all().delete()
         print("done")
 
 
@@ -105,7 +105,10 @@ def populate_embeddings(specs):
         spec["child_bounding_box"] = Polygon.from_bbox(tuple(spec["child_bounding_box"]))
 
         # Build and save the DatasetEmbedding object.
-        print(f"""  DatasetEmbedding '{spec["child"].name}' -> '{spec["parent"].name}' ({spec["investigation"].name})""")
+        child = spec["child"].name
+        parent = spec["parent"].name
+        investigation = spec["investigation"].name
+        print(f"""  DatasetEmbedding '{child}' -> '{parent}' ({investigation})""")
         embedding = DatasetEmbedding(**spec)
         embedding.save()
 
