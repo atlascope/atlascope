@@ -139,14 +139,36 @@ def populate_investigations(jsonfile):
     print("")
 
 
+def populate_embeddings(jsonfile):
+    print("Populating dataset embeddings...")
+
+    # Read in the spec.
+    specs = json.load(open(jsonfile))
+
+    for spec in specs:
+        # Replace the names in the spec with the models they reference.
+        spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
+        spec["parent"] = Dataset.objects.get(name=spec["parent"])
+        spec["child"] = Dataset.objects.get(name=spec["child"])
+        spec["child_bounding_box"] = Polygon.from_bbox(tuple(spec["child_bounding_box"]))
+
+        # Build and save the DatasetEmbedding object.
+        print(f"""  DatasetEmbedding '{spec["child"].name}' -> '{spec["parent"].name}' ({spec["investigation"].name})""")
+        embedding = DatasetEmbedding(**spec)
+        embedding.save()
+
+    print("")
+
+
 @click.command()
 def command():
     delete_all()
 
     populate_datasets(POPULATE_DIR / 'datasets.json')
     populate_investigations(POPULATE_DIR / 'investigations.json')
+    populate_embeddings(POPULATE_DIR / 'embeddings.json')
 
-    for model, filename in MODEL_JSON_MAPPING[2:]:
+    for model, filename in MODEL_JSON_MAPPING[3:]:
         print('-----')
         objects = json.load(open(POPULATE_DIR / filename))
         for obj in objects:
