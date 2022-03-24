@@ -160,6 +160,29 @@ def populate_embeddings(jsonfile):
     print("")
 
 
+def populate_jobs(jsonfile):
+    print("Populating jobs...")
+
+    # Read in the spec.
+    specs = json.load(open(jsonfile))
+
+    for spec in specs:
+        # Pull in the investigation and dataset referenced in the job spec.
+        spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
+        spec["original_dataset"] = Dataset.objects.get(name=spec["original_dataset"])
+
+        # Build and save the Job object.
+        print(f"""  Job '{spec["job_type"]}' ({spec["investigation"].name})""")
+        job = Job(**spec)
+        job.save()
+
+        print("    spawning job run...", end="", flush=True)
+        job.spawn()
+        print("done")
+
+    print("")
+
+
 @click.command()
 def command():
     delete_all()
@@ -167,8 +190,9 @@ def command():
     populate_datasets(POPULATE_DIR / 'datasets.json')
     populate_investigations(POPULATE_DIR / 'investigations.json')
     populate_embeddings(POPULATE_DIR / 'embeddings.json')
+    populate_jobs(POPULATE_DIR / 'jobs.json')
 
-    for model, filename in MODEL_JSON_MAPPING[3:]:
+    for model, filename in MODEL_JSON_MAPPING[4:]:
         print('-----')
         objects = json.load(open(POPULATE_DIR / filename))
         for obj in objects:
