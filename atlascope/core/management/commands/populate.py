@@ -13,9 +13,19 @@ from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job,
 POPULATE_DIR = Path('atlascope/core/management/populate/')
 
 
-def delete_all():
-    print("Deleting...")
+def announce(msg):
+    def decorator(f):
+        def wrapped(*args, **kwargs):
+            print(f"{msg}...")
+            f(*args, **kwargs)
+            print("")
 
+        return wrapped
+    return decorator
+
+
+@announce("Deleting")
+def delete_all():
     # Delete dataset objects.
     print("  Dataset objects...", end="", flush=True)
     Dataset.objects.filter(source_dataset__isnull=False).delete()
@@ -28,12 +38,9 @@ def delete_all():
         Model.objects.all().delete()
         print("done")
 
-    print("")
 
-
+@announce("Populating datasets")
 def populate_datasets(specs):
-    print("Populating Datasets...")
-
     for spec in specs:
         # Separate any importer arguments.
         importer = spec.get("importer")
@@ -68,12 +75,9 @@ def populate_datasets(specs):
                 else:
                     raise
 
-    print("")
 
-
+@announce("Populating investigations")
 def populate_investigations(specs):
-    print("Populating Investigations...")
-
     for spec in specs:
         # Pull out the dataset models that are in the investigation.
         datasets = [Dataset.objects.get(name=name) for name in spec["datasets"]]
@@ -90,12 +94,9 @@ def populate_investigations(specs):
             print(f"      {d.name}")
         investigation.datasets.set(datasets)
 
-    print("")
 
-
+@announce("Populating dataset embeddings")
 def populate_embeddings(specs):
-    print("Populating dataset embeddings...")
-
     for spec in specs:
         # Replace the names in the spec with the models they reference.
         spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
@@ -108,12 +109,9 @@ def populate_embeddings(specs):
         embedding = DatasetEmbedding(**spec)
         embedding.save()
 
-    print("")
 
-
+@announce("Populating jobs")
 def populate_jobs(specs):
-    print("Populating jobs...")
-
     for spec in specs:
         # Pull in the investigation and dataset referenced in the job spec.
         spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
@@ -128,12 +126,9 @@ def populate_jobs(specs):
         job.spawn()
         print("done")
 
-    print("")
 
-
+@announce("Populating pins")
 def populate_pins(specs):
-    print("Populating pins...")
-
     for spec in specs:
         # Pull in foreign models and other objects.
         spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
@@ -146,8 +141,6 @@ def populate_pins(specs):
         print(f"""  Pin '{spec["parent"].name}' ({spec["investigation"].name})""")
         pin = Pin(**spec)
         pin.save()
-
-    print("")
 
 
 def get_json(jsonfile):
