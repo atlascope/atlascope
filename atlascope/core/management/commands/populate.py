@@ -68,12 +68,59 @@ def delete_all():
         Model.objects.all().delete()
         print("done")
 
+    print("")
+
+
+def populate_datasets(jsonfile):
+    print("Populating Datasets...")
+
+    # Read in the spec.
+    specs = json.load(open(jsonfile))
+
+    for spec in specs:
+        # Separate any importer arguments.
+        importer = spec.get("importer")
+        if importer:
+            del spec["importer"]
+
+        # Grab any file to upload.
+        content = spec.get("content")
+        if content:
+            del spec["content"]
+
+        # Build and save the dataset object.
+        print(f"""  Dataset '{spec["name"]}'""")
+        dataset = Dataset(**spec)
+        dataset.save()
+
+        # If there's content to save, save it.
+        if content:
+            print("    uploading data...", end="", flush=True)
+            dataset.content.save(content, open(POPULATE_DIR / "inputs" / content, "rb"))
+            print("done")
+
+        # If there's an importer to run, run it.
+        if importer:
+            print("    running importer...", end="", flush=True)
+            try:
+                dataset.perform_import(**importer)
+                print("done")
+            except ValidationError:
+                if 'DJANGO_API_TOKEN' not in os.environ:
+                    print("skipped (DJANGO_API_TOKEN not set)")
+                else:
+                    raise
+
+    print("")
+
 
 @click.command()
 def command():
     delete_all()
 
-    for model, filename in MODEL_JSON_MAPPING:
+    populate_datasets(POPULATE_DIR / 'datasets.json')
+
+    for model, filename in MODEL_JSON_MAPPING[1:]:
         print('-----')
         objects = json.load(open(POPULATE_DIR / filename))
         for obj in objects:
