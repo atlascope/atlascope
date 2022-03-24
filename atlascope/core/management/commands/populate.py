@@ -10,7 +10,7 @@ from rest_framework.serializers import ValidationError
 
 from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin
 
-POPULATE_DIR = 'atlascope/core/management/populate/'
+POPULATE_DIR = Path('atlascope/core/management/populate/')
 
 MODEL_JSON_MAPPING = [
     (Dataset, 'datasets.json'),
@@ -31,7 +31,7 @@ def expand_references(obj, model):
             remote_model = found_field.remote_field.model
             obj[field_name] = remote_model.objects.get(name=value)
         elif hasattr(found_field, 'upload_to'):
-            target_file = open(Path(POPULATE_DIR, 'inputs', value), 'rb')
+            target_file = open(POPULATE_DIR / 'inputs' / value, 'rb')
             files_to_save[field_name] = {
                 'name': value,
                 'contents': target_file,
@@ -75,7 +75,7 @@ def command():
 
     for model, filename in MODEL_JSON_MAPPING:
         print('-----')
-        objects = json.load(open(POPULATE_DIR + filename))
+        objects = json.load(open(POPULATE_DIR / filename))
         for obj in objects:
             if 'kwargs' in obj:
                 kwargs = obj['kwargs']
