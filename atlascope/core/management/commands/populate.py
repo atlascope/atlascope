@@ -114,13 +114,39 @@ def populate_datasets(jsonfile):
     print("")
 
 
+def populate_investigations(jsonfile):
+    print("Populating Investigations...")
+
+    # Read in the spec.
+    specs = json.load(open(jsonfile))
+
+    for spec in specs:
+        # Pull out the dataset models that are in the investigation.
+        datasets = [Dataset.objects.get(name=name) for name in spec["datasets"]]
+        del spec["datasets"]
+
+        # Build and save investigation objects.
+        print(f"""  Investigation '{spec["name"]}'""")
+        investigation = Investigation(**spec)
+        investigation.save()
+
+        # Associate the datasets to the investigation.
+        print("    datasets:")
+        for d in datasets:
+            print(f"      {d.name}")
+        investigation.datasets.set(datasets)
+
+    print("")
+
+
 @click.command()
 def command():
     delete_all()
 
     populate_datasets(POPULATE_DIR / 'datasets.json')
+    populate_investigations(POPULATE_DIR / 'investigations.json')
 
-    for model, filename in MODEL_JSON_MAPPING[1:]:
+    for model, filename in MODEL_JSON_MAPPING[2:]:
         print('-----')
         objects = json.load(open(POPULATE_DIR / filename))
         for obj in objects:
