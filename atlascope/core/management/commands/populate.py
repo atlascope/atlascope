@@ -31,11 +31,8 @@ def delete_all():
     print("")
 
 
-def populate_datasets(jsonfile):
+def populate_datasets(specs):
     print("Populating Datasets...")
-
-    # Read in the spec.
-    specs = json.load(open(jsonfile))
 
     for spec in specs:
         # Separate any importer arguments.
@@ -74,11 +71,8 @@ def populate_datasets(jsonfile):
     print("")
 
 
-def populate_investigations(jsonfile):
+def populate_investigations(specs):
     print("Populating Investigations...")
-
-    # Read in the spec.
-    specs = json.load(open(jsonfile))
 
     for spec in specs:
         # Pull out the dataset models that are in the investigation.
@@ -99,11 +93,8 @@ def populate_investigations(jsonfile):
     print("")
 
 
-def populate_embeddings(jsonfile):
+def populate_embeddings(specs):
     print("Populating dataset embeddings...")
-
-    # Read in the spec.
-    specs = json.load(open(jsonfile))
 
     for spec in specs:
         # Replace the names in the spec with the models they reference.
@@ -120,11 +111,8 @@ def populate_embeddings(jsonfile):
     print("")
 
 
-def populate_jobs(jsonfile):
+def populate_jobs(specs):
     print("Populating jobs...")
-
-    # Read in the spec.
-    specs = json.load(open(jsonfile))
 
     for spec in specs:
         # Pull in the investigation and dataset referenced in the job spec.
@@ -143,11 +131,8 @@ def populate_jobs(jsonfile):
     print("")
 
 
-def populate_pins(jsonfile):
+def populate_pins(specs):
     print("Populating pins...")
-
-    # Read in the spec.
-    specs = json.load(open(jsonfile))
 
     for spec in specs:
         # Pull in foreign models and other objects.
@@ -165,12 +150,16 @@ def populate_pins(jsonfile):
     print("")
 
 
+def get_json(jsonfile):
+    return json.load(open(jsonfile))
+
+
 @click.command()
 def command():
     delete_all()
 
-    populate_datasets(POPULATE_DIR / 'datasets.json')
-    populate_investigations(POPULATE_DIR / 'investigations.json')
-    populate_embeddings(POPULATE_DIR / 'embeddings.json')
-    populate_jobs(POPULATE_DIR / 'jobs.json')
-    populate_pins(POPULATE_DIR / 'pins.json')
+    populate_datasets(get_json(POPULATE_DIR / 'datasets.json'))
+    populate_investigations(get_json(POPULATE_DIR / 'investigations.json'))
+    populate_embeddings(get_json(POPULATE_DIR / 'embeddings.json'))
+    populate_jobs(get_json(POPULATE_DIR / 'jobs.json'))
+    populate_pins(get_json(POPULATE_DIR / 'pins.json'))
