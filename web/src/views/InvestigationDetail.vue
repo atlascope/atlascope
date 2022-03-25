@@ -151,7 +151,6 @@ export default defineComponent({
 
     const selectedDataset: Ref<Dataset | null> = ref(null);
     const activeDataset = computed(() => store.state.activeDataset);
-    const activeDatasetMetadata = computed(() => store.state.activeDatasetMetadata);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     /* eslint-disable */
     let featureLayer: any;
@@ -299,7 +298,6 @@ export default defineComponent({
       map,
       tilesourceDatasets,
       activeDataset,
-      activeDatasetMetadata,
       selectedDataset,
       activeDatasetChanged,
       selectedPins,

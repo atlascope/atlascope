@@ -74,7 +74,7 @@ export default defineComponent({
   setup() {
     const frameInfo: Ref<any[]> = ref([]);
     const showFrames: Ref<boolean> = ref(false);
-    const tileMetadata = computed(() => store.state.activeDatasetMetadata);
+    const activeDataset = computed(() => store.state.activeDataset);
 
     function updateFrameInfo() {
       showFrames.value = false;
@@ -84,22 +84,31 @@ export default defineComponent({
     function resetFrameInfo() {
       /* eslint-disable */
       frameInfo.value = [];
-      const additionalMetadata: any = tileMetadata.value?.additional_metadata;
-      if (additionalMetadata.frames) {
+      // const additionalMetadata: any = tileMetadata.value?.additional_metadata;
+      if (!activeDataset.value || !activeDataset.value.id) {
+        store.dispatch.updateFrames(frameInfo.value);
+        return;
+      }
+      const additionalMetadata: any = store.state.datasetTileMetadata[activeDataset.value.id].additional_metadata;
+      if ( additionalMetadata && additionalMetadata.frames) {
         frameInfo.value = additionalMetadata.frames.map((frame: any) => ({
           name: frame.Name || 'no name',
           frame: frame.Frame,
           displayed: true,
-          color: '000000',
+          color: 'ffffff',
         }));
       }
       store.dispatch.updateFrames(frameInfo.value);
       /* eslint-enable */
     }
 
-    watch(tileMetadata, () => {
+    watch(activeDataset, () => {
       resetFrameInfo();
-    }, { deep: true });
+    });
+
+    onMounted(() => {
+      resetFrameInfo();
+    });
 
     return {
       updateFrameInfo,
