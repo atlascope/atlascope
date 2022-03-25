@@ -26,7 +26,6 @@ export interface State {
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
     datasetTileMetadata: { [key: string]: TileMetadata };
-    activeDatasetMetadata: TileMetadata | null;
     activeDatasetFrames: TiffFrame[];
 }
 
@@ -52,7 +51,6 @@ const {
     selectedPins: [],
     datasetEmbeddings: [],
     datasetTileMetadata: {},
-    activeDatasetMetadata: null,
     activeDatasetFrames: [],
   } as State,
   mutations: {
@@ -82,9 +80,6 @@ const {
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
-    },
-    setActiveDatasetMetadata(state, metadata: TileMetadata | null) {
-      state.activeDatasetMetadata = metadata;
     },
     setActiveDatasetFrames(state, frames: TiffFrame[]) {
       state.activeDatasetFrames = frames;
@@ -189,17 +184,6 @@ const {
     updateFrames(context, frames: TiffFrame[]) {
       const { commit } = rootActionContext(context);
       commit.setActiveDatasetFrames(frames);
-    },
-    async fetchDatasetMetadata(context, datasetId: string): Promise<TileMetadata | null> {
-      const { commit } = rootActionContext(context);
-      if (store.state.axiosInstance) {
-        const url = `/datasets/${datasetId}/tiles/metadata`;
-        const metadata = (await store.state.axiosInstance.get(url)).data;
-        commit.setActiveDatasetMetadata(metadata);
-        return metadata;
-      }
-      commit.setActiveDatasetMetadata(null);
-      return null;
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
