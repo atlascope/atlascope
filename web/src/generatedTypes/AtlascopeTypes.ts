@@ -71,33 +71,6 @@ export interface DatasetCreate {
   import_arguments: object;
 }
 
-export interface DatasetEmbedding {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
-  child_bounding_box?: number[];
-
-  /**
-   * Investigation
-   * @format uuid
-   */
-  investigation: string;
-
-  /**
-   * Parent
-   * @format uuid
-   */
-  parent: string;
-
-  /**
-   * Child
-   * @format uuid
-   */
-  child: string;
-}
-
 export interface DatasetSubImage {
   /** X0 */
   x0: number;
@@ -371,20 +344,6 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsEmbeddings
-   * @request GET:/datasets/{id}/embeddings
-   * @response `200` `(DatasetEmbedding)[]`
-   */
-  export namespace DatasetsEmbeddings {
-    export type RequestParams = { id: string };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = DatasetEmbedding[];
-  }
-  /**
-   * No description
-   * @tags datasets
    * @name DatasetsSubimage
    * @request POST:/datasets/{id}/subimage
    * @response `201` `DatasetSubImage`
@@ -464,11 +423,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsEmbeddings
+   * @name InvestigationsEmbeddingsRead
    * @request GET:/investigations/{id}/embeddings
    * @response `200` `(DatasetEmbedding)[]`
    */
-  export namespace InvestigationsEmbeddings {
+  export namespace InvestigationsEmbeddingsRead {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
