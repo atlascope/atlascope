@@ -1,5 +1,11 @@
 [
     {
+        "investigation": "Vandy test data",
+        "parent": "Local Vandy Dataset",
+        "child": "HTA9_1_BA_F_ROI04",
+        "child_bounding_box": [100, 100, 200, 200]
+    },
+    {
         "investigation": "Whole Team Investigation",
         "id": 301,
         "parent": "Remote Vandy Dataset",
