@@ -28,8 +28,6 @@ class Dataset(TimeStampedModel, models.Model):
         on_delete=models.PROTECT,
         related_name='derived_datasets',
     )
-    # scale
-    # applicable_heuristics
 
     def perform_import(self, importer="UploadImporter", **kwargs):
         importer_obj = available_importers[importer]()
