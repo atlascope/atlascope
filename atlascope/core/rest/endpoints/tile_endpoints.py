@@ -1,4 +1,5 @@
 import io
+from itertools import cycle
 
 import PIL
 from django.urls import path
@@ -50,17 +51,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     model = Dataset
     renderer_classes = [LargeImageRenderer]
 
-    default_colors = [
-        '#a61e1c',
-        '#cf641d',
-        '#cfba1d',
-        '#58cf1d',
-        '#1dcfab',
-        '#1d88cf',
-        '#201dcf',
-        '#a81dcf',
-        '#cf1dae',
-    ]
+    default_colors = ['#ffffff']
 
     @swagger_auto_schema(
         responses={200: 'Image file', 404: 'Image tile not found'},
@@ -118,7 +109,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
             else:
                 colors = self.default_colors
             composite = None
-            for channel, color in list(zip(channels, colors)):
+            for channel, color in list(zip(channels, cycle(colors))):
                 tile = tile_source.getTile(
                     x,
                     y,
