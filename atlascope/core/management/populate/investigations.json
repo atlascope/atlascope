@@ -1,5 +1,12 @@
 [
     {
+        "name": "Vandy test data",
+        "datasets": [
+            "Local Vandy Dataset",
+            "HTA9_1_BA_F_ROI04"
+        ]
+    },
+    {
         "name": "Whole Team Investigation",
         "id": 101,
         "datasets": [
