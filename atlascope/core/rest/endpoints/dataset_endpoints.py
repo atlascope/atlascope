@@ -17,7 +17,7 @@ class DatasetViewSet(
     mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
-    queryset = Dataset.objects.all().order_by('name')
+    queryset = Dataset.objects.all().order_by('id')
     serializer_class = DatasetSerializer
 
     def get_serializer_class(self):
