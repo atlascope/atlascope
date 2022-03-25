@@ -4,7 +4,7 @@
         "id": 501,
         "parent": "Local Vandy Dataset",
         "child_location": [1000, 1000],
-        "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non pulvinar turpis. Suspendisse et elit et nisi imperdiet sodales. Integer aliquet sodales mi a vulputate. Pellentesque ut mi faucibus, dictum ex a, imperdiet metus. Cras sed ipsum a lacus placerat pulvinar. Donec tincidunt velit bibendum velit eleifend, ut volutpat lorem feugiat.",
+        "note": "A red example pin.",
         "color": "red"
     },
     {
@@ -12,7 +12,7 @@
         "id": 502,
         "parent": "Local Vandy Dataset",
         "child_location": [3000, 1000],
-        "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non pulvinar turpis. Suspendisse et elit et nisi imperdiet sodales. Integer aliquet sodales mi a vulputate. Pellentesque ut mi faucibus, dictum ex a, imperdiet metus. Cras sed ipsum a lacus placerat pulvinar. Donec tincidunt velit bibendum velit eleifend, ut volutpat lorem feugiat.",
+        "note": "A green example pin. Look how green it is.",
         "color": "green"
     },
     {
@@ -20,7 +20,7 @@
         "id": 503,
         "parent": "Local Vandy Dataset",
         "child_location": [2000, 2000],
-        "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non pulvinar turpis. Suspendisse et elit et nisi imperdiet sodales. Integer aliquet sodales mi a vulputate. Pellentesque ut mi faucibus, dictum ex a, imperdiet metus. Cras sed ipsum a lacus placerat pulvinar. Donec tincidunt velit bibendum velit eleifend, ut volutpat lorem feugiat.",
+        "note": "A blue example pin. Yay!",
         "color": "blue"
     }
 ]
