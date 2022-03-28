@@ -31,6 +31,10 @@
           </v-icon>
           No tilesource datasets found for this investigation.
         </v-banner>
+        <v-spacer />
+      </v-col>
+      <v-col>
+        <investigation-detail-frame-menu />
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -46,6 +50,7 @@
               :position-y="noteY"
               absolute
               offset-y
+              allow-overflow
             >
               <v-card class="pin-hover-card">
                 {{ hoverText }}
@@ -91,6 +96,10 @@
 .pin-hover-card {
   width: 500px;
 }
+
+.frame-row {
+  display: inline;
+}
 </style>
 
 <script lang="ts">
@@ -101,6 +110,7 @@ import useGeoJS from '../utilities/useGeoJS';
 import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
+import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
@@ -108,6 +118,7 @@ export default defineComponent({
 
   components: {
     InvestigationSidebar,
+    InvestigationDetailFrameMenu,
   },
 
   props: {
@@ -145,11 +156,27 @@ export default defineComponent({
     let featureLayer: any;
     let pinFeature: any;
     /* eslint-enable */
+    const activeDatasetLayer: Ref<any> = ref(null);
+    const frames = computed(() => store.state.activeDatasetFrames);
 
     function activeDatasetChanged(newActiveDataset: Dataset) {
       selectedDataset.value = newActiveDataset;
       store.dispatch.updateSelectedPins([]);
       store.dispatch.setActiveDataset(newActiveDataset);
+    }
+
+    function buildUrlQueryArgs() {
+      const channels: number[] = [];
+      const colors: string[] = [];
+      const selectedFrames = frames.value.filter((frame) => frame.displayed);
+      if (selectedFrames.length === 0) {
+        return '';
+      }
+      selectedFrames.forEach((frame) => {
+        channels.push(frame.frame);
+        colors.push(frame.color);
+      });
+      return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
     }
 
     function tearDownMap() {
@@ -167,7 +194,6 @@ export default defineComponent({
       if (!tileSourceMetadata) {
         return;
       }
-
       const geojsParams = generatePixelCoordinateParams(
         tileSourceMetadata.size_x || 0,
         tileSourceMetadata.size_y || 0,
@@ -177,19 +203,28 @@ export default defineComponent({
       if (!geojsParams || !geojsParams.map || !geojsParams.layer) {
         return;
       }
-      // console.log(tileSourceMetadata.additional_metadata.frames);
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png`;
+      const queryString = buildUrlQueryArgs();
+      geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png${queryString}`;
       geojsParams.layer.crossDomain = 'use-credentials';
 
       createMap(geojsParams.map);
-      createLayer('osm', geojsParams.layer);
+      activeDatasetLayer.value = createLayer('osm', geojsParams.layer);
       clampBoundsX(false);
     }
 
     watch(activeDataset, (newValue) => {
       drawMap(newValue);
     });
+
+    watch(frames, () => {
+      if (activeDataset.value && activeDatasetLayer) {
+        const queryString = buildUrlQueryArgs();
+        const apiRoot = process.env.VUE_APP_API_ROOT;
+        const newUrl = `${apiRoot}/datasets/${activeDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        activeDatasetLayer.value.url(newUrl).draw();
+      }
+    }, { deep: true });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
     function getPinsToDisplay() {

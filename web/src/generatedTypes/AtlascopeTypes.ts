@@ -116,11 +116,9 @@ export interface TileMetadata {
 
   /**
    * Additional metadata
-   * Any additional metadata from the tile source.
+   * Any additional metadata on the tile source.
    */
-  additional_metadata: {
-    frames: Array<Record<string, string>>;
-  }
+  additional_metadata?: object;
 }
 
 export interface Investigation {
@@ -425,11 +423,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsEmbeddings
+   * @name InvestigationsEmbeddingsRead
    * @request GET:/investigations/{id}/embeddings
    * @response `200` `(DatasetEmbedding)[]`
    */
-  export namespace InvestigationsEmbeddings {
+  export namespace InvestigationsEmbeddingsRead {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -453,11 +451,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsPins
+   * @name InvestigationsPinsRead
    * @request GET:/investigations/{id}/pins
    * @response `200` `(Pin)[]`
    */
-  export namespace InvestigationsPins {
+  export namespace InvestigationsPinsRead {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
