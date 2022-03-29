@@ -17,6 +17,8 @@ RUN apt-get update \
         libgeos-dev \
         # TIFF reading
         libtiff-dev \
+        # Fuse mounting for Remote Large image caching
+        fuse \
         # Nginx to proxy localhost
         nginx \
  && pip install --upgrade pip \
@@ -39,6 +41,10 @@ RUN pip install \
 
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
+
+# Set up fuse mount
+RUN mkdir -p /data
+RUN python -m simple_httpfs /data --schema=http
 
 # Setup nginx to proxy localhost:9000 to minio:9000
 COPY ./dev/nginx.conf /etc/nginx/nginx.conf

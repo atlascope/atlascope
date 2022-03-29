@@ -7,10 +7,15 @@ services:
     command: ["./manage.py", "runserver", "0.0.0.0:8000"]
     # Log printing via Rich is enhanced by a TTY
     tty: true
+    devices:
+      - /dev/fuse:/dev/fuse
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_ADMIN
     env_file: ./dev/.env.docker-compose
     volumes:
       - .:/opt/django-project
-      - ./atlascope_plugins:/opt/atlascope-plugins
     ports:
       - 8000:8000
     depends_on:
@@ -31,10 +36,15 @@ services:
     ]
     # Docker Compose does not set the TTY width, which causes Celery errors
     tty: false
+    devices:
+      - /dev/fuse:/dev/fuse
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_ADMIN
     env_file: ./dev/.env.docker-compose
     volumes:
       - .:/opt/django-project
-      - ./atlascope_plugins:/opt/atlascope-plugins
     depends_on:
       - postgres
       - rabbitmq

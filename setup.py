@@ -48,6 +48,7 @@ setup(
         'drf-yasg',
         'django-click',
         'fsspec',
+        'simple-httpfs',
         'importlib_metadata>=3.6',
         'large-image[gdal,ometiff]',
         # Production-only
