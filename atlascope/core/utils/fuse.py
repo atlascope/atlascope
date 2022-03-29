@@ -24,9 +24,9 @@ def precheck_fuse(url: str) -> bool:
 def url_file_to_fuse_path(url: str) -> Path:
     parsed = urlparse(url)
     if parsed.scheme in ['https', 'http']:
-        fuse_path = url.replace(f'{parsed.scheme}://', '/data') + '..'
+        fuse_path = url.replace(f'{parsed.scheme}://', '/data/') + '..'
     elif parsed.scheme == 's3':
-        fuse_path = url.replace('s3://', '/data') + '..'
+        fuse_path = url.replace('s3://', '/data/') + '..'
     else:
         raise ValueError(f'Scheme {parsed.scheme} not currently handled by FUSE.')
     return Path(fuse_path)
@@ -38,14 +38,13 @@ def remote_dataset_to_local_path(dataset):
     If FUSE is unavailable, this will fallback to downloading the entire
     file to local storage.
     """
-    url = dataset.content.url
-    root = Path('/', 'data')
-    path = root / str(dataset.id)
+    url = dataset.content.url.replace('localhost', 'minio').split('?')[0]
     if precheck_fuse(url):
         return url_file_to_fuse_path(url)
     # Fallback to loading entire file locally
+    path = Path('/', 'data', str(dataset.id))
     cached = fsspec.open_local(
         f'simplecache::{url}',
         filecache={'cache_storage': path},
     )
-    return cached[0]
+    return cached
