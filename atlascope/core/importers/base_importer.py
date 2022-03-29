@@ -1,4 +1,8 @@
 from inspect import Parameter, signature
+from io import BytesIO
+from pathlib import Path
+import tempfile
+import large_image_converter
 
 from rest_framework.exceptions import APIException
 from rest_framework.serializers import ValidationError
@@ -50,3 +54,11 @@ class AtlascopeImporter:
         self.perform_import(**kwargs)
         if not self.content:
             raise APIException(f'{self.__class__.__name__} has failed.')
+
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            dest = Path(tmpdirname, 'gdal_conversion')
+            with open(dest, 'wb') as fd:
+                fd.write(self.content.getvalue())
+            converted = large_image_converter.convert(str(dest))
+            with open(converted, 'rb') as result:
+                self.content = BytesIO(result.read())
