@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -18,7 +16,6 @@ def validate_job_type(value):
 
 
 class Job(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     complete = models.BooleanField(default=False)
     investigation = models.ForeignKey(
         'Investigation',
