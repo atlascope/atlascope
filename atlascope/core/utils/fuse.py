@@ -1,8 +1,9 @@
 from pathlib import Path
-import fsspec
 from urllib.error import HTTPError
 from urllib.parse import urlparse
 from urllib.request import urlopen
+
+import fsspec
 
 
 def precheck_fuse(url: str) -> bool:
@@ -33,7 +34,9 @@ def url_file_to_fuse_path(url: str) -> Path:
 
 
 def remote_dataset_to_local_path(dataset):
-    """Create a local path for a dataset's remote content.
+    """
+    Create a local path for a dataset's remote content.
+
     This will first attempt to use httpfs to FUSE mount the file's URL.
     If FUSE is unavailable, this will fallback to downloading the entire
     file to local storage.
