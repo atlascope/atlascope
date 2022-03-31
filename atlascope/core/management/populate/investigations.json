@@ -17,6 +17,14 @@
         ]
     },
     {
+        "name": "Side breakout playground",
+        "id": 106,
+        "datasets": [
+            "HTA9_1_BA_F_ROI02",
+            "HTA9_1_BA_F_ROI04"
+        ]
+    },
+    {
         "name": "Vandy test data",
         "datasets": [
             "Local Vandy Dataset",
