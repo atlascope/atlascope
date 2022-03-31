@@ -25,6 +25,13 @@
         ]
     },
     {
+        "name": "Vandy Importer demo",
+        "id": 107,
+        "datasets": [
+            "HTA9_1_BA_F_ROI04 (remote)"
+        ]
+    },
+    {
         "name": "Vandy test data",
         "datasets": [
             "Local Vandy Dataset",

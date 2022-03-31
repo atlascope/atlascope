@@ -24,6 +24,15 @@
         "content": "HTA9_1_BA_F_ROI04.ome.tif"
     },
     {
+        "name": "HTA9_1_BA_F_ROI04 (remote)",
+        "id": 207,
+        "description": "Vandy test dataset 1 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef71), retrieved via Vandy importer",
+        "importer": {
+            "importer": "VandyImporter",
+            "file_id": "60e84a1868f4fe34fc7eef72"
+        }
+    },
+    {
         "name": "Remote Vandy Dataset",
         "id": 203,
         "description": "This is the test dataset from the VANDY Explorer",
