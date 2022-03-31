@@ -1,24 +1,24 @@
 [
     {
-        "investigation": "Whole Team Investigation",
+        "investigation": "Pin playground",
         "id": 501,
-        "parent": "Local Vandy Dataset",
+        "parent": "HTA9_1_BA_F_ROI02",
         "child_location": [1000, 1000],
         "note": "A red example pin.",
         "color": "red"
     },
     {
-        "investigation": "Whole Team Investigation",
+        "investigation": "Pin playground",
         "id": 502,
-        "parent": "Local Vandy Dataset",
+        "parent": "HTA9_1_BA_F_ROI02",
         "child_location": [3000, 1000],
         "note": "A green example pin. Look how green it is.",
         "color": "green"
     },
     {
-        "investigation": "Whole Team Investigation",
+        "investigation": "Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
         "id": 503,
-        "parent": "Local Vandy Dataset",
         "child_location": [2000, 2000],
         "note": "A blue example pin. Yay!",
         "color": "blue"
