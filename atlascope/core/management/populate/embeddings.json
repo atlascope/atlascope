@@ -8,16 +8,9 @@
     },
     {
         "investigation": "Semantic zoom playground",
-        "id": 302,
-        "parent": "HTA9_1_BA_F_ROI02",
-        "child": "Local Vandy Dataset",
-        "child_bounding_box": [300, 300, 200, 200]
-    },
-    {
-        "investigation": "Semantic zoom playground",
         "id": 303,
         "parent": "HTA9_1_BA_F_ROI02",
-        "child": "Local Vandy Dataset (Copy)",
+        "child": "HTA9_1_BA_F_ROI02 (Copy)",
         "child_bounding_box": [600, 500, 200, 200]
     }
 ]
