@@ -1,22 +1,23 @@
 [
     {
-        "investigation": "Vandy test data",
-        "parent": "Local Vandy Dataset",
+        "investigation": "Semantic zoom playground",
+        "id": 301,
+        "parent": "HTA9_1_BA_F_ROI02",
         "child": "HTA9_1_BA_F_ROI04",
         "child_bounding_box": [100, 100, 200, 200]
     },
     {
-        "investigation": "Whole Team Investigation",
-        "id": 301,
-        "parent": "Remote Vandy Dataset",
+        "investigation": "Semantic zoom playground",
+        "id": 302,
+        "parent": "HTA9_1_BA_F_ROI02",
         "child": "Local Vandy Dataset",
-        "child_bounding_box": [100, 100, 200, 200]
+        "child_bounding_box": [300, 300, 200, 200]
     },
     {
-        "investigation": "Whole Team Investigation",
-        "id": 302,
-        "parent": "Local Vandy Dataset",
+        "investigation": "Semantic zoom playground",
+        "id": 303,
+        "parent": "HTA9_1_BA_F_ROI02",
         "child": "Local Vandy Dataset (Copy)",
-        "child_bounding_box": [100, 100, 200, 200]
+        "child_bounding_box": [600, 500, 200, 200]
     }
 ]
