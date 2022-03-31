@@ -1,16 +1,19 @@
 [
     {
         "name": "Local Vandy Dataset",
+        "id": 201,
         "description": "This is the test dataset from the VANDY Explorer",
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
     {
         "name": "Local Vandy Dataset (Copy)",
+        "id": 202,
         "description": "This is the test dataset from the VANDY Explorer",
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
     {
         "name": "Remote Vandy Dataset",
+        "id": 203,
         "description": "This is the test dataset from the VANDY Explorer",
         "importer": {
             "importer": "VandyImporter",
@@ -19,6 +22,7 @@
     },
     {
         "name": "Cells Subimage",
+        "id": 204,
         "description": "This is a screenshot of some green cells",
         "content": "green_cell_dataset_selection.png"
     }
