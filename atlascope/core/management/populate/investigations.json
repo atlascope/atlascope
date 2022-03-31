@@ -1,6 +1,7 @@
 [
     {
         "name": "Whole Team Investigation",
+        "id": 101,
         "datasets": [
             "Local Vandy Dataset",
             "Local Vandy Dataset (Copy)",
@@ -9,12 +10,14 @@
     },
     {
         "name": "Backend Investigation",
+        "id": 102,
         "datasets": [
             "Local Vandy Dataset"
         ]
     },
     {
         "name": "Frontend Investigation",
+        "id": 103,
         "datasets": [
             "Remote Vandy Dataset"
         ]
