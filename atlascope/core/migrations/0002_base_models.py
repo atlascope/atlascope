@@ -20,7 +20,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Dataset',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.TextField(blank=True, max_length=5000)),
                 ('public', models.BooleanField(default=True)),
@@ -44,7 +49,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='JobRun',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('input_image', s3_file_field.fields.S3FileField(null=True)),
                 ('other_inputs', models.JSONField(null=True)),
                 ('outputs', models.JSONField(null=True)),
@@ -55,7 +65,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='JobScript',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('script_contents', s3_file_field.fields.S3FileField(null=True)),
             ],
@@ -63,7 +78,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Pin',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 (
                     'color',
                     models.CharField(
@@ -91,7 +111,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='JobRunOutputImage',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('stored_image', s3_file_field.fields.S3FileField(null=True)),
                 (
                     'job_run',
@@ -113,7 +138,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Investigation',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 (
                     'created',
                     django_extensions.db.fields.CreationDateTimeField(
