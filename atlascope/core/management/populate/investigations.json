@@ -7,6 +7,16 @@
         ]
     },
     {
+        "name": "Semantic zoom playground",
+        "id": 105,
+        "datasets": [
+            "HTA9_1_BA_F_ROI02",
+            "HTA9_1_BA_F_ROI04",
+            "Local Vandy Dataset",
+            "Local Vandy Dataset (Copy)"
+        ]
+    },
+    {
         "name": "Vandy test data",
         "datasets": [
             "Local Vandy Dataset",
