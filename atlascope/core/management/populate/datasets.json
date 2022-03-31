@@ -7,6 +7,7 @@
     },
     {
         "name": "HTA9_1_BA_F_ROI02",
+        "id": 205,
         "description": "VANDY test dataset 1 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef71)",
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
@@ -18,6 +19,7 @@
     },
     {
         "name": "HTA9_1_BA_F_ROI04",
+        "id": 206,
         "description": "VANDY test dataset 2 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79)",
         "content": "HTA9_1_BA_F_ROI04.ome.tif"
     },
