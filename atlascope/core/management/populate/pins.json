@@ -1,7 +1,7 @@
 [
     {
         "investigation": "Pin playground",
-        "id": 501,
+        "id": 5000,
         "parent": "HTA9_1_BA_F_ROI02",
         "child_location": [1000, 1000],
         "note": "A red example pin.",
@@ -9,7 +9,7 @@
     },
     {
         "investigation": "Pin playground",
-        "id": 502,
+        "id": 5001,
         "parent": "HTA9_1_BA_F_ROI02",
         "child_location": [3000, 1000],
         "note": "A green example pin. Look how green it is.",
@@ -18,7 +18,7 @@
     {
         "investigation": "Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
-        "id": 503,
+        "id": 5002,
         "child_location": [2000, 2000],
         "note": "A blue example pin. Yay!",
         "color": "blue"
