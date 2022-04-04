@@ -1,11 +1,12 @@
 import io
 from itertools import cycle
-
+from pathlib import Path
 import PIL
+
+from django.conf import settings
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-import fsspec
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
 from large_image_source_tiff import TiffFileTileSource
@@ -26,14 +27,11 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
 
     def get(self, *args, **kwargs):
         dataset = self.get_object()
-        cached = fsspec.open_local(
-            f'simplecache::{dataset.content.url}',
-            filecache={'cache_storage': '/tmp/files'},
-        )
+        content_location = Path(settings.BASE_DIR, dataset.content.name)
         try:
-            tile_source = OMETiffFileTileSource(cached[0])
+            tile_source = OMETiffFileTileSource(content_location)
         except TileSourceError:
-            tile_source = TiffFileTileSource(cached[0])
+            tile_source = TiffFileTileSource(content_location)
         serializer = self.get_serializer(tile_source)
         return Response(serializer.data)
 
@@ -89,15 +87,12 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        cached = fsspec.open_local(
-            f'simplecache::{dataset.content.url}',
-            filecache={'cache_storage': '/tmp/files'},
-        )
+        content_location = Path(settings.BASE_DIR, dataset.content.name)
         try:
             try:
-                tile_source = OMETiffFileTileSource(cached[0])
+                tile_source = OMETiffFileTileSource(content_location)
             except TileSourceError:
-                tile_source = TiffFileTileSource(cached[0])
+                tile_source = TiffFileTileSource(content_location)
             channels = self.request.query_params.get('channels')
             if channels:
                 channels = channels.split(',')
