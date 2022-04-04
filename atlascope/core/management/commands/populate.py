@@ -1,4 +1,5 @@
 import json
+from jsonschema import validate
 import os
 from pathlib import Path
 
@@ -10,6 +11,17 @@ from rest_framework.serializers import ValidationError
 from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin
 
 POPULATE_DIR = Path('atlascope/core/management/populate/')
+
+spec_types = ["datasets", "investigations", "embeddings", "jobs", "pins"]
+
+
+def validate_all(spec):
+    schema = get_json(POPULATE_DIR / "schema.json")
+
+    for s in spec_types:
+        print(f"Validating {s}.json...", end="", flush=True)
+        validate(instance=spec[s], schema=schema[s])
+        print("done")
 
 
 def announce(msg):
@@ -152,10 +164,16 @@ def get_json(jsonfile):
 
 @click.command()
 def command():
+    spec = {}
+    for s in spec_types:
+        spec[s] = get_json(POPULATE_DIR / f"{s}.json")
+
+    validate_all(spec)
+
     delete_all()
 
-    populate_datasets(get_json(POPULATE_DIR / 'datasets.json'))
-    populate_investigations(get_json(POPULATE_DIR / 'investigations.json'))
-    populate_embeddings(get_json(POPULATE_DIR / 'embeddings.json'))
-    populate_jobs(get_json(POPULATE_DIR / 'jobs.json'))
-    populate_pins(get_json(POPULATE_DIR / 'pins.json'))
+    populate_datasets(spec['datasets'])
+    populate_investigations(spec['investigations'])
+    populate_embeddings(spec['embeddings'])
+    populate_jobs(spec['jobs'])
+    populate_pins(spec['pins'])

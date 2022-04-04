@@ -1,25 +1,25 @@
 [
     {
         "name": "HTA9_1_BA_F_ROI02",
-        "id": 205,
+        "id": 2005,
         "description": "VANDY test dataset 1 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef71)",
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
     {
         "name": "HTA9_1_BA_F_ROI02 (Copy)",
-        "id": 202,
+        "id": 2002,
         "description": "This is the test dataset from the VANDY Explorer",
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
     {
         "name": "HTA9_1_BA_F_ROI04",
-        "id": 206,
+        "id": 2006,
         "description": "VANDY test dataset 2 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79)",
         "content": "HTA9_1_BA_F_ROI04.ome.tif"
     },
     {
         "name": "HTA9_1_BA_F_ROI04 (remote)",
-        "id": 207,
+        "id": 2007,
         "description": "Vandy test dataset 1 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef71), retrieved via Vandy importer",
         "importer": {
             "importer": "VandyImporter",
@@ -28,7 +28,7 @@
     },
     {
         "name": "Cells Subimage",
-        "id": 204,
+        "id": 2004,
         "description": "This is a screenshot of some green cells",
         "content": "green_cell_dataset_selection.png"
     }
