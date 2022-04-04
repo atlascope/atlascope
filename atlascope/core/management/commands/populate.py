@@ -1,11 +1,11 @@
 import json
-from jsonschema import validate
 import os
 from pathlib import Path
 
 from django.contrib.gis.geos import Point
 from django.contrib.gis.geos.polygon import Polygon
 import djclick as click
+from jsonschema import validate
 from rest_framework.serializers import ValidationError
 
 from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin
