@@ -47,12 +47,10 @@ setup(
         'djangorestframework',
         'drf-yasg',
         'django-click',
-        'fsspec',
         'importlib_metadata>=3.6',
         'large-image[gdal,ometiff]',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
-        'django-s3-file-field[boto3]',
         'gunicorn',
         'numpy',
         'pillow',
@@ -66,7 +64,6 @@ setup(
         'dev': [
             'django-composed-configuration[dev]>=0.18',
             'django-debug-toolbar',
-            'django-s3-file-field[minio]',
             'ipython',
             'tox',
         ]
