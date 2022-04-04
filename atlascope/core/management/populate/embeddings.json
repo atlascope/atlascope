@@ -1,14 +1,14 @@
 [
     {
         "investigation": "Semantic zoom playground",
-        "id": 3001,
+        "id": 3000,
         "parent": "HTA9_1_BA_F_ROI02",
         "child": "HTA9_1_BA_F_ROI04",
         "child_bounding_box": [100, 100, 200, 200]
     },
     {
         "investigation": "Semantic zoom playground",
-        "id": 3003,
+        "id": 3001,
         "parent": "HTA9_1_BA_F_ROI02",
         "child": "HTA9_1_BA_F_ROI02 (Copy)",
         "child_bounding_box": [600, 500, 200, 200]

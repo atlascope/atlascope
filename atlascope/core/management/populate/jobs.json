@@ -1,13 +1,13 @@
 [
     {
         "job_type": "average_color",
-        "id": 4001,
+        "id": 4000,
         "investigation": "Analytics playground",
         "original_dataset": "Cells Subimage"
     },
     {
         "job_type": "brightest_n_pixels",
-        "id": 4002,
+        "id": 4001,
         "investigation": "Analytics playground",
         "original_dataset": "Cells Subimage",
         "additional_inputs": {
