@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@sentry/vue": "^6.2.0",
+    "@types/lodash": "^4.14.181",
     "@vue/composition-api": "^1.0.0-rc.2",
     "axios": "^0.21.1",
     "direct-vuex": "^0.12.1",
     "geojs": "^1.4.3",
+    "lodash": "^4.17.21",
     "swagger-typescript-api": "^9.3.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

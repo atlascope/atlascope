@@ -46,20 +46,16 @@
           <div
             ref="map"
             class="map"
+          />
+          <v-card
+            v-for="note in pinNotes"
+            :key="note.id"
+            :value="note"
+            :class="{'pin-note': true, hidden: !note.showNote}"
+            :style="{'top': `${note.notePositionY}px`, 'left': `${note.notePositionX}px`}"
           >
-            <v-menu
-              v-model="showNote"
-              :position-x="noteX"
-              :position-y="noteY"
-              absolute
-              offset-y
-              allow-overflow
-            >
-              <v-card class="pin-hover-card">
-                {{ hoverText }}
-              </v-card>
-            </v-menu>
-          </div>
+            {{ note.note }}
+          </v-card>
         </v-sheet>
       </v-col>
       <v-col
@@ -100,6 +96,17 @@
   width: 500px;
 }
 
+.pin-note {
+  position: absolute;
+  width: 500px;
+  background-color: white;
+  border: 1px solid black;
+}
+
+.hidden {
+  display: none;
+}
+
 .frame-row {
   display: inline;
 }
@@ -115,6 +122,7 @@ import {
   watch,
   Ref,
 } from '@vue/composition-api';
+import { debounce } from 'lodash';
 import useGeoJS from '../utilities/useGeoJS';
 import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
@@ -222,6 +230,12 @@ export default defineComponent({
       pinFeature = null;
     }
 
+    function movePinNoteCards(event: any) {
+      console.log({ event });
+    }
+
+    const debounceMovePinNoteCards = debounce(movePinNoteCards, 500);
+
     function drawMap(dataset: Dataset | null) {
       tearDownMap();
       if (!dataset || !dataset.id) {
@@ -259,7 +273,7 @@ export default defineComponent({
         url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
-      createMap(mapParams);
+      const geojsMap = createMap(mapParams);
       rootDatasetLayer.value = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
@@ -354,6 +368,8 @@ export default defineComponent({
           /* eslint-enable */
         }
       }
+      geojsMap.geoOn(geoEvents.pan, debounceMovePinNoteCards);
+      geojsMap.geoOn(geoEvents.zoom, debounceMovePinNoteCards);
       clampBoundsX(false);
     }
 
@@ -415,6 +431,18 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    const pinNotes: Ref<any[]> = ref([]);
+    function updatePinNotes() {
+      // eventually check to see that child dataset doesn not exist
+      // and note does exist
+      pinNotes.value = store.state.currentPins.map((pin) => ({
+        ...pin,
+        showNote: false,
+        notePositionX: 0,
+        notePositionY: 0,
+      }));
+    }
+
     function getPinsToDisplay() {
       // TODO: as we move towards embedding multiple datasets into the view,
       // we will need a more sophisticated way to determine which pins to render
@@ -435,6 +463,7 @@ export default defineComponent({
     }
 
     watch(selectedPins, () => {
+      // updatePinNotes();
       if (!featureLayer) {
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
       }
@@ -462,6 +491,20 @@ export default defineComponent({
           showNote.value = false;
           hoverText.value = '';
         });
+        pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
+          if (!map.value) { return; }
+
+          if (event.mouse.buttonsDown.left) {
+            const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
+            noteToToggle.showNote = !noteToToggle.showNote;
+            noteToToggle.notePositionX = event.mouse.page.x;
+            noteToToggle.notePositionY = event.mouse.page.y;
+            showNote.value = true;
+            noteX.value = event.mouse.page.x;
+            noteY.value = event.mouse.page.y;
+            hoverText.value= event.data.note;
+          }
+        });
       } else {
         pinFeature.data(pinFeatureData).draw();
       }
@@ -472,6 +515,7 @@ export default defineComponent({
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.rootDataset;
       drawMap(store.state.rootDataset);
+      updatePinNotes();
       loaded.value = true;
     });
 
@@ -489,6 +533,7 @@ export default defineComponent({
       selectedDataset,
       rootDatasetChanged,
       selectedPins,
+      pinNotes,
     };
   },
 });
