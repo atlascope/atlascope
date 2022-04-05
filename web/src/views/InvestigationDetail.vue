@@ -462,8 +462,6 @@ export default defineComponent({
         ...pin,
         showNote: false,
         inBounds: false,
-        notePositionX: 0,
-        notePositionY: 0,
       }));
     }
 
@@ -508,6 +506,16 @@ export default defineComponent({
             fillColor: (pin: any) => pin.color,
           })
           .draw();
+        pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
+          if (!map.value) { return; }
+
+          if (event.mouse.buttonsDown.left) {
+            const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
+            noteToToggle.showNote = !noteToToggle.showNote;
+            noteToToggle.notePositionX = event.mouse.page.x;
+            noteToToggle.notePositionY = event.mouse.page.y;
+          }
+        });
         pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
           if (!map.value) { return; }
 
