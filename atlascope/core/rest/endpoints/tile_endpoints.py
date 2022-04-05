@@ -1,8 +1,8 @@
 import io
 from itertools import cycle
 from pathlib import Path
-import PIL
 
+import PIL
 from django.conf import settings
 from django.urls import path
 from drf_yasg import openapi
