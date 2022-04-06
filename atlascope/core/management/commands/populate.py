@@ -1,9 +1,7 @@
 import json
+import logging
 import os
 from pathlib import Path
-import tempfile
-import large_image_converter
-import logging
 
 from django.contrib.gis.geos import Point
 from django.contrib.gis.geos.polygon import Polygon
@@ -65,12 +63,7 @@ def populate_datasets(specs):
         # If there's content to save, save it.
         if content:
             print("    uploading data...", end="", flush=True)
-            with tempfile.TemporaryDirectory() as tmpdirname:
-                dest = Path(tmpdirname, 'gdal_conversion')
-                with open(dest, 'wb') as fd:
-                    fd.write(open(POPULATE_DIR / "inputs" / content, "rb").read())
-                converted = large_image_converter.convert(str(dest))
-                dataset.content.save(content, open(converted, 'rb'))
+            dataset.perform_import(content=open(POPULATE_DIR / "inputs" / content, "rb").read())
             print("done")
 
         # If there's an importer to run, run it.

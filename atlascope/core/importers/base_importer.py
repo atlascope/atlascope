@@ -1,9 +1,13 @@
+import imghdr
 from inspect import Parameter, signature
 from io import BytesIO
 from pathlib import Path
 import tempfile
-import large_image_converter
 
+from large_image.exceptions import TileSourceError
+import large_image_converter
+from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_source_tiff import TiffFileTileSource
 from rest_framework.exceptions import APIException
 from rest_framework.serializers import ValidationError
 
@@ -59,6 +63,13 @@ class AtlascopeImporter:
             dest = Path(tmpdirname, 'gdal_conversion')
             with open(dest, 'wb') as fd:
                 fd.write(self.content.getvalue())
-            converted = large_image_converter.convert(str(dest))
-            with open(converted, 'rb') as result:
-                self.content = BytesIO(result.read())
+            if imghdr.what(dest) == 'tiff':
+                try:
+                    tile_source = OMETiffFileTileSource(dest)
+                except TileSourceError:
+                    tile_source = TiffFileTileSource(dest)
+                channel_info = tile_source.getMetadata()['channels']
+                self.metadata['channels'] = channel_info
+                converted = large_image_converter.convert(str(dest))
+                with open(converted, 'rb') as result:
+                    self.content = BytesIO(result.read())
