@@ -20,7 +20,7 @@
     {
         "name": "HTA9_1_BA_F_ROI04 (remote)",
         "id": 2003,
-        "description": "Vandy test dataset 1 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef71), retrieved via Vandy importer",
+        "description": "Vandy test dataset 3 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79), retrieved via Vandy importer",
         "importer": {
             "importer": "VandyImporter",
             "file_id": "60e84a1868f4fe34fc7eef72"
