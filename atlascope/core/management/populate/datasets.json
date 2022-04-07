@@ -6,15 +6,15 @@
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
     {
-        "name": "HTA9_1_BA_F_ROI02 (Copy)",
+        "name": "HTA9_1_BA_F_ROI03",
         "id": 2001,
-        "description": "This is the test dataset from the VANDY Explorer",
-        "content": "HTA9_1_BA_F_ROI02.ome.tif"
+        "description": "VANDY test dataset 2 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef75)",
+        "content": "HTA9_1_BA_F_ROI03.ome.tif"
     },
     {
         "name": "HTA9_1_BA_F_ROI04",
         "id": 2002,
-        "description": "VANDY test dataset 2 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79)",
+        "description": "VANDY test dataset 3 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79)",
         "content": "HTA9_1_BA_F_ROI04.ome.tif"
     },
     {
