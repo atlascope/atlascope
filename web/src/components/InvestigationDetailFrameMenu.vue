@@ -74,7 +74,7 @@ export default defineComponent({
   setup() {
     const frameInfo: Ref<any[]> = ref([]);
     const showFrames: Ref<boolean> = ref(false);
-    const activeDataset = computed(() => store.state.activeDataset);
+    const rootDataset = computed(() => store.state.rootDataset);
 
     function updateFrameInfo() {
       showFrames.value = false;
@@ -85,11 +85,11 @@ export default defineComponent({
       /* eslint-disable */
       frameInfo.value = [];
       // const additionalMetadata: any = tileMetadata.value?.additional_metadata;
-      if (!activeDataset.value || !activeDataset.value.id) {
+      if (!rootDataset.value || !rootDataset.value.id) {
         store.dispatch.updateFrames(frameInfo.value);
         return;
       }
-      const additionalMetadata: any = store.state.datasetTileMetadata[activeDataset.value.id].additional_metadata;
+      const additionalMetadata: any = store.state.datasetTileMetadata[rootDataset.value.id].additional_metadata;
       if ( additionalMetadata && additionalMetadata.frames) {
         frameInfo.value = additionalMetadata.frames.map((frame: any) => ({
           name: frame.Name || 'no name',
@@ -102,7 +102,7 @@ export default defineComponent({
       /* eslint-enable */
     }
 
-    watch(activeDataset, () => {
+    watch(rootDataset, () => {
       resetFrameInfo();
     });
 

@@ -20,7 +20,7 @@
           single-line
           dense
           hide-details
-          @change="activeDatasetChanged"
+          @change="rootDatasetChanged"
         />
         <v-banner
           v-if="loaded && tilesourceDatasets.length === 0"
@@ -104,7 +104,13 @@
 
 <script lang="ts">
 import {
-  ref, defineComponent, onMounted, PropType, computed, watch, Ref,
+  ref,
+  defineComponent,
+  onMounted,
+  PropType,
+  computed,
+  watch,
+  Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
@@ -112,6 +118,26 @@ import store from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
+import type { DatasetEmbedding } from '../generatedTypes/AtlascopeTypes';
+
+interface RootDatasetEmbedding {
+  id: null;
+  child_bounding_box: number[];
+  parent: null;
+  child: string;
+}
+
+interface StackFrame {
+  embedding: DatasetEmbedding | RootDatasetEmbedding;
+  parent: {
+    scale: number;
+    offset: {
+      x: number;
+      y: number;
+    };
+  };
+  treeDepth: number;
+}
 
 export default defineComponent({
   name: 'InvestigationDetail',
@@ -150,19 +176,19 @@ export default defineComponent({
     }
 
     const selectedDataset: Ref<Dataset | null> = ref(null);
-    const activeDataset = computed(() => store.state.activeDataset);
+    const rootDataset = computed(() => store.state.rootDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     /* eslint-disable */
     let featureLayer: any;
     let pinFeature: any;
     /* eslint-enable */
-    const activeDatasetLayer: Ref<any> = ref(null);
-    const frames = computed(() => store.state.activeDatasetFrames);
+    const rootDatasetLayer: Ref<any> = ref(null);
+    const frames = computed(() => store.state.rootDatasetFrames);
 
-    function activeDatasetChanged(newActiveDataset: Dataset) {
-      selectedDataset.value = newActiveDataset;
+    function rootDatasetChanged(newRootDataset: Dataset) {
+      selectedDataset.value = newRootDataset;
       store.dispatch.updateSelectedPins([]);
-      store.dispatch.setActiveDataset(newActiveDataset);
+      store.dispatch.setRootDataset(newRootDataset);
     }
 
     function buildUrlQueryArgs() {
@@ -190,39 +216,142 @@ export default defineComponent({
       if (!dataset || !dataset.id) {
         return;
       }
-      const tileSourceMetadata = store.state.datasetTileMetadata[dataset.id];
-      if (!tileSourceMetadata) {
-        return;
-      }
-      const geojsParams = generatePixelCoordinateParams(
-        tileSourceMetadata.size_x || 0,
-        tileSourceMetadata.size_y || 0,
-        tileSourceMetadata.tile_size || 0,
-        tileSourceMetadata.tile_size || 0,
-      );
-      if (!geojsParams || !geojsParams.map || !geojsParams.layer) {
-        return;
-      }
-      const apiRoot = process.env.VUE_APP_API_ROOT;
-      const queryString = buildUrlQueryArgs();
-      geojsParams.layer.url = `${apiRoot}/datasets/${dataset.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-      geojsParams.layer.crossDomain = 'use-credentials';
 
-      createMap(geojsParams.map);
-      activeDatasetLayer.value = createLayer('osm', geojsParams.layer);
+      const apiRoot = process.env.VUE_APP_API_ROOT;
+      const embeddings = store.state.datasetEmbeddings;
+      const rootDatasetID = dataset.id;
+      const rootTileMetadata = store.state.datasetTileMetadata[rootDatasetID];
+
+      if (
+        rootTileMetadata === undefined
+        || rootTileMetadata.size_x === undefined
+        || rootTileMetadata.size_y === undefined
+        || rootTileMetadata.tile_size === undefined
+        || rootTileMetadata.levels === undefined
+      ) {
+        return;
+      }
+
+      const rootPixelParams = generatePixelCoordinateParams(
+        rootTileMetadata.size_x || 0,
+        rootTileMetadata.size_y || 0,
+        rootTileMetadata.tile_size || 0,
+        rootTileMetadata.tile_size || 0,
+      );
+      const mapParams = {
+        ...rootPixelParams.map,
+        max: 40,
+      };
+      const rootLayerParams = {
+        ...rootPixelParams.layer,
+        zIndex: 0,
+        url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
+        crossDomain: 'use-credentials',
+      };
+      createMap(mapParams);
+      rootDatasetLayer.value = createLayer('osm', rootLayerParams);
+
+      const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
+      const stack: Array<StackFrame> = [];
+      stack.unshift(
+        ...embeddings
+          .filter((e) => e.parent === rootDatasetID)
+          .map((e) => ({
+            embedding: e,
+            parent: { scale: 1, offset: { x: 0, y: 0 } },
+            treeDepth: 1,
+          })),
+      );
+
+      while (stack.length > 0) {
+        const { embedding, parent, treeDepth } = stack.shift()!;
+        if (!visited.has(embedding)) {
+          visited.add(embedding);
+
+          if (
+            embedding === undefined
+            || embedding.child_bounding_box === undefined
+            || embedding.child_bounding_box.length !== 4
+          ) {
+            return;
+          }
+
+          const datasetID = embedding.child;
+          const tileMetadata = store.state.datasetTileMetadata[datasetID];
+
+          if (
+            tileMetadata === undefined
+            || tileMetadata.size_x === undefined
+            || tileMetadata.size_y === undefined
+            || tileMetadata.tile_size === undefined
+            || tileMetadata.levels === undefined
+          ) {
+            return;
+          }
+
+          const boundingBox = {
+            x: {
+              min: embedding.child_bounding_box[0],
+              max: embedding.child_bounding_box[2],
+            },
+            y: {
+              min: embedding.child_bounding_box[1],
+              max: embedding.child_bounding_box[3],
+            },
+          };
+          const scale = Math.min(
+            (parent.scale * (boundingBox.x.max - boundingBox.x.min))
+              / tileMetadata.size_x,
+            (parent.scale * (boundingBox.y.max - boundingBox.y.min))
+              / tileMetadata.size_y,
+          );
+          const offset = {
+            x: (parent.scale / scale) * (parent.offset.x + boundingBox.x.min),
+            y: (parent.scale / scale) * (parent.offset.y + boundingBox.y.min),
+          };
+          const pixelParams = generatePixelCoordinateParams(
+            tileMetadata.size_x || 0,
+            tileMetadata.size_y || 0,
+            tileMetadata.tile_size || 0,
+            tileMetadata.tile_size || 0,
+          );
+          const layerParams = {
+            ...pixelParams.layer,
+            zIndex: treeDepth,
+            url: `${apiRoot}/datasets/${datasetID}/tiles/{z}/{x}/{y}.png`,
+            crossDomain: 'use-credentials',
+          };
+          createLayer(
+            'osm',
+            layerParams,
+            `+proj=longlat +axis=enu +xoff=-${offset.x} +yoff=${
+              offset.y
+            } +s11=${1 / scale} +s22=${1 / scale}`,
+          );
+
+          const frontier = embeddings.filter((e) => e.parent === datasetID);
+          stack.unshift(
+            ...frontier.map((e) => ({
+              embedding: e,
+              parent: { scale, offset },
+              treeDepth: treeDepth + 1,
+            })),
+          );
+        }
+      }
       clampBoundsX(false);
     }
 
-    watch(activeDataset, (newValue) => {
+    watch(rootDataset, (newValue) => {
       drawMap(newValue);
     });
 
     watch(frames, () => {
-      if (activeDataset.value && activeDatasetLayer) {
+      if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/${activeDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-        activeDatasetLayer.value.url(newUrl).draw();
+        const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        rootDatasetLayer.value.url(newUrl).draw();
       }
     }, { deep: true });
 
@@ -231,10 +360,10 @@ export default defineComponent({
       // TODO: as we move towards embedding multiple datasets into the view,
       // we will need a more sophisticated way to determine which pins to render
       // and determining where they should be rendered
-      const selectedPinsForActiveDataset = selectedPins.value.filter(
-        (pin) => pin.parent === activeDataset.value?.id,
+      const selectedPinsForRootDataset = selectedPins.value.filter(
+        (pin) => pin.parent === rootDataset.value?.id,
       );
-      const pinFeatureData = selectedPinsForActiveDataset.map((pin) => {
+      const pinFeatureData = selectedPinsForRootDataset.map((pin) => {
         const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         return {
           ...location,
@@ -282,8 +411,8 @@ export default defineComponent({
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      selectedDataset.value = store.state.activeDataset;
-      drawMap(store.state.activeDataset);
+      selectedDataset.value = store.state.rootDataset;
+      drawMap(store.state.rootDataset);
       loaded.value = true;
     });
 
@@ -297,9 +426,9 @@ export default defineComponent({
       toggleSidebar,
       map,
       tilesourceDatasets,
-      activeDataset,
+      rootDataset,
       selectedDataset,
-      activeDatasetChanged,
+      rootDatasetChanged,
       selectedPins,
     };
   },
