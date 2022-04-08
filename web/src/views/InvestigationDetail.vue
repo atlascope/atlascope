@@ -51,7 +51,7 @@
             v-for="note in pinNotes"
             :key="note.id"
             :value="note"
-            :class="{'pin-note': true, hidden: !note.showNote}"
+            :class="{'pin-note': true, hidden: !note.showNote || !note.inBounds }"
             :style="{'top': `${note.notePositionY}px`, 'left': `${note.notePositionX}px`}"
           >
             {{ note.note }}
@@ -206,6 +206,12 @@ export default defineComponent({
       store.dispatch.setRootDataset(newRootDataset);
     }
 
+    function selectPinsForRootDataset() {
+      store.dispatch.updateSelectedPins(store.state.currentPins.filter(
+        (pin: Pin) => pin.parent === rootDataset.value?.id,
+      ));
+    }
+
     function buildUrlQueryArgs() {
       const channels: number[] = [];
       const colors: string[] = [];
@@ -246,9 +252,9 @@ export default defineComponent({
             || note.notePositionY > top + height
             || note.notePositionX < left
             || note.notePositionY < top) {
-          note.showNote = false;
+          note.inBounds = false;
         } else {
-          note.showNote = true;
+          note.inBounds = true;
         }
       });
     }
@@ -454,6 +460,7 @@ export default defineComponent({
       pinNotes.value = store.state.currentPins.map((pin) => ({
         ...pin,
         showNote: false,
+        inBounds: false,
         notePositionX: 0,
         notePositionY: 0,
       }));
@@ -463,10 +470,7 @@ export default defineComponent({
       // TODO: as we move towards embedding multiple datasets into the view,
       // we will need a more sophisticated way to determine which pins to render
       // and determining where they should be rendered
-      const selectedPinsForRootDataset = selectedPins.value.filter(
-        (pin) => pin.parent === rootDataset.value?.id,
-      );
-      const pinFeatureData = selectedPinsForRootDataset.map((pin) => {
+      const pinFeatureData = selectedPins.value.map((pin) => {
         const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         return {
           ...location,
@@ -478,11 +482,19 @@ export default defineComponent({
       return pinFeatureData;
     }
 
-    watch(selectedPins, () => {
-      // updatePinNotes();
+    watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
       }
+      const newPinIds = newPins.map((pin) => pin.id);
+      oldPins.forEach((pin) => {
+        if (!newPinIds.includes(pin.id)) {
+          const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+          if (note) {
+            note.showNote = false;
+          }
+        }
+      });
       const pinFeatureData = getPinsToDisplay();
       if (!pinFeature) {
         /* eslint-disable */
@@ -516,6 +528,7 @@ export default defineComponent({
       selectedDataset.value = store.state.rootDataset;
       drawMap(store.state.rootDataset);
       createPinNotes();
+      selectPinsForRootDataset();
       loaded.value = true;
     });
 
