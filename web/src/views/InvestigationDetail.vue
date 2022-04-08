@@ -20,7 +20,7 @@
           single-line
           dense
           hide-details
-          @change="activeDatasetChanged"
+          @change="rootDatasetChanged"
         />
         <v-banner
           v-if="loaded && tilesourceDatasets.length === 0"
@@ -150,19 +150,19 @@ export default defineComponent({
     }
 
     const selectedDataset: Ref<Dataset | null> = ref(null);
-    const activeDataset = computed(() => store.state.activeDataset);
+    const rootDataset = computed(() => store.state.rootDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     /* eslint-disable */
     let featureLayer: any;
     let pinFeature: any;
     /* eslint-enable */
-    const activeDatasetLayer: Ref<any> = ref(null);
-    const frames = computed(() => store.state.activeDatasetFrames);
+    const rootDatasetLayer: Ref<any> = ref(null);
+    const frames = computed(() => store.state.rootDatasetFrames);
 
-    function activeDatasetChanged(newActiveDataset: Dataset) {
-      selectedDataset.value = newActiveDataset;
+    function rootDatasetChanged(newRootDataset: Dataset) {
+      selectedDataset.value = newRootDataset;
       store.dispatch.updateSelectedPins([]);
-      store.dispatch.setActiveDataset(newActiveDataset);
+      store.dispatch.setRootDataset(newRootDataset);
     }
 
     function buildUrlQueryArgs() {
@@ -213,16 +213,16 @@ export default defineComponent({
       clampBoundsX(false);
     }
 
-    watch(activeDataset, (newValue) => {
+    watch(rootDataset, (newValue) => {
       drawMap(newValue);
     });
 
     watch(frames, () => {
-      if (activeDataset.value && activeDatasetLayer) {
+      if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/${activeDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-        activeDatasetLayer.value.url(newUrl).draw();
+        const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        rootDatasetLayer.value.url(newUrl).draw();
       }
     }, { deep: true });
 
@@ -231,10 +231,10 @@ export default defineComponent({
       // TODO: as we move towards embedding multiple datasets into the view,
       // we will need a more sophisticated way to determine which pins to render
       // and determining where they should be rendered
-      const selectedPinsForActiveDataset = selectedPins.value.filter(
-        (pin) => pin.parent === activeDataset.value?.id,
+      const selectedPinsForRootDataset = selectedPins.value.filter(
+        (pin) => pin.parent === rootDataset.value?.id,
       );
-      const pinFeatureData = selectedPinsForActiveDataset.map((pin) => {
+      const pinFeatureData = selectedPinsForRootDataset.map((pin) => {
         const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         return {
           ...location,
@@ -282,8 +282,8 @@ export default defineComponent({
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      selectedDataset.value = store.state.activeDataset;
-      drawMap(store.state.activeDataset);
+      selectedDataset.value = store.state.rootDataset;
+      drawMap(store.state.rootDataset);
       loaded.value = true;
     });
 
@@ -297,9 +297,9 @@ export default defineComponent({
       toggleSidebar,
       map,
       tilesourceDatasets,
-      activeDataset,
+      rootDataset,
       selectedDataset,
-      activeDatasetChanged,
+      rootDatasetChanged,
       selectedPins,
     };
   },
