@@ -180,9 +180,6 @@ export default defineComponent({
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
-    const showNote = ref(false);
-    const noteX = ref(0);
-    const noteY = ref(0);
     const hoverText = ref('');
 
     function toggleSidebar() {
@@ -197,6 +194,8 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
+    const pinNotes: Ref<any[]> = ref([]);
+    /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
     const frames = computed(() => store.state.rootDatasetFrames);
     /* eslint-enable */
@@ -230,11 +229,31 @@ export default defineComponent({
       pinFeature = null;
     }
 
-    function movePinNoteCards(event: any) {
-      console.log({ event });
+    function movePinNoteCards() {
+      if (!featureLayer || !pinFeature || !map.value) { return; }
+      pinFeature.data().forEach((pinPoint: any) => {
+        const { x, y } = pinPoint;
+        const newScreenCoords = pinFeature.featureGcsToDisplay({ x, y });
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pinPoint.id);
+        const {
+          left, top, width, height,
+        } = map.value?.getBoundingClientRect() || {
+          left: 0, top: 0, width: 0, height: 0,
+        };
+        note.notePositionX = newScreenCoords.x + left;
+        note.notePositionY = newScreenCoords.y + top;
+        if (note.notePositionX > left + width
+            || note.notePositionY > top + height
+            || note.notePositionX < left
+            || note.notePositionY < top) {
+          note.showNote = false;
+        } else {
+          note.showNote = true;
+        }
+      });
     }
 
-    const debounceMovePinNoteCards = debounce(movePinNoteCards, 500);
+    const debounceMovePinNoteCards = debounce(movePinNoteCards, 50);
 
     function drawMap(dataset: Dataset | null) {
       tearDownMap();
@@ -431,10 +450,7 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
-    const pinNotes: Ref<any[]> = ref([]);
-    function updatePinNotes() {
-      // eventually check to see that child dataset doesn not exist
-      // and note does exist
+    function createPinNotes() {
       pinNotes.value = store.state.currentPins.map((pin) => ({
         ...pin,
         showNote: false,
@@ -479,18 +495,6 @@ export default defineComponent({
             fillColor: (pin: any) => pin.color,
           })
           .draw();
-        pinFeature.geoOn(geoEvents.feature.mouseon, (event: any) => {
-          if (!map.value) { return; }
-          showNote.value = true;
-          noteX.value = event.mouse.page.x;
-          noteY.value = event.mouse.page.y;
-          hoverText.value = event.data.note;
-        });
-        pinFeature.geoOn(geoEvents.feature.mouseoff, (event: any) => {
-          if (!map.value) { return; }
-          showNote.value = false;
-          hoverText.value = '';
-        });
         pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
           if (!map.value) { return; }
 
@@ -499,10 +503,6 @@ export default defineComponent({
             noteToToggle.showNote = !noteToToggle.showNote;
             noteToToggle.notePositionX = event.mouse.page.x;
             noteToToggle.notePositionY = event.mouse.page.y;
-            showNote.value = true;
-            noteX.value = event.mouse.page.x;
-            noteY.value = event.mouse.page.y;
-            hoverText.value= event.data.note;
           }
         });
       } else {
@@ -515,16 +515,13 @@ export default defineComponent({
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.rootDataset;
       drawMap(store.state.rootDataset);
-      updatePinNotes();
+      createPinNotes();
       loaded.value = true;
     });
 
     return {
       loaded,
       sidebarCollapsed,
-      showNote,
-      noteX,
-      noteY,
       hoverText,
       toggleSidebar,
       map,
