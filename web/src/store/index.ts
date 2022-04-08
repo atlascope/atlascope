@@ -21,12 +21,12 @@ export interface State {
     axiosInstance: AxiosInstance | null;
     currentInvestigation: Investigation | null;
     currentDatasets: Dataset[];
-    activeDataset: Dataset | null;
+    rootDataset: Dataset | null;
     currentPins: Pin[];
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
     datasetTileMetadata: { [key: string]: TileMetadata };
-    activeDatasetFrames: TiffFrame[];
+    rootDatasetFrames: TiffFrame[];
 }
 
 interface TileMetadataForDataset {
@@ -46,12 +46,12 @@ const {
     axiosInstance: null,
     currentInvestigation: null,
     currentDatasets: [],
-    activeDataset: null,
+    rootDataset: null,
     currentPins: [],
     selectedPins: [],
     datasetEmbeddings: [],
     datasetTileMetadata: {},
-    activeDatasetFrames: [],
+    rootDatasetFrames: [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -66,8 +66,8 @@ const {
     setCurrentDatasets(state, datasets: Dataset[]) {
       state.currentDatasets = datasets;
     },
-    setActiveDataset(state, dataset: Dataset | null) {
-      state.activeDataset = dataset;
+    setRootDataset(state, dataset: Dataset | null) {
+      state.rootDataset = dataset;
     },
     setCurrentPins(state, pins: Pin[]) {
       state.currentPins = pins;
@@ -81,8 +81,8 @@ const {
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
     },
-    setActiveDatasetFrames(state, frames: TiffFrame[]) {
-      state.activeDatasetFrames = frames;
+    setRootDatasetFrames(state, frames: TiffFrame[]) {
+      state.rootDatasetFrames = frames;
     },
   },
   getters: {
@@ -118,8 +118,8 @@ const {
           commit.setCurrentDatasets(datasets);
 
           const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
-          const activeDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
-          commit.setActiveDataset(activeDataset);
+          const rootDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
+          commit.setRootDataset(rootDataset);
 
           const embeddings: DatasetEmbedding[] = (await store.state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
@@ -171,11 +171,11 @@ const {
       const { commit } = rootActionContext(context);
       commit.setCurrentInvestigation(null);
       commit.setCurrentDatasets([]);
-      commit.setActiveDataset(null);
+      commit.setRootDataset(null);
     },
-    setActiveDataset(context, dataset: Dataset | null) {
+    setRootDataset(context, dataset: Dataset | null) {
       const { commit } = rootActionContext(context);
-      commit.setActiveDataset(dataset);
+      commit.setRootDataset(dataset);
     },
     updateSelectedPins(context, pins: Pin[]) {
       const { commit } = rootActionContext(context);
@@ -183,7 +183,7 @@ const {
     },
     updateFrames(context, frames: TiffFrame[]) {
       const { commit } = rootActionContext(context);
-      commit.setActiveDatasetFrames(frames);
+      commit.setRootDatasetFrames(frames);
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
