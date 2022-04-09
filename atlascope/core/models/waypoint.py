@@ -1,7 +1,7 @@
-from django.contrib.gis.db import models as gisModels
+from django.contrib.gis.db import models as gis_models
 from django.db import models
 
 
 class Waypoint(models.Model):
-    location = gisModels.PointField(null=True)
+    location = gis_models.PointField(null=True)
     zoom = models.IntegerField(null=True)
