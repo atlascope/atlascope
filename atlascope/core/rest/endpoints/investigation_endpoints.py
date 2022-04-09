@@ -4,15 +4,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import (
+from atlascope.core.models import (  # Tour,; TourCreateSerializer,; TourSerializer,
     DatasetEmbeddingSerializer,
     Investigation,
     InvestigationSerializer,
     JobDetailSerializer,
     PinSerializer,
-    # Tour,
-    # TourCreateSerializer,
-    # TourSerializer,
 )
 
 
