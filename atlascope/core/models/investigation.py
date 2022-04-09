@@ -9,8 +9,6 @@ class Investigation(TimeStampedModel, models.Model):
     description = models.TextField(max_length=5000, blank=True)
     datasets = models.ManyToManyField('Dataset', related_name='investigations')
     notes = models.TextField(max_length=5000, blank=True)
-    way_point = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True)
-    tour = models.ForeignKey('Tour', on_delete=models.CASCADE, null=True)
 
 
 class InvestigationSerializer(serializers.ModelSerializer):
