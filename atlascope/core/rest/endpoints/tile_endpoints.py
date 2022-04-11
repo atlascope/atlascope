@@ -27,7 +27,7 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
 
     def get(self, *args, **kwargs):
         dataset = self.get_object()
-        content_location = Path(settings.BASE_DIR, dataset.content.name)
+        content_location = dataset.content.path
         try:
             tile_source = OMETiffFileTileSource(content_location)
         except TileSourceError:
