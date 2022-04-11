@@ -1,22 +1,38 @@
 [
     {
-        "name": "Whole Team Investigation",
+        "name": "Pin playground",
+        "id": 1000,
         "datasets": [
-            "Local Vandy Dataset",
-            "Local Vandy Dataset (Copy)",
-            "Remote Vandy Dataset"
+            "HTA9_1_BA_F_ROI02"
         ]
     },
     {
-        "name": "Backend Investigation",
+        "name": "Semantic zoom playground",
+        "id": 1001,
         "datasets": [
-            "Local Vandy Dataset"
+            "HTA9_1_BA_F_ROI02",
+            "HTA9_1_BA_F_ROI04",
+            "HTA9_1_BA_F_ROI03"
         ]
     },
     {
-        "name": "Frontend Investigation",
+        "name": "Side breakout playground",
+        "id": 1002,
         "datasets": [
-            "Remote Vandy Dataset"
+            "HTA9_1_BA_F_ROI02",
+            "HTA9_1_BA_F_ROI04"
+        ]
+    },
+    {
+        "name": "Analytics playground",
+        "id": 1003,
+        "datasets": []
+    },
+    {
+        "name": "Vandy Importer demo",
+        "id": 1004,
+        "datasets": [
+            "HTA9_1_BA_F_ROI04 (remote)"
         ]
     }
 ]

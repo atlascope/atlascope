@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django.contrib import admin
 from django.contrib.gis.db.models import PointField
 from django.db import models
@@ -16,7 +14,6 @@ PIN_COLORS = [
 
 
 class Pin(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,

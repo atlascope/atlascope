@@ -57,7 +57,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
             openapi.Parameter(
                 'id',
                 openapi.IN_PATH,
-                description='A UUID string identifying this dataset.',
+                description='A string identifying this dataset.',
                 type=openapi.TYPE_STRING,
             ),
             openapi.Parameter(
