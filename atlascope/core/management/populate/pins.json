@@ -1,23 +1,26 @@
 [
     {
-        "investigation": "Whole Team Investigation",
-        "parent": "Local Vandy Dataset",
+        "investigation": "Pin playground",
+        "id": 5000,
+        "parent": "HTA9_1_BA_F_ROI02",
         "child_location": [1000, 1000],
-        "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non pulvinar turpis. Suspendisse et elit et nisi imperdiet sodales. Integer aliquet sodales mi a vulputate. Pellentesque ut mi faucibus, dictum ex a, imperdiet metus. Cras sed ipsum a lacus placerat pulvinar. Donec tincidunt velit bibendum velit eleifend, ut volutpat lorem feugiat.",
+        "note": "A red example pin.",
         "color": "red"
     },
     {
-        "investigation": "Whole Team Investigation",
-        "parent": "Local Vandy Dataset",
+        "investigation": "Pin playground",
+        "id": 5001,
+        "parent": "HTA9_1_BA_F_ROI02",
         "child_location": [3000, 1000],
-        "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non pulvinar turpis. Suspendisse et elit et nisi imperdiet sodales. Integer aliquet sodales mi a vulputate. Pellentesque ut mi faucibus, dictum ex a, imperdiet metus. Cras sed ipsum a lacus placerat pulvinar. Donec tincidunt velit bibendum velit eleifend, ut volutpat lorem feugiat.",
+        "note": "A green example pin. Look how green it is.",
         "color": "green"
     },
     {
-        "investigation": "Whole Team Investigation",
-        "parent": "Local Vandy Dataset",
+        "investigation": "Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5002,
         "child_location": [2000, 2000],
-        "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non pulvinar turpis. Suspendisse et elit et nisi imperdiet sodales. Integer aliquet sodales mi a vulputate. Pellentesque ut mi faucibus, dictum ex a, imperdiet metus. Cras sed ipsum a lacus placerat pulvinar. Donec tincidunt velit bibendum velit eleifend, ut volutpat lorem feugiat.",
+        "note": "A blue example pin. Yay!",
         "color": "blue"
     }
 ]

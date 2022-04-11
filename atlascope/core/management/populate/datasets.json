@@ -1,17 +1,26 @@
 [
     {
-        "name": "Local Vandy Dataset",
-        "description": "This is the test dataset from the VANDY Explorer",
+        "name": "HTA9_1_BA_F_ROI02",
+        "id": 2000,
+        "description": "VANDY test dataset 1 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef71)",
         "content": "HTA9_1_BA_F_ROI02.ome.tif"
     },
     {
-        "name": "Local Vandy Dataset (Copy)",
-        "description": "This is the test dataset from the VANDY Explorer",
-        "content": "HTA9_1_BA_F_ROI02.ome.tif"
+        "name": "HTA9_1_BA_F_ROI03",
+        "id": 2001,
+        "description": "VANDY test dataset 2 (https://styx.neurology.emory.edu/girder/#item/60e84a1868f4fe34fc7eef75)",
+        "content": "HTA9_1_BA_F_ROI03.ome.tif"
     },
     {
-        "name": "Remote Vandy Dataset",
-        "description": "This is the test dataset from the VANDY Explorer",
+        "name": "HTA9_1_BA_F_ROI04",
+        "id": 2002,
+        "description": "VANDY test dataset 3 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79)",
+        "content": "HTA9_1_BA_F_ROI04.ome.tif"
+    },
+    {
+        "name": "HTA9_1_BA_F_ROI04 (remote)",
+        "id": 2003,
+        "description": "Vandy test dataset 3 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79), retrieved via Vandy importer",
         "importer": {
             "importer": "VandyImporter",
             "file_id": "60e84a1868f4fe34fc7eef72"
@@ -19,6 +28,7 @@
     },
     {
         "name": "Cells Subimage",
+        "id": 2004,
         "description": "This is a screenshot of some green cells",
         "content": "green_cell_dataset_selection.png"
     }
