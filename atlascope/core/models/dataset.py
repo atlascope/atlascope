@@ -14,7 +14,7 @@ class Dataset(TimeStampedModel, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
-    content = models.FileField(null=True, upload_to=settings.DATASET_STORAGE_DIR)
+    content = models.FileField(null=True)
     metadata = models.JSONField(null=True)
     dataset_type = models.CharField(
         max_length=20,
