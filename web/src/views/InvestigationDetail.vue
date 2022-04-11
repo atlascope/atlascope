@@ -202,7 +202,8 @@ export default defineComponent({
     function buildUrlQueryArgs() {
       const channels: number[] = [];
       const colors: string[] = [];
-      const selectedFrames = frames.value.filter((frame) => frame.displayed);
+      /* eslint-disable */
+      const selectedFrames = frames.value.filter((frame: any) => frame.displayed);
       if (selectedFrames.length === 0) {
         return '';
       }
@@ -210,6 +211,7 @@ export default defineComponent({
         channels.push(frame.frame);
         colors.push(frame.color);
       });
+      /* eslint-enable */
       return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
     }
 
@@ -262,6 +264,7 @@ export default defineComponent({
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
       const stack: Array<StackFrame> = [];
+      /* eslint-disable */
       stack.unshift(
         ...embeddings
           .filter((e) => e.parent === rootDatasetID)
@@ -274,6 +277,7 @@ export default defineComponent({
 
       while (stack.length > 0) {
         const { embedding, parent, treeDepth } = stack.shift()!;
+        /* eslint-enable */
         if (!visited.has(embedding)) {
           visited.add(embedding);
 
@@ -338,6 +342,7 @@ export default defineComponent({
             } +s11=${1 / scale} +s22=${1 / scale}`,
           );
 
+          /* eslint-disable */
           const frontier = embeddings.filter((e) => e.parent === datasetID);
           stack.unshift(
             ...frontier.map((e) => ({
@@ -346,6 +351,7 @@ export default defineComponent({
               treeDepth: treeDepth + 1,
             })),
           );
+          /* eslint-enable */
         }
       }
       clampBoundsX(false);

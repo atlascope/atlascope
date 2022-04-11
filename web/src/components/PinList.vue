@@ -59,7 +59,7 @@ export default defineComponent({
 
     onMounted(() => {
       // reset selectedPins
-      store.state.selectedPins.forEach((pin) => {
+      store.state.selectedPins.forEach((pin: Pin) => {
         selectedPins.value.push(pin);
       });
     });

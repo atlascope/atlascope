@@ -102,24 +102,24 @@ const {
   },
   actions: {
     async fetchInvestigations(context) {
-      const { commit } = rootActionContext(context);
-      if (store.state.axiosInstance) {
-        const investigations = (await store.state.axiosInstance.get('/investigations')).data;
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance) {
+        const investigations = (await state.axiosInstance.get('/investigations')).data;
         commit.setInvestigations(investigations.results);
       } else {
         commit.setInvestigations([]);
       }
     },
     async fetchCurrentInvestigation(context, investigationId: string) {
-      const { commit } = rootActionContext(context);
-      if (store.state.axiosInstance) {
-        const investigation = (await store.state.axiosInstance.get(`/investigations/${investigationId}`)).data;
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance) {
+        const investigation = (await state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
 
-        if (store.state.currentInvestigation) {
+        if (state.currentInvestigation) {
           const datasetPromises: Promise<AxiosResponse>[] = [];
-          store.state.currentInvestigation.datasets.forEach((datasetId) => {
-            const promise = store.state.axiosInstance?.get(`/datasets/${datasetId}`);
+          state.currentInvestigation.datasets.forEach((datasetId: string) => {
+            const promise = state.axiosInstance?.get(`/datasets/${datasetId}`);
             if (promise) {
               datasetPromises.push(promise);
             }
@@ -131,33 +131,39 @@ const {
           const rootDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
           commit.setRootDataset(rootDataset);
 
-          const embeddings: DatasetEmbedding[] = (await store.state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
+          const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
           const metadataPromises: Promise<{ datasetId: string; result: AxiosResponse }>[] = [];
           tileSourceDatasets.forEach((dataset) => {
-            const promise = store.state.axiosInstance?.get(`/datasets/${dataset.id}/tiles/metadata`).then((result) => ({
-              datasetId: dataset.id,
-              result,
-            }));
+            const promise = state.axiosInstance?.get(
+              `/datasets/${dataset.id}/tiles/metadata`).then(
+              (result: AxiosResponse) => ({
+                datasetId: dataset.id,
+                result,
+              }));
             if (promise) {
               metadataPromises.push(promise);
             }
           });
           embeddings.forEach((embedding) => {
-            const promise = store.state.axiosInstance?.get(`/datasets/${embedding.child}/tiles/metadata`).then((result) => ({
-              datasetId: embedding.child,
-              result,
-            }));
+            const promise = state.axiosInstance?.get(
+              `/datasets/${embedding.child}/tiles/metadata`).then(
+                (result: AxiosResponse) => ({
+                  datasetId: embedding.child,
+                  result,
+                }));
             if (promise) {
               metadataPromises.push(promise);
             }
           });
           embeddings.forEach((embedding) => {
-            const promise = store.state.axiosInstance?.get(`/datasets/${embedding.parent}/tiles/metadata`).then((result) => ({
-              datasetId: embedding.parent,
-              result,
-            }));
+            const promise = state.axiosInstance?.get(
+              `/datasets/${embedding.parent}/tiles/metadata`).then(
+                (result: AxiosResponse) => ({
+                  datasetId: embedding.parent,
+                  result,
+                }));
             if (promise) {
               metadataPromises.push(promise);
             }
@@ -170,7 +176,7 @@ const {
             });
           });
 
-          const pins = (await store.state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
+          const pins = (await state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
           commit.setCurrentPins(pins);
         }
       } else {
@@ -195,12 +201,14 @@ const {
       const { commit } = rootActionContext(context);
       commit.setRootDatasetFrames(frames);
     },
-    async createSubimageDataset(context, selection) {
-      // TODO: rewrite when multiple datasets are shown
-      const dataset = store.state.rootDataset;
+    async createSubimageDataset(context, selection): Promise<AxiosResponse | boolean> {
+      const { state } = rootActionContext(context);
 
-      if (store.state.axiosInstance && dataset) {
-        return (await store.state.axiosInstance.post(
+      // TODO: rewrite when multiple datasets are shown
+      const dataset = state.rootDataset;
+
+      if (state.axiosInstance && dataset) {
+        return (await state.axiosInstance.post(
           `/datasets/${dataset.id}/subimage`,
           {
             x0: selection[0],
