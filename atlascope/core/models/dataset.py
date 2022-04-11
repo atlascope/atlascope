@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -12,7 +10,6 @@ from atlascope.core.importers import available_importers
 
 
 class Dataset(TimeStampedModel, models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
     content = S3FileField(null=True)
