@@ -27,6 +27,8 @@ export interface State {
     datasetEmbeddings: DatasetEmbedding[];
     datasetTileMetadata: { [key: string]: TileMetadata };
     rootDatasetFrames: TiffFrame[];
+    selectionMode: boolean;
+    subimageSelection: number[] | null;
 }
 
 interface TileMetadataForDataset {
@@ -52,6 +54,8 @@ const {
     datasetEmbeddings: [],
     datasetTileMetadata: {},
     rootDatasetFrames: [],
+    selectionMode: false,
+    subimageSelection: null,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -83,6 +87,12 @@ const {
     },
     setRootDatasetFrames(state, frames: TiffFrame[]) {
       state.rootDatasetFrames = frames;
+    },
+    setSelectionMode(state, mode: boolean) {
+      state.selectionMode = mode;
+    },
+    setSubimageSelection(state, selection: number[] | null) {
+      state.subimageSelection = selection;
     },
   },
   getters: {
@@ -184,6 +194,23 @@ const {
     updateFrames(context, frames: TiffFrame[]) {
       const { commit } = rootActionContext(context);
       commit.setRootDatasetFrames(frames);
+    },
+    async createSubimageDataset(context, selection) {
+      // TODO: rewrite when multiple datasets are shown
+      const dataset = store.state.rootDataset;
+
+      if (store.state.axiosInstance && dataset) {
+        return (await store.state.axiosInstance.post(
+          `/datasets/${dataset.id}/subimage`,
+          {
+            x0: selection[0],
+            y0: selection[1],
+            x1: selection[2],
+            y1: selection[3],
+          },
+        )).data;
+      }
+      return false;
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
