@@ -62,6 +62,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   };
 
   const geoEvents = geo.event;
+  const geoAnnotations = geo.annotation;
 
   const generatePixelCoordinateParams = (
     width: number,
@@ -88,6 +89,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     createLayer,
     generatePixelCoordinateParams,
     geoEvents,
+    geoAnnotations,
     clampBoundsX,
   };
 }

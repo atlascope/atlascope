@@ -33,8 +33,11 @@
         </v-banner>
         <v-spacer />
       </v-col>
-      <v-col>
+      <v-col cols="auto">
         <investigation-detail-frame-menu />
+      </v-col>
+      <v-col cols="auto">
+        <dataset-subimage-selector />
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -115,6 +118,7 @@ import {
 import useGeoJS from '../utilities/useGeoJS';
 import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
+import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
@@ -145,6 +149,7 @@ export default defineComponent({
   components: {
     InvestigationSidebar,
     InvestigationDetailFrameMenu,
+    DatasetSubimageSelector,
   },
 
   props: {
@@ -163,6 +168,7 @@ export default defineComponent({
       createMap,
       createLayer,
       geoEvents,
+      geoAnnotations,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -178,12 +184,14 @@ export default defineComponent({
     const selectedDataset: Ref<Dataset | null> = ref(null);
     const rootDataset = computed(() => store.state.rootDataset);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+    const selectionMode = computed(() => store.state.selectionMode);
     /* eslint-disable */
+    let annotationLayer: any;
     let featureLayer: any;
     let pinFeature: any;
-    /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
     const frames = computed(() => store.state.rootDatasetFrames);
+    /* eslint-enable */
 
     function rootDatasetChanged(newRootDataset: Dataset) {
       selectedDataset.value = newRootDataset;
@@ -207,6 +215,7 @@ export default defineComponent({
 
     function tearDownMap() {
       exit();
+      annotationLayer = null;
       featureLayer = null;
       pinFeature = null;
     }
@@ -354,6 +363,50 @@ export default defineComponent({
         rootDatasetLayer.value.url(newUrl).draw();
       }
     }, { deep: true });
+
+    function handleSelectionChange() {
+      const annotations = annotationLayer.annotations();
+      /* eslint-disable-next-line */
+      annotations.forEach((annotation: any) => {
+        annotation.style({
+          fillColor: '#00796b',
+          strokeColor: '#00796b',
+        });
+        if (annotation.state() !== geoAnnotations.state.create) {
+          if (annotations.length > 1) {
+            annotationLayer.removeAnnotation(annotation);
+          } else {
+            const corners = annotation.coordinates();
+            const newSelection = [
+              corners[1].x, corners[1].y, corners[3].x, corners[3].y,
+            ].map(
+              (num) => Math.round(num),
+            );
+            store.commit.setSubimageSelection(newSelection);
+          }
+        }
+      });
+    }
+
+    watch(selectionMode, () => {
+      if (!annotationLayer) {
+        annotationLayer = createLayer('annotation', {
+          annotations: ['rectangle'],
+          showLabels: false,
+        });
+        annotationLayer.geoOn(geoEvents.annotation.add, handleSelectionChange);
+        annotationLayer.geoOn(geoEvents.annotation.update, handleSelectionChange);
+        annotationLayer.geoOn(geoEvents.annotation.remove, handleSelectionChange);
+        annotationLayer.geoOn(geoEvents.annotation.state, handleSelectionChange);
+      }
+      if (!selectionMode.value) {
+        annotationLayer.mode(null);
+        annotationLayer.removeAllAnnotations();
+        store.commit.setSubimageSelection(null);
+      } else {
+        annotationLayer.mode('rectangle');
+      }
+    });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
     function getPinsToDisplay() {
