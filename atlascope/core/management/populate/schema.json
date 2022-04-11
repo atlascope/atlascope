@@ -1,0 +1,152 @@
+{
+    "investigations": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["name", "id", "datasets"],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "minimum": 1000,
+                    "exclusiveMaximum": 2000
+                },
+                "datasets": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+
+    "datasets": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["name", "id", "description"],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "minimum": 2000,
+                    "exclusiveMaximum": 3000
+                },
+                "description": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "importer": {
+                    "type": "object",
+                    "required": ["importer"],
+                    "properties": {
+                        "importer": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    "pins": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["investigation", "id", "parent", "child_location", "note", "color"],
+            "properties": {
+                "investigation": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "minimum": 5000,
+                    "exclusiveMaximum": 6000
+                },
+                "parent": {
+                    "type": "string"
+                },
+                "child_location": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                },
+                "note": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+
+    "embeddings": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["investigation", "id", "parent", "child", "child_bounding_box"],
+            "properties": {
+                "investigation": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "minimum": 3000,
+                    "exclusiveMaximum": 4000
+                },
+                "parent": {
+                    "type": "string"
+                },
+                "child": {
+                    "type": "string"
+                },
+                "child_bounding_box": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                }
+            }
+        }
+    },
+
+    "jobs": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["job_type", "id", "investigation", "original_dataset"],
+            "properties": {
+                "job_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "minimum": 4000,
+                    "exclusiveMaximum": 5000
+                },
+                "investigation": {
+                    "type": "string"
+                },
+                "original_dataset": {
+                    "type": "string"
+                },
+                "additional_inputs": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}
