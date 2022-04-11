@@ -8,7 +8,6 @@ class DatasetFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Dataset
 
-    id = factory.Faker('uuid4')
     name = factory.Faker('word')
     description = factory.Faker('sentence')
     content = None
@@ -28,7 +27,6 @@ class InvestigationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Investigation
 
-    id = factory.Faker('uuid4')
     name = factory.Faker('word')
     description = factory.Faker('sentence')
     notes = factory.Faker('sentence')
@@ -48,7 +46,6 @@ class PinFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Pin
 
-    id = factory.Faker('uuid4')
     investigation = factory.SubFactory(InvestigationFactory)
     parent = factory.SubFactory(DatasetFactory)
     child = factory.SubFactory(DatasetFactory)
@@ -61,7 +58,6 @@ class JobFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Job
 
-    id = factory.Faker('uuid4')
     complete = False
     investigation = factory.SubFactory(InvestigationFactory)
     original_dataset = factory.SubFactory(DatasetFactory)

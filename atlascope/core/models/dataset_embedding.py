@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django.contrib import admin
 from django.contrib.gis.db.models import PolygonField
 from django.db import models
@@ -7,7 +5,6 @@ from rest_framework import serializers
 
 
 class DatasetEmbedding(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
