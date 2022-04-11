@@ -43,7 +43,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, ref, watch, computed,
+  defineComponent, ref, computed,
 } from '@vue/composition-api';
 import store from '../store';
 
@@ -56,7 +56,7 @@ export default defineComponent({
     const saved = ref<boolean>(false);
 
     async function saveSubimageDataset() {
-      const response = store.dispatch.createSubimageDataset(selection.value);
+      const response = await store.dispatch.createSubimageDataset(selection.value);
       if (response) {
         store.commit.setSelectionMode(false);
         saved.value = true;
