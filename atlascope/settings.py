@@ -18,7 +18,7 @@ class AtlascopeMixin(ConfigMixin):
     ROOT_URLCONF = 'atlascope.urls'
 
     BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-    DATASET_STORAGE_DIR = Path('data')
+    MEDIA_ROOT = BASE_DIR / Path('data')
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
     # custom Atlascope definitions
