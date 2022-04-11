@@ -39,7 +39,3 @@ RUN pip install \
 
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
-
-COPY ./dev/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
