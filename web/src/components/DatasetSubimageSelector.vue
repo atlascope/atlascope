@@ -33,10 +33,10 @@
       </v-btn>
     </div>
     <div
-      v-if="saved"
+      v-if="savedNotification"
       style="display: inline"
     >
-      Saved!
+      {{ savedNotification }}
     </div>
   </div>
 </template>
@@ -53,15 +53,18 @@ export default defineComponent({
   setup() {
     const selection = computed(() => store.state.subimageSelection);
     const selectionMode = computed(() => store.state.selectionMode);
-    const saved = ref<boolean>(false);
+    const savedNotification = ref<string>();
 
     async function saveSubimageDataset() {
-      const response = await store.dispatch.createSubimageDataset(selection.value);
-      if (response) {
-        store.commit.setSelectionMode(false);
-        saved.value = true;
-        setTimeout(() => { saved.value = false; }, 3000);
+      try {
+        const response = await store.dispatch.createSubimageDataset(selection.value);
+        if (response) savedNotification.value = 'Saved!';
+        else savedNotification.value = 'Failure to Save.';
+      } catch (e) {
+        savedNotification.value = 'Failure to Save.';
       }
+      store.commit.setSelectionMode(false);
+      setTimeout(() => { savedNotification.value = ''; }, 3000);
     }
     function selectionText() {
       if (!selection.value) return '';
@@ -72,7 +75,7 @@ export default defineComponent({
       selectionMode,
       selection,
       store,
-      saved,
+      savedNotification,
       saveSubimageDataset,
       selectionText,
     };
