@@ -14,18 +14,17 @@
           <v-icon>mdi-select</v-icon>
         </v-btn>
       </template>
-      <span>Select a portion of the data</span>
+      <span>Create a dataset for a region of the image</span>
     </v-tooltip>
     <div v-else>
       <v-btn
-        v-if="!selection"
         color="secondary"
         @click="() => store.commit.setSelectionMode(false)"
       >
         Cancel
       </v-btn>
       <v-btn
-        v-else
+        v-if="selection"
         color="primary"
         @click="saveSubimageDataset"
       >
@@ -67,7 +66,7 @@ export default defineComponent({
     }
     function selectionText() {
       if (!selection.value) return '';
-      return `(${selection.value[0]}, ${selection.value[1]}) -> (${selection.value[2]}, ${selection.value[3]})`;
+      return `(${selection.value[0]}, ${selection.value[1]}), (${selection.value[2]}, ${selection.value[3]})`;
     }
 
     return {
