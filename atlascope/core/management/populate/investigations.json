@@ -3,7 +3,8 @@
         "name": "Pin playground",
         "id": 1000,
         "datasets": [
-            "HTA9_1_BA_F_ROI02"
+            "HTA9_1_BA_F_ROI02",
+            "Cells Subimage"
         ]
     },
     {
