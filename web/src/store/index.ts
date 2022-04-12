@@ -25,14 +25,14 @@ export interface State {
     currentPins: Pin[];
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
-    datasetTileMetadata: { [key: string]: TileMetadata };
+    datasetTileMetadata: { [key: number]: TileMetadata };
     rootDatasetFrames: TiffFrame[];
     selectionMode: boolean;
     subimageSelection: number[] | null;
 }
 
 interface TileMetadataForDataset {
-    datasetId: string;
+    datasetId: number;
     tileMetadata: TileMetadata;
 }
 
@@ -136,7 +136,7 @@ const {
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<{ datasetId: string; result: AxiosResponse }>[] = [];
+          const metadataPromises: Promise<{ datasetId: number; result: AxiosResponse }>[] = [];
           tileSourceDatasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/${dataset.id}/tiles/metadata`).then(
