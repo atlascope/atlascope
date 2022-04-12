@@ -18,14 +18,13 @@
     </v-tooltip>
     <div v-else>
       <v-btn
-        v-if="!selection"
         color="secondary"
         @click="() => store.commit.setSelectionMode(false)"
       >
         Cancel
       </v-btn>
       <v-btn
-        v-else
+        v-if="selection"
         color="primary"
         @click="saveSubimageDataset"
       >
