@@ -98,7 +98,8 @@
 
 .pin-note {
   position: absolute;
-  width: 500px;
+  max-width: 300px;
+  padding: 2px;
   background-color: white;
   border: 1px solid black;
 }
