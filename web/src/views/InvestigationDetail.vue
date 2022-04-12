@@ -186,7 +186,7 @@ export default defineComponent({
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     const selectionMode = computed(() => store.state.selectionMode);
     /* eslint-disable */
-    let annotationLayer: any;
+    let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
     const rootDatasetLayer: Ref<any> = ref(null);
@@ -217,7 +217,7 @@ export default defineComponent({
 
     function tearDownMap() {
       exit();
-      annotationLayer = null;
+      selectionLayer = null;
       featureLayer = null;
       pinFeature = null;
     }
@@ -371,7 +371,7 @@ export default defineComponent({
     }, { deep: true });
 
     function handleSelectionChange() {
-      const annotations = annotationLayer.annotations();
+      const annotations = selectionLayer.annotations();
       /* eslint-disable-next-line */
       annotations.forEach((annotation: any) => {
         annotation.style({
@@ -380,7 +380,7 @@ export default defineComponent({
         });
         if (annotation.state() !== geoAnnotations.state.create) {
           if (annotations.length > 1) {
-            annotationLayer.removeAnnotation(annotation);
+            selectionLayer.removeAnnotation(annotation);
           } else {
             const corners = annotation.coordinates();
             const newSelection = [
@@ -395,22 +395,22 @@ export default defineComponent({
     }
 
     watch(selectionMode, () => {
-      if (!annotationLayer) {
-        annotationLayer = createLayer('annotation', {
+      if (!selectionLayer) {
+        selectionLayer = createLayer('annotation', {
           annotations: ['rectangle'],
           showLabels: false,
         });
-        annotationLayer.geoOn(geoEvents.annotation.add, handleSelectionChange);
-        annotationLayer.geoOn(geoEvents.annotation.update, handleSelectionChange);
-        annotationLayer.geoOn(geoEvents.annotation.remove, handleSelectionChange);
-        annotationLayer.geoOn(geoEvents.annotation.state, handleSelectionChange);
+        selectionLayer.geoOn(geoEvents.annotation.add, handleSelectionChange);
+        selectionLayer.geoOn(geoEvents.annotation.update, handleSelectionChange);
+        selectionLayer.geoOn(geoEvents.annotation.remove, handleSelectionChange);
+        selectionLayer.geoOn(geoEvents.annotation.state, handleSelectionChange);
       }
       if (!selectionMode.value) {
-        annotationLayer.mode(null);
-        annotationLayer.removeAllAnnotations();
+        selectionLayer.mode(null);
+        selectionLayer.removeAllAnnotations();
         store.commit.setSubimageSelection(null);
       } else {
-        annotationLayer.mode('rectangle');
+        selectionLayer.mode('rectangle');
       }
     });
 
