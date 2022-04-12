@@ -58,8 +58,7 @@ export default defineComponent({
     async function saveSubimageDataset() {
       try {
         const response = await store.dispatch.createSubimageDataset(selection.value);
-        if (response) savedNotification.value = 'Saved!';
-        else savedNotification.value = 'Failure to Save.';
+        savedNotification.value = response ? 'Saved!' : 'Failed to Save';
       } catch (e) {
         savedNotification.value = 'Failure to Save.';
       }
