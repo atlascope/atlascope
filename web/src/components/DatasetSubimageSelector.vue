@@ -1,0 +1,82 @@
+<template>
+  <div>
+    <v-tooltip
+      v-if="!selectionMode"
+      bottom
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          icon
+          v-bind="attrs"
+          v-on="on"
+          @click="() => store.commit.setSelectionMode(true)"
+        >
+          <v-icon>mdi-select</v-icon>
+        </v-btn>
+      </template>
+      <span>Create a dataset for a region of the image</span>
+    </v-tooltip>
+    <div v-else>
+      <v-btn
+        color="secondary"
+        @click="() => store.commit.setSelectionMode(false)"
+      >
+        Cancel
+      </v-btn>
+      <v-btn
+        v-if="selection"
+        color="primary"
+        @click="saveSubimageDataset"
+      >
+        Create Subimage Dataset {{ selectionText() }}
+      </v-btn>
+    </div>
+    <div
+      v-if="savedNotification"
+      style="display: inline"
+    >
+      {{ savedNotification }}
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import {
+  defineComponent, ref, computed,
+} from '@vue/composition-api';
+import store from '../store';
+
+export default defineComponent({
+  name: 'DatasetSubimageSelector',
+
+  setup() {
+    const selection = computed(() => store.state.subimageSelection);
+    const selectionMode = computed(() => store.state.selectionMode);
+    const savedNotification = ref<string>();
+
+    async function saveSubimageDataset() {
+      try {
+        const response = await store.dispatch.createSubimageDataset(selection.value);
+        savedNotification.value = response ? 'Saved!' : 'Failed to Save';
+      } catch (e) {
+        savedNotification.value = 'Failure to Save.';
+      }
+      store.commit.setSelectionMode(false);
+      setTimeout(() => { savedNotification.value = ''; }, 3000);
+    }
+    function selectionText() {
+      if (!selection.value) return '';
+      return `(${selection.value[0]}, ${selection.value[1]}), (${selection.value[2]}, ${selection.value[3]})`;
+    }
+
+    return {
+      selectionMode,
+      selection,
+      store,
+      savedNotification,
+      saveSubimageDataset,
+      selectionText,
+    };
+  },
+});
+</script>
