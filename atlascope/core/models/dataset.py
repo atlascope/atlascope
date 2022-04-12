@@ -37,6 +37,7 @@ class Dataset(TimeStampedModel, models.Model):
         self.metadata = importer_obj.metadata
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
+        self.save()
 
     def subimage(self, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
         metadata = {

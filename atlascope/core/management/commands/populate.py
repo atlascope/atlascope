@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from rest_framework.serializers import ValidationError
 from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin
 
 POPULATE_DIR = Path('atlascope/core/management/populate/')
+logging.disable('INFO')
+logging.disable('WARNING')
 
 spec_types = ["datasets", "investigations", "embeddings", "jobs", "pins"]
 
@@ -72,7 +75,7 @@ def populate_datasets(specs):
         # If there's content to save, save it.
         if content:
             print("    uploading data...", end="", flush=True)
-            dataset.content.save(content, open(POPULATE_DIR / "inputs" / content, "rb"))
+            dataset.perform_import(content=open(POPULATE_DIR / "inputs" / content, "rb").read())
             print("done")
 
         # If there's an importer to run, run it.

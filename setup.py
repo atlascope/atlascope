@@ -51,6 +51,7 @@ setup(
         'importlib_metadata>=3.6',
         'jsonschema',
         'large-image[gdal,ometiff]',
+        'large-image-converter',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'django-s3-file-field[boto3]',

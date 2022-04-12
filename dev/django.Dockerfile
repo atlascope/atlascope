@@ -17,6 +17,8 @@ RUN apt-get update \
         libgeos-dev \
         # TIFF reading
         libtiff-dev \
+        # Large Image Converter dependency
+        libvips \
         # Nginx to proxy localhost
         nginx \
  && pip install --upgrade pip \
