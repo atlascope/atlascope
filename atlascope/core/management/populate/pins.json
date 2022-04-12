@@ -22,5 +22,14 @@
         "child_location": [2000, 2000],
         "note": "A blue example pin. Yay!",
         "color": "blue"
+    },
+    {
+        "investigation": "Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5003,
+        "note": "A non-tiled image overlay pin",
+        "child_location": [2000, 1500],
+        "child": "Cells Subimage",
+        "color": "orange"
     }
 ]
