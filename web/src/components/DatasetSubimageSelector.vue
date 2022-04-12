@@ -67,7 +67,7 @@ export default defineComponent({
     }
     function selectionText() {
       if (!selection.value) return '';
-      return `(${selection.value[0]}, ${selection.value[1]}) -> (${selection.value[2]}, ${selection.value[3]})`;
+      return `(${selection.value[0]}, ${selection.value[1]}), (${selection.value[2]}, ${selection.value[3]})`;
     }
 
     return {
