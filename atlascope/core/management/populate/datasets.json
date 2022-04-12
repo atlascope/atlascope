@@ -30,6 +30,7 @@
         "name": "Cells Subimage",
         "id": 2004,
         "description": "This is a screenshot of some green cells",
-        "content": "green_cell_dataset_selection.png"
+        "content": "green_cell_dataset_selection.png",
+        "dataset_type": "non_tiled_image"
     }
 ]
