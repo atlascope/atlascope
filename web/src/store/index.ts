@@ -72,6 +72,8 @@ const {
     },
     setRootDataset(state, dataset: Dataset | null) {
       state.rootDataset = dataset;
+      state.selectionMode = false;
+      state.subimageSelection = null;
     },
     setCurrentPins(state, pins: Pin[]) {
       state.currentPins = pins;
