@@ -14,7 +14,7 @@
           <v-icon>mdi-select</v-icon>
         </v-btn>
       </template>
-      <span>Select a portion of the data</span>
+      <span>Create a dataset for a region of the image</span>
     </v-tooltip>
     <div v-else>
       <v-btn
