@@ -5,7 +5,6 @@ import PIL
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-import fsspec
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
 from large_image_source_tiff import TiffFileTileSource
@@ -18,6 +17,7 @@ from rest_framework.response import Response
 
 from atlascope.core.models import Dataset
 from atlascope.core.rest.additional_serializers import TileMetadataSerializer
+from atlascope.core.utils.fuse import remote_dataset_to_local_path
 
 
 class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
@@ -26,14 +26,11 @@ class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
 
     def get(self, *args, **kwargs):
         dataset = self.get_object()
-        cached = fsspec.open_local(
-            f'simplecache::{dataset.content.url}',
-            filecache={'cache_storage': '/tmp/files'},
-        )
+        file_path = remote_dataset_to_local_path(dataset)
         try:
-            tile_source = OMETiffFileTileSource(cached[0])
+            tile_source = OMETiffFileTileSource(file_path)
         except TileSourceError:
-            tile_source = TiffFileTileSource(cached[0])
+            tile_source = TiffFileTileSource(file_path)
         serializer = self.get_serializer(tile_source)
         return Response(serializer.data)
 
@@ -89,15 +86,12 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        cached = fsspec.open_local(
-            f'simplecache::{dataset.content.url}',
-            filecache={'cache_storage': '/tmp/files'},
-        )
+        file_path = remote_dataset_to_local_path(dataset)
         try:
             try:
-                tile_source = OMETiffFileTileSource(cached[0])
+                tile_source = OMETiffFileTileSource(file_path)
             except TileSourceError:
-                tile_source = TiffFileTileSource(cached[0])
+                tile_source = TiffFileTileSource(file_path)
             channels = self.request.query_params.get('channels')
             if channels:
                 channels = channels.split(',')
