@@ -125,7 +125,7 @@ import {
 } from '@vue/composition-api';
 import { debounce } from 'lodash';
 import useGeoJS from '../utilities/useGeoJS';
-import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
+import { getNonTiledImageDimensions, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
@@ -137,7 +137,7 @@ interface RootDatasetEmbedding {
   id: null;
   child_bounding_box: number[];
   parent: null;
-  child: string;
+  child: number;
 }
 
 interface StackFrame {
@@ -195,6 +195,7 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
+    let nonTiledOverlayFeature: any;
     const pinNotes: Ref<any[]> = ref([]);
     /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
@@ -238,24 +239,26 @@ export default defineComponent({
 
     function movePinNoteCards() {
       if (!featureLayer || !pinFeature || !map.value) { return; }
-      pinFeature.data().forEach((pinPoint: any) => {
-        const { x, y } = pinPoint;
+      pinFeature.data().forEach((pin: Pin) => {
+        const { x, y } = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         const newScreenCoords = pinFeature.featureGcsToDisplay({ x, y });
-        const note = pinNotes.value.find((pinNote) => pinNote.id === pinPoint.id);
-        const {
-          left, top, width, height,
-        } = map.value?.getBoundingClientRect() || {
-          left: 0, top: 0, width: 0, height: 0,
-        };
-        note.notePositionX = newScreenCoords.x + left;
-        note.notePositionY = newScreenCoords.y + top;
-        if (note.notePositionX > left + width
-            || note.notePositionY > top + height
-            || note.notePositionX < left
-            || note.notePositionY < top) {
-          note.inBounds = false;
-        } else {
-          note.inBounds = true;
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+        if (note) {
+          const {
+            left, top, width, height,
+          } = map.value?.getBoundingClientRect() || {
+            left: 0, top: 0, width: 0, height: 0,
+          };
+          note.notePositionX = newScreenCoords.x + left;
+          note.notePositionY = newScreenCoords.y + top;
+          if (note.notePositionX > left + width
+              || note.notePositionY > top + height
+              || note.notePositionX < left
+              || note.notePositionY < top) {
+            note.inBounds = false;
+          } else {
+            note.inBounds = true;
+          }
         }
       });
     }
@@ -457,33 +460,67 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    /**
+     * Create note cards for any pins without a child dataset.
+     */
     function createPinNotes() {
-      pinNotes.value = store.state.currentPins.map((pin) => ({
+      const noteOnlyPins = store.state.currentPins.filter(
+        (pin: Pin) => (!pin.child && pin.note?.length),
+      );
+      pinNotes.value = noteOnlyPins.map((pin) => ({
         ...pin,
         showNote: false,
         inBounds: false,
       }));
     }
 
-    function getPinsToDisplay() {
-      // TODO: as we move towards embedding multiple datasets into the view,
-      // we will need a more sophisticated way to determine which pins to render
-      // and determining where they should be rendered
-      const pinFeatureData = selectedPins.value.map((pin) => {
-        const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-        return {
-          ...location,
-          id: pin.id,
-          color: pin.color,
-          note: pin.note,
-        };
-      });
-      return pinFeatureData;
+    async function toggleNonTiledImageOverlay(pin: Pin, dataset: Dataset) {
+      if (!dataset.content) return;
+      if (!featureLayer) return; // sanity check. this should exist
+      if (!nonTiledOverlayFeature) {
+        nonTiledOverlayFeature = featureLayer.createFeature('quad');
+      }
+      const quadData = nonTiledOverlayFeature.data() || [];
+      const existingOverlay = quadData.find((overlay: any) => overlay.pinId === pin.id);
+      if (existingOverlay) {
+        nonTiledOverlayFeature.data(
+          nonTiledOverlayFeature.data().filter((overlay: any) => overlay.pinId !== pin.id),
+        ).draw();
+        nonTiledOverlayFeature.draw();
+      } else {
+        const image: HTMLImageElement = await getNonTiledImageDimensions(dataset.content);
+        const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+        const lr = { x: ul.x + (image.width || 0), y: ul.y + (image.height || 0) };
+        quadData.push({
+          ul,
+          lr,
+          // image,
+          pinId: pin.id,
+        });
+        nonTiledOverlayFeature.data(quadData).draw();
+      }
+    }
+
+    function toggleDatasetPin(pin: Pin) {
+      const childDataset: Dataset | undefined = store.state.currentDatasets.find(
+        (dataset: Dataset) => dataset.id === pin.child,
+      );
+      if (!childDataset) return;
+      switch (childDataset.dataset_type) {
+        case 'non_tiled_image':
+          toggleNonTiledImageOverlay(pin, childDataset);
+          break;
+        default:
+          break;
+      }
     }
 
     watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
-        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+        featureLayer = createLayer(
+          'feature',
+          { features: ['point', 'line', 'polygon', 'quad.image'] },
+        );
       }
       const newPinIds = newPins.map((pin) => pin.id);
       oldPins.forEach((pin) => {
@@ -494,26 +531,31 @@ export default defineComponent({
           }
         }
       });
-      const pinFeatureData = getPinsToDisplay();
       if (!pinFeature) {
         /* eslint-disable */
         pinFeature = featureLayer.createFeature('point')
-          .data(pinFeatureData)
-          .position((pin: any) => ({ x: pin.x, y: pin.y }))
+          .data(selectedPins.value)
+          .position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }))
           .style({
             radius: 10,
             strokeColor: 'white',
-            fillColor: (pin: any) => pin.color,
+            fillColor: (pin: Pin) => pin.color,
           })
           .draw();
         pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
           if (!map.value) { return; }
 
           if (event.mouse.buttonsDown.left) {
-            const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-            noteToToggle.showNote = !noteToToggle.showNote;
-            noteToToggle.notePositionX = event.mouse.page.x;
-            noteToToggle.notePositionY = event.mouse.page.y;
+            if (!event.data.child && event.data.note) {
+              // note-only pins
+              const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
+              noteToToggle.showNote = !noteToToggle.showNote;
+              noteToToggle.notePositionX = event.mouse.page.x;
+              noteToToggle.notePositionY = event.mouse.page.y;
+            } else if (event.data.child) {
+              // pins with child dataset
+              toggleDatasetPin(event.data);
+            }
           }
         });
         pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
@@ -527,7 +569,7 @@ export default defineComponent({
           }
         });
       } else {
-        pinFeature.data(pinFeatureData).draw();
+        pinFeature.data(selectedPins.value).draw();
       }
       /* eslint-enable */
     });
