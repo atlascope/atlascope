@@ -490,17 +490,21 @@ export default defineComponent({
       } else {
         const apiRoot = process.env.VUE_APP_API_ROOT;
         const nonTiledUrl = `${apiRoot}/datasets/${dataset.id}/content`;
-        const image: HTMLImageElement = await getNonTiledImageDimensions(nonTiledUrl);
-        image.crossOrigin = 'Anonymous';
-        const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-        const lr = { x: ul.x + (image.width || 0), y: ul.y + (image.height || 0) };
-        quadData.push({
-          ul,
-          lr,
-          image,
-          pinId: pin.id,
-        });
-        nonTiledOverlayFeature.data(quadData).draw();
+        try {
+          const image: HTMLImageElement = await getNonTiledImageDimensions(nonTiledUrl);
+          image.crossOrigin = 'Anonymous';
+          const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+          const lr = { x: ul.x + (image.width || 0), y: ul.y + (image.height || 0) };
+          quadData.push({
+            ul,
+            lr,
+            image,
+            pinId: pin.id,
+          });
+          nonTiledOverlayFeature.data(quadData).draw();
+        } catch (error) {
+          console.error(`Failed to show overlay for dataset ${dataset.id}.`);
+        }
       }
     }
 
