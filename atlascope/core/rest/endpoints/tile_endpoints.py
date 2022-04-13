@@ -136,8 +136,35 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                     raise NotFound()
             raise APIException(error_msg)
 
+class ContentView(GenericAPIView, mixins.RetrieveModelMixin):
+    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='non_tiled_image')
+    model = Dataset
+    renderer_classes = [LargeImageRenderer]
+
+    @swagger_auto_schema(
+        responses={200: 'Image file', 404: 'Content not found'},
+        manual_parameters=[
+            openapi.Parameter(
+                'id',
+                openapi.IN_PATH,
+                description='A string identifying the dataset.',
+                type=openapi.TYPE_STRING,
+            )
+        ]
+    )
+    def get(self, *args, **kwargs):
+        dataset = self.get_object()
+        cached = fsspec.open_local(
+            f'simplecache::{dataset.content.url}',
+            filecache={'cache_storage': '/tmp/files'},
+        )
+        image = PIL.Image.open(cached[0])
+        buf = io.BytesIO()
+        image.save(buf, format='PNG')
+        return Response(buf.getvalue())
 
 urlpatterns = [
     path('datasets/<str:pk>/tiles/metadata', TileMetadataView.as_view()),
     path('datasets/<str:pk>/tiles/<int:z>/<int:x>/<int:y>.png', TileView.as_view()),
+    path('datasets/<str:pk>/content', ContentView.as_view())
 ]
