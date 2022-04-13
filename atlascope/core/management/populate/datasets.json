@@ -32,5 +32,26 @@
         "description": "This is a screenshot of some green cells",
         "content": "green_cell_dataset_selection.png",
         "dataset_type": "non_tiled_image"
+    },
+    {
+        "name":"Blue Tile",
+        "id": 2005,
+        "description": "A speckled blue PNG image",
+        "content": "blue.png",
+        "dataset_type": "non_tiled_image"
+    },
+    {
+        "name":"Red Tile",
+        "id": 2006,
+        "description": "A speckled red PNG image",
+        "content": "red.png",
+        "dataset_type": "non_tiled_image"
+    },
+    {
+        "name":"Green Tile",
+        "id": 2007,
+        "description": "A speckled green PNG image",
+        "content": "green.png",
+        "dataset_type": "non_tiled_image"
     }
 ]

@@ -4,7 +4,9 @@
         "id": 1000,
         "datasets": [
             "HTA9_1_BA_F_ROI02",
-            "Cells Subimage"
+            "Blue Tile",
+            "Red Tile",
+            "Green Tile"
         ]
     },
     {
