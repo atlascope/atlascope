@@ -197,8 +197,8 @@ export default defineComponent({
     let pinFeature: any;
     let nonTiledOverlayFeature: any;
     const pinNotes: Ref<any[]> = ref([]);
-    /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
+    /* eslint-enable */
     const frames = computed(() => store.state.rootDatasetFrames);
     /* eslint-enable */
 
@@ -481,17 +481,17 @@ export default defineComponent({
         nonTiledOverlayFeature = featureLayer.createFeature('quad');
       }
       const quadData = nonTiledOverlayFeature.data() || [];
+      // eslint-disable-next-line
       const existingOverlay = quadData.find((overlay: any) => overlay.pinId === pin.id);
       if (existingOverlay) {
         nonTiledOverlayFeature.data(
+          // eslint-disable-next-line
           nonTiledOverlayFeature.data().filter((overlay: any) => overlay.pinId !== pin.id),
         ).draw();
         nonTiledOverlayFeature.draw();
       } else {
-        const apiRoot = process.env.VUE_APP_API_ROOT;
-        const nonTiledUrl = `${apiRoot}/datasets/${dataset.id}/content`;
         try {
-          const image: HTMLImageElement = await getNonTiledImageDimensions(nonTiledUrl);
+          const image: HTMLImageElement = await getNonTiledImageDimensions(dataset.content);
           image.crossOrigin = 'Anonymous';
           const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
           const lr = { x: ul.x + (image.width || 0), y: ul.y + (image.height || 0) };
@@ -503,6 +503,7 @@ export default defineComponent({
           });
           nonTiledOverlayFeature.data(quadData).draw();
         } catch (error) {
+          // eslint-disable-next-line
           console.error(`Failed to show overlay for dataset ${dataset.id}.`);
         }
       }
@@ -530,12 +531,19 @@ export default defineComponent({
         );
       }
       const newPinIds = newPins.map((pin) => pin.id);
-      oldPins.forEach((pin) => {
-        if (!newPinIds.includes(pin.id)) {
-          const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
-          if (note) {
-            note.showNote = false;
-          }
+      const removedPinIds = oldPins.filter((pin: Pin) => !newPinIds.includes(pin.id))
+        .map((pin: Pin) => pin.id);
+      if (nonTiledOverlayFeature) {
+        const overlayData = nonTiledOverlayFeature.data();
+        const newOverlayData = overlayData.filter(
+          (overlay: any) => !removedPinIds.includes(overlay.pinId),
+        );
+        nonTiledOverlayFeature.data(newOverlayData).draw();
+      }
+      removedPinIds.forEach((pinId) => {
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pinId);
+        if (note) {
+          note.showNote = false;
         }
       });
       if (!pinFeature) {
