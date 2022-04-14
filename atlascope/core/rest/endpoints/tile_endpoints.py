@@ -1,9 +1,7 @@
 import io
 from itertools import cycle
-from pathlib import Path
 
 import PIL
-from django.conf import settings
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -87,12 +85,11 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     )
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
-        content_location = Path(settings.BASE_DIR, dataset.content.name)
         try:
             try:
-                tile_source = OMETiffFileTileSource(content_location)
+                tile_source = OMETiffFileTileSource(dataset.content.path)
             except TileSourceError:
-                tile_source = TiffFileTileSource(content_location)
+                tile_source = TiffFileTileSource(dataset.content.path)
             channels = self.request.query_params.get('channels')
             if channels:
                 channels = channels.split(',')
