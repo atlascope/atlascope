@@ -17,8 +17,6 @@ RUN apt-get update \
         libgeos-dev \
         # TIFF reading
         libtiff-dev \
-        # Nginx to proxy localhost
-        nginx \
  && pip install --upgrade pip \
  && rm -rf /var/lib/apt/lists/*
 
