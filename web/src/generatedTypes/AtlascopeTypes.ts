@@ -359,7 +359,7 @@ export namespace Datasets {
    * No description
    * @tags datasets
    * @name DatasetsTilesMetadataRead
-   * @request GET:/datasets/{id}/tiles/metadata
+   * @request GET:/datasets/tile_source/{id}/tiles/metadata
    * @response `200` `TileMetadata`
    */
   export namespace DatasetsTilesMetadataRead {
@@ -373,7 +373,7 @@ export namespace Datasets {
    * No description
    * @tags datasets
    * @name DatasetsTilesRead
-   * @request GET:/datasets/{id}/tiles/{z}/{x}/{y}.png
+   * @request GET:/datasets/tile_source/{id}/tiles/{z}/{x}/{y}.png
    * @response `200` `void` Image file
    * @response `404` `void` Image tile not found
    */

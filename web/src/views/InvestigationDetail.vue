@@ -293,7 +293,7 @@ export default defineComponent({
       const rootLayerParams = {
         ...rootPixelParams.layer,
         zIndex: 0,
-        url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
+        url: `${apiRoot}/datasets/tile_source/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
       const geojsMap = createMap(mapParams);
@@ -368,7 +368,7 @@ export default defineComponent({
           const layerParams = {
             ...pixelParams.layer,
             zIndex: treeDepth,
-            url: `${apiRoot}/datasets/${datasetID}/tiles/{z}/{x}/{y}.png`,
+            url: `${apiRoot}/datasets/tile_source/${datasetID}/tiles/{z}/{x}/{y}.png`,
             crossDomain: 'use-credentials',
           };
           createLayer(
@@ -404,7 +404,7 @@ export default defineComponent({
       if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        const newUrl = `${apiRoot}/datasets/tile_source/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
         rootDatasetLayer.value.url(newUrl).draw();
       }
     }, { deep: true });
