@@ -238,10 +238,10 @@ export default defineComponent({
 
     function movePinNoteCards() {
       if (!featureLayer || !pinFeature || !map.value) { return; }
-      pinFeature.data().forEach((pinPoint: any) => {
-        const { x, y } = pinPoint;
+      pinFeature.data().forEach((pin: Pin) => {
+        const { x, y } = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
         const newScreenCoords = pinFeature.featureGcsToDisplay({ x, y });
-        const note = pinNotes.value.find((pinNote) => pinNote.id === pinPoint.id);
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
         const {
           left, top, width, height,
         } = map.value?.getBoundingClientRect() || {
@@ -467,22 +467,6 @@ export default defineComponent({
       }));
     }
 
-    function getPinsToDisplay() {
-      // TODO: as we move towards embedding multiple datasets into the view,
-      // we will need a more sophisticated way to determine which pins to render
-      // and determining where they should be rendered
-      const pinFeatureData = selectedPins.value.map((pin) => {
-        const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-        return {
-          ...location,
-          id: pin.id,
-          color: pin.color,
-          note: pin.note,
-        };
-      });
-      return pinFeatureData;
-    }
-
     watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
@@ -496,16 +480,15 @@ export default defineComponent({
           }
         }
       });
-      const pinFeatureData = getPinsToDisplay();
       if (!pinFeature) {
         /* eslint-disable */
         pinFeature = featureLayer.createFeature('point')
-          .data(pinFeatureData)
-          .position((pin: any) => ({ x: pin.x, y: pin.y }))
+          .data(selectedPins.value)
+          .position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }))
           .style({
             radius: 10,
             strokeColor: 'white',
-            fillColor: (pin: any) => pin.color,
+            fillColor: (pin: Pin) => pin.color,
           })
           .draw();
         pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
@@ -519,7 +502,7 @@ export default defineComponent({
           }
         });
       } else {
-        pinFeature.data(pinFeatureData).draw();
+        pinFeature.data(selectedPins.value).draw();
       }
       /* eslint-enable */
     });
