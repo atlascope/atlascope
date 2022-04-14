@@ -136,6 +136,7 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
                     raise NotFound()
             raise APIException(error_msg)
 
+
 urlpatterns = [
     path('datasets/<str:pk>/tiles/metadata', TileMetadataView.as_view()),
     path('datasets/<str:pk>/tiles/<int:z>/<int:x>/<int:y>.png', TileView.as_view()),
