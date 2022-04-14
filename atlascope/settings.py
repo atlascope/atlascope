@@ -18,6 +18,8 @@ class AtlascopeMixin(ConfigMixin):
     ROOT_URLCONF = 'atlascope.urls'
 
     BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+    MEDIA_ROOT = BASE_DIR / Path('data')
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
     # custom Atlascope definitions
     DATASET_TYPES = [
@@ -49,7 +51,6 @@ class AtlascopeMixin(ConfigMixin):
 
         # Install additional apps
         configuration.INSTALLED_APPS += [
-            's3_file_field',
             'django.contrib.gis',
         ]
 
