@@ -123,9 +123,8 @@ import {
   watch,
   Ref,
 } from '@vue/composition-api';
-import { debounce } from 'lodash';
 import useGeoJS from '../utilities/useGeoJS';
-import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
+import { postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
@@ -260,8 +259,6 @@ export default defineComponent({
       });
     }
 
-    const debounceMovePinNoteCards = debounce(movePinNoteCards, 50);
-
     function drawMap(dataset: Dataset | null) {
       tearDownMap();
       if (!dataset || !dataset.id) {
@@ -394,8 +391,8 @@ export default defineComponent({
           /* eslint-enable */
         }
       }
-      geojsMap.geoOn(geoEvents.pan, debounceMovePinNoteCards);
-      geojsMap.geoOn(geoEvents.zoom, debounceMovePinNoteCards);
+      geojsMap.geoOn(geoEvents.pan, movePinNoteCards);
+      geojsMap.geoOn(geoEvents.zoom, movePinNoteCards);
       clampBoundsX(false);
     }
 
@@ -461,7 +458,7 @@ export default defineComponent({
       pinNotes.value = store.state.currentPins.map((pin) => ({
         ...pin,
         showNote: false,
-        inBounds: false,
+        inBounds: true,
         notePositionX: 0,
         notePositionY: 0,
       }));
