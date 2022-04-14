@@ -573,16 +573,6 @@ export default defineComponent({
             }
           }
         });
-        pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
-          if (!map.value) { return; }
-
-          if (event.mouse.buttonsDown.left) {
-            const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-            noteToToggle.showNote = !noteToToggle.showNote;
-            noteToToggle.notePositionX = event.mouse.page.x;
-            noteToToggle.notePositionY = event.mouse.page.y;
-          }
-        });
       } else {
         pinFeature.data(selectedPins.value).draw();
       }

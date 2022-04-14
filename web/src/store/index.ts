@@ -120,7 +120,7 @@ const {
 
         if (state.currentInvestigation) {
           const datasetPromises: Promise<AxiosResponse>[] = [];
-          state.currentInvestigation.datasets.forEach((datasetId: string) => {
+          state.currentInvestigation.datasets.forEach((datasetId: number) => {
             const promise = state.axiosInstance?.get(`/datasets/${datasetId}`);
             if (promise) {
               datasetPromises.push(promise);
