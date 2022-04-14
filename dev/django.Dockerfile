@@ -17,8 +17,6 @@ RUN apt-get update \
         libgeos-dev \
         # TIFF reading
         libtiff-dev \
-        # Nginx to proxy localhost
-        nginx \
  && pip install --upgrade pip \
  && rm -rf /var/lib/apt/lists/*
 
@@ -39,9 +37,3 @@ RUN pip install \
 
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
-
-# Setup nginx to proxy localhost:9000 to minio:9000
-COPY ./dev/nginx.conf /etc/nginx/nginx.conf
-COPY ./dev/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
