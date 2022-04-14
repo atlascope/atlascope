@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from rest_framework import serializers
-from s3_file_field import S3FileField
 
 from atlascope.core.importers import available_importers
 
@@ -12,7 +11,7 @@ from atlascope.core.importers import available_importers
 class Dataset(TimeStampedModel, models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=5000, blank=True)
-    content = S3FileField(null=True)
+    content = models.FileField(null=True)
     metadata = models.JSONField(null=True)
     dataset_type = models.CharField(
         max_length=20,
