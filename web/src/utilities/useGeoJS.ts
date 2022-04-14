@@ -50,7 +50,9 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
 
   const createMap = (mapParams?: object) => {
     const node = { node: element.value };
-    map.value = geo.map({ ...node, ...mapParams });
+    const geojsMap = geo.map({ ...node, ...mapParams });
+    map.value = geojsMap;
+    return geojsMap;
   };
 
   const createLayer = (layerType: string, layerParams: object, gcs?: string) => {

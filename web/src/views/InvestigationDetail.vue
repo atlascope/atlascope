@@ -46,20 +46,16 @@
           <div
             ref="map"
             class="map"
+          />
+          <v-card
+            v-for="note in pinNotes"
+            :key="note.id"
+            :value="note"
+            :class="{'pin-note': true, hidden: !note.showNote || !note.inBounds }"
+            :style="{'top': `${note.notePositionY}px`, 'left': `${note.notePositionX}px`}"
           >
-            <v-menu
-              v-model="showNote"
-              :position-x="noteX"
-              :position-y="noteY"
-              absolute
-              offset-y
-              allow-overflow
-            >
-              <v-card class="pin-hover-card">
-                {{ hoverText }}
-              </v-card>
-            </v-menu>
-          </div>
+            {{ note.note }}
+          </v-card>
         </v-sheet>
       </v-col>
       <v-col
@@ -100,6 +96,18 @@
   width: 500px;
 }
 
+.pin-note {
+  position: absolute;
+  max-width: 300px;
+  padding: 2px;
+  background-color: white;
+  border: 1px solid black;
+}
+
+.hidden {
+  display: none;
+}
+
 .frame-row {
   display: inline;
 }
@@ -116,7 +124,7 @@ import {
   Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
-import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
+import { postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
@@ -172,9 +180,6 @@ export default defineComponent({
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
-    const showNote = ref(false);
-    const noteX = ref(0);
-    const noteY = ref(0);
     const hoverText = ref('');
 
     function toggleSidebar() {
@@ -189,6 +194,8 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
+    const pinNotes: Ref<any[]> = ref([]);
+    /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
     const frames = computed(() => store.state.rootDatasetFrames);
     /* eslint-enable */
@@ -197,6 +204,12 @@ export default defineComponent({
       selectedDataset.value = newRootDataset;
       store.dispatch.updateSelectedPins([]);
       store.dispatch.setRootDataset(newRootDataset);
+    }
+
+    function selectPinsForRootDataset() {
+      store.dispatch.updateSelectedPins(store.state.currentPins.filter(
+        (pin: Pin) => pin.parent === rootDataset.value?.id,
+      ));
     }
 
     function buildUrlQueryArgs() {
@@ -220,6 +233,30 @@ export default defineComponent({
       selectionLayer = null;
       featureLayer = null;
       pinFeature = null;
+    }
+
+    function movePinNoteCards() {
+      if (!featureLayer || !pinFeature || !map.value) { return; }
+      pinFeature.data().forEach((pin: Pin) => {
+        const { x, y } = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+        const newScreenCoords = pinFeature.featureGcsToDisplay({ x, y });
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+        const {
+          left, top, width, height,
+        } = map.value?.getBoundingClientRect() || {
+          left: 0, top: 0, width: 0, height: 0,
+        };
+        note.notePositionX = newScreenCoords.x + left;
+        note.notePositionY = newScreenCoords.y + top;
+        if (note.notePositionX > left + width
+            || note.notePositionY > top + height
+            || note.notePositionX < left
+            || note.notePositionY < top) {
+          note.inBounds = false;
+        } else {
+          note.inBounds = true;
+        }
+      });
     }
 
     function drawMap(dataset: Dataset | null) {
@@ -259,7 +296,7 @@ export default defineComponent({
         url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
-      createMap(mapParams);
+      const geojsMap = createMap(mapParams);
       rootDatasetLayer.value = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
@@ -354,6 +391,8 @@ export default defineComponent({
           /* eslint-enable */
         }
       }
+      geojsMap.geoOn(geoEvents.pan, movePinNoteCards);
+      geojsMap.geoOn(geoEvents.zoom, movePinNoteCards);
       clampBoundsX(false);
     }
 
@@ -415,55 +454,52 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
-    function getPinsToDisplay() {
-      // TODO: as we move towards embedding multiple datasets into the view,
-      // we will need a more sophisticated way to determine which pins to render
-      // and determining where they should be rendered
-      const selectedPinsForRootDataset = selectedPins.value.filter(
-        (pin) => pin.parent === rootDataset.value?.id,
-      );
-      const pinFeatureData = selectedPinsForRootDataset.map((pin) => {
-        const location: Point = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-        return {
-          ...location,
-          id: pin.id,
-          color: pin.color,
-          note: pin.note,
-        };
-      });
-      return pinFeatureData;
+    function createPinNotes() {
+      pinNotes.value = store.state.currentPins.map((pin) => ({
+        ...pin,
+        showNote: false,
+        inBounds: true,
+        notePositionX: 0,
+        notePositionY: 0,
+      }));
     }
 
-    watch(selectedPins, () => {
+    watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
         featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
       }
-      const pinFeatureData = getPinsToDisplay();
+      const newPinIds = newPins.map((pin) => pin.id);
+      oldPins.forEach((pin) => {
+        if (!newPinIds.includes(pin.id)) {
+          const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+          if (note) {
+            note.showNote = false;
+          }
+        }
+      });
       if (!pinFeature) {
         /* eslint-disable */
         pinFeature = featureLayer.createFeature('point')
-          .data(pinFeatureData)
-          .position((pin: any) => ({ x: pin.x, y: pin.y }))
+          .data(selectedPins.value)
+          .position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }))
           .style({
             radius: 10,
             strokeColor: 'white',
-            fillColor: (pin: any) => pin.color,
+            fillColor: (pin: Pin) => pin.color,
           })
           .draw();
-        pinFeature.geoOn(geoEvents.feature.mouseon, (event: any) => {
+        pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
           if (!map.value) { return; }
-          showNote.value = true;
-          noteX.value = event.mouse.page.x;
-          noteY.value = event.mouse.page.y;
-          hoverText.value = event.data.note;
-        });
-        pinFeature.geoOn(geoEvents.feature.mouseoff, (event: any) => {
-          if (!map.value) { return; }
-          showNote.value = false;
-          hoverText.value = '';
+
+          if (event.mouse.buttonsDown.left) {
+            const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
+            noteToToggle.showNote = !noteToToggle.showNote;
+            noteToToggle.notePositionX = event.mouse.page.x;
+            noteToToggle.notePositionY = event.mouse.page.y;
+          }
         });
       } else {
-        pinFeature.data(pinFeatureData).draw();
+        pinFeature.data(selectedPins.value).draw();
       }
       /* eslint-enable */
     });
@@ -472,15 +508,14 @@ export default defineComponent({
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       selectedDataset.value = store.state.rootDataset;
       drawMap(store.state.rootDataset);
+      createPinNotes();
+      selectPinsForRootDataset();
       loaded.value = true;
     });
 
     return {
       loaded,
       sidebarCollapsed,
-      showNote,
-      noteX,
-      noteY,
       hoverText,
       toggleSidebar,
       map,
@@ -489,6 +524,7 @@ export default defineComponent({
       selectedDataset,
       rootDatasetChanged,
       selectedPins,
+      pinNotes,
     };
   },
 });
