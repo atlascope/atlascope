@@ -1,6 +1,10 @@
+import io
+
+import PIL
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
+from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -10,6 +14,14 @@ from atlascope.core.models import (
     DatasetSerializer,
     DatasetSubImageSerializer,
 )
+
+
+class ContentRenderer(BaseRenderer):
+    media_type = 'image/png'
+    format = 'png'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
 
 
 class DatasetViewSet(
@@ -49,3 +61,15 @@ class DatasetViewSet(
         subimage.save()
 
         return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)
+
+
+    @swagger_auto_schema(
+        responses={200: 'Image file', 404: 'Content not found'},
+    )
+    @action(detail=True, methods=['GET'], renderer_classes=[ContentRenderer])
+    def content(self, request, pk):
+        dataset = self.get_object()
+        image = PIL.Image.open(dataset.content.path)
+        buf = io.BytesIO()
+        image.save(buf, format='PNG')
+        return Response(buf.getvalue())
