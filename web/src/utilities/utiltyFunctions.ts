@@ -19,7 +19,7 @@ export function postGisToPoint(location: string): Point | undefined {
   return undefined;
 }
 
-export function getNonTiledImageDimensions(url: string): Promise<HTMLImageElement> {
+export function getNonTiledImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
