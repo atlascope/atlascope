@@ -9,6 +9,6 @@ module.exports = {
 
   // disable all the progress printout from webpack
   devServer: {
-		progress: false
-	},
+    progress: false,
+  },
 };
