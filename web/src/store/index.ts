@@ -25,6 +25,7 @@ export interface State {
     currentPins: Pin[];
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
+    showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
     rootDatasetFrames: TiffFrame[];
     selectionMode: boolean;
@@ -51,6 +52,7 @@ const {
     rootDataset: null,
     currentPins: [],
     selectedPins: [],
+    showEmbeddings: true,
     datasetEmbeddings: [],
     datasetTileMetadata: {},
     rootDatasetFrames: [],
@@ -75,6 +77,13 @@ const {
       state.selectionMode = false;
       state.subimageSelection = null;
     },
+    resetRootDataset(state) {
+      const tileSourceDatasets = state.currentDatasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
+      const rootDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
+      state.rootDataset = rootDataset;
+      state.selectionMode = false;
+      state.subimageSelection = null;
+    },
     setCurrentPins(state, pins: Pin[]) {
       state.currentPins = pins;
     },
@@ -83,6 +92,9 @@ const {
     },
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
       state.datasetEmbeddings = embeddings;
+    },
+    setShowEmbeddings(state, show: boolean) {
+      state.showEmbeddings = show;
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
@@ -130,8 +142,7 @@ const {
           commit.setCurrentDatasets(datasets);
 
           const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
-          const rootDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
-          commit.setRootDataset(rootDataset);
+          commit.resetRootDataset();
 
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
