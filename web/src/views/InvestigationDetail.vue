@@ -491,7 +491,7 @@ export default defineComponent({
       } else {
         try {
           const urlRoot = process.env.VUE_APP_API_ROOT;
-          const url = `${urlRoot}/datasets/${dataset.id}/content`;
+          const url = `${urlRoot}/datasets/${dataset.id}/tiles/0/0/0.png`;
           const image: HTMLImageElement = await getNonTiledImage(url);
           image.crossOrigin = 'Anonymous';
           const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };

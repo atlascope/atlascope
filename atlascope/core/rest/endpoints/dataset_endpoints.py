@@ -1,6 +1,3 @@
-import io
-
-import PIL
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
@@ -61,16 +58,3 @@ class DatasetViewSet(
         subimage.save()
 
         return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)
-
-    @swagger_auto_schema(
-        responses={200: 'Image file', 404: 'Content not found', 501: 'Error: Not implemented'},
-    )
-    @action(detail=True, methods=['GET'], renderer_classes=[ContentRenderer])
-    def content(self, request, pk):
-        dataset = self.get_object()
-        if dataset.dataset_type == 'non_tiled_image':
-            image = PIL.Image.open(dataset.content.path)
-            buf = io.BytesIO()
-            image.save(buf, format='PNG')
-            return Response(buf.getvalue())
-        return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)

@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from large_image.exceptions import TileSourceError
 from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_source_pil import PILFileTileSource
 from large_image_source_tiff import TiffFileTileSource
 import numpy
 from rest_framework import mixins
@@ -43,7 +44,9 @@ class LargeImageRenderer(BaseRenderer):
 
 
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
-    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
+    queryset = Dataset.objects.filter(
+        content__isnull=False, dataset_type__in=['tile_source', 'non_tiled_image']
+    )
     model = Dataset
     renderer_classes = [LargeImageRenderer]
 
@@ -86,6 +89,10 @@ class TileView(GenericAPIView, mixins.RetrieveModelMixin):
     def get(self, *args, x=None, y=None, z=None, **kwargs):
         dataset = self.get_object()
         try:
+            if dataset.dataset_type == 'non_tiled_image':
+                tile_source = PILFileTileSource(dataset.content.path)
+                tile = tile_source.getTile(x, y, z)
+                return Response(tile)
             try:
                 tile_source = OMETiffFileTileSource(dataset.content.path)
             except TileSourceError:
