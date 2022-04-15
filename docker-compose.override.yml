@@ -38,6 +38,14 @@ services:
       - postgres
       - rabbitmq
 
+  yarn:
+    build:
+      context: .
+      dockerfile: ./dev/yarn.Dockerfile
+    volumes:
+      - ./web:/web
+    command: yarn serve
+
   demotiles:
     build:
       context: ./dev/demotiles
