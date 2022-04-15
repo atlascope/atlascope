@@ -124,7 +124,7 @@ import {
   Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
-import { getNonTiledImageDimensions, postGisToPoint } from '../utilities/utiltyFunctions';
+import { getNonTiledImage, postGisToPoint } from '../utilities/utiltyFunctions';
 import store from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
@@ -490,7 +490,9 @@ export default defineComponent({
         nonTiledOverlayFeature.draw();
       } else {
         try {
-          const image: HTMLImageElement = await getNonTiledImageDimensions(dataset.content);
+          const urlRoot = process.env.VUE_APP_API_ROOT;
+          const url = `${urlRoot}/datasets/${dataset.id}/content`;
+          const image: HTMLImageElement = await getNonTiledImage(url);
           image.crossOrigin = 'Anonymous';
           const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
           const lr = { x: ul.x + (image.width || 0), y: ul.y + (image.height || 0) };
