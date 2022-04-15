@@ -20,7 +20,6 @@
           single-line
           dense
           hide-details
-          @change="rootDatasetChanged"
         />
         <v-banner
           v-if="loaded && tilesourceDatasets.length === 0"
@@ -35,9 +34,6 @@
       </v-col>
       <v-col cols="auto">
         <investigation-detail-frame-menu />
-      </v-col>
-      <v-col cols="auto">
-        <dataset-subimage-selector />
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -126,7 +122,6 @@ import {
 import useGeoJS from '../utilities/useGeoJS';
 import { postGisToPoint } from '../utilities/utiltyFunctions';
 import store, { TiffFrame } from '../store';
-import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
@@ -173,7 +168,6 @@ export default defineComponent({
   components: {
     InvestigationSidebar,
     InvestigationDetailFrameMenu,
-    DatasetSubimageSelector,
   },
 
   props: {
@@ -205,8 +199,8 @@ export default defineComponent({
       sidebarCollapsed.value = !sidebarCollapsed.value;
     }
 
-    const selectedDataset: Ref<Dataset | null> = ref(null);
     const rootDataset = computed(() => store.state.rootDataset);
+    const showEmbeddings = computed(() => store.state.showEmbeddings);
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     const selectionMode = computed(() => store.state.selectionMode);
     /* eslint-disable */
@@ -217,12 +211,6 @@ export default defineComponent({
     /* eslint-enable */
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
-
-    function rootDatasetChanged(newRootDataset: Dataset) {
-      selectedDataset.value = newRootDataset;
-      store.dispatch.updateSelectedPins([]);
-      store.dispatch.setRootDataset(newRootDataset);
-    }
 
     function selectPinsForRootDataset() {
       store.dispatch.updateSelectedPins(store.state.currentPins.filter(
@@ -302,7 +290,7 @@ export default defineComponent({
       }
 
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      const embeddings = store.state.datasetEmbeddings;
+      const embeddings = showEmbeddings.value ? store.state.datasetEmbeddings : [];
       const rootDatasetID = dataset.id;
       const rootTileMetadata = store.state.datasetTileMetadata[rootDatasetID];
 
@@ -434,6 +422,10 @@ export default defineComponent({
       drawMap(newValue);
     });
 
+    watch(showEmbeddings, () => {
+      drawMap(rootDataset.value);
+    });
+
     watch(frames, () => {
       if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
@@ -543,7 +535,6 @@ export default defineComponent({
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      selectedDataset.value = store.state.rootDataset;
       drawMap(store.state.rootDataset);
       createPinNotes();
       selectPinsForRootDataset();
@@ -558,8 +549,6 @@ export default defineComponent({
       map,
       tilesourceDatasets,
       rootDataset,
-      selectedDataset,
-      rootDatasetChanged,
       selectedPins,
       pinNotes,
     };
