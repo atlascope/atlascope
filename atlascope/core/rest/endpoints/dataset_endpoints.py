@@ -62,14 +62,15 @@ class DatasetViewSet(
 
         return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)
 
-
     @swagger_auto_schema(
-        responses={200: 'Image file', 404: 'Content not found'},
+        responses={200: 'Image file', 404: 'Content not found', 501: 'Error: Not implemented'},
     )
     @action(detail=True, methods=['GET'], renderer_classes=[ContentRenderer])
     def content(self, request, pk):
         dataset = self.get_object()
-        image = PIL.Image.open(dataset.content.path)
-        buf = io.BytesIO()
-        image.save(buf, format='PNG')
-        return Response(buf.getvalue())
+        if dataset.dataset_type == 'non_tiled_image':
+            image = PIL.Image.open(dataset.content.path)
+            buf = io.BytesIO()
+            image.save(buf, format='PNG')
+            return Response(buf.getvalue())
+        return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)
