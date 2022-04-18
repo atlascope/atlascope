@@ -15,6 +15,12 @@
         v-model="entireImage"
         label="Analyze entire image"
       />
+      <div
+        v-if="savedNotification && !entireImage"
+        style="display: inline"
+      >
+        {{ savedNotification }}
+      </div>
       <v-btn
         v-if="!selectionMode && !entireImage"
         @click="() => store.commit.setSelectionMode(true)"
@@ -35,12 +41,6 @@
       >
         Cancel
       </v-btn>
-      <div
-        v-if="savedNotification && !entireImage"
-        style="display: inline"
-      >
-        {{ savedNotification }}
-      </div>
     </div>
   </v-card>
 </template>

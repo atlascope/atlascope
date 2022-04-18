@@ -20,7 +20,10 @@ from atlascope.core.rest.additional_serializers import TileMetadataSerializer
 
 
 class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
-    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
+    queryset = Dataset.objects.filter(
+        content__isnull=False,
+        dataset_type__in=['tile_source', 'subimage'],
+    )
     serializer_class = TileMetadataSerializer
 
     def get(self, *args, **kwargs):
@@ -43,7 +46,10 @@ class LargeImageRenderer(BaseRenderer):
 
 
 class TileView(GenericAPIView, mixins.RetrieveModelMixin):
-    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
+    queryset = Dataset.objects.filter(
+        content__isnull=False,
+        dataset_type__in=['tile_source', 'subimage'],
+    )
     model = Dataset
     renderer_classes = [LargeImageRenderer]
 
