@@ -37,7 +37,7 @@ class Dataset(TimeStampedModel, models.Model):
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
-    def subimage(self, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
+    def subimage(self, investigation, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
         metadata = {
             'x0': x0,
             'x1': x1,
@@ -52,6 +52,9 @@ class Dataset(TimeStampedModel, models.Model):
             content=self.content,
             dataset_type="subimage",
         )
+        dataset.save()
+        investigation.datasets.add(dataset)
+        investigation.save()
 
         return dataset
 
@@ -117,11 +120,24 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
     )
 
 
+class InvestigationRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        from atlascope.core.models import Investigation
+
+        return Investigation.objects.all()
+
+
 class DatasetSubImageSerializer(serializers.Serializer):
+    def get_investigations():
+        from atlascope.core.models import Investigation
+
+        return Investigation.objects.all()
+
     x0 = serializers.IntegerField(required=True)
     y0 = serializers.IntegerField(required=True)
     x1 = serializers.IntegerField(required=True)
     y1 = serializers.IntegerField(required=True)
+    investigation = InvestigationRelatedField(required=True)
 
 
 @admin.register(Dataset)

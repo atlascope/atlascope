@@ -33,7 +33,7 @@ export interface State {
 }
 
 interface TileMetadataForDataset {
-    datasetId: number;
+    datasetId: number | undefined;
     tileMetadata: TileMetadata;
 }
 
@@ -97,7 +97,7 @@ const {
       state.showEmbeddings = show;
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
-      state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
+      if (obj.datasetId) state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
     },
     setRootDatasetFrames(state, frames: TiffFrame[]) {
       state.rootDatasetFrames = frames;
@@ -112,6 +112,9 @@ const {
   getters: {
     tilesourceDatasets(state: State): Dataset[] {
       return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'tile_source');
+    },
+    subimageDatasets(state: State): Dataset[] {
+      return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'subimage');
     },
   },
   actions: {
@@ -140,15 +143,13 @@ const {
           });
           const datasets = (await Promise.all(datasetPromises)).map((response) => response.data);
           commit.setCurrentDatasets(datasets);
-
-          const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
           commit.resetRootDataset();
 
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<{ datasetId: number; result: AxiosResponse }>[] = [];
-          tileSourceDatasets.forEach((dataset) => {
+          const metadataPromises: Promise<{ datasetId: number | undefined; result: AxiosResponse }>[] = [];
+          datasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
@@ -215,21 +216,31 @@ const {
       commit.setRootDatasetFrames(frames);
     },
     async createSubimageDataset(context, selection): Promise<AxiosResponse | boolean> {
-      const { state } = rootActionContext(context);
-
-      // TODO: rewrite when multiple datasets are shown
+      const { state, commit } = rootActionContext(context);
       const dataset = state.rootDataset;
+      const investigation = state.currentInvestigation;
 
       if (state.axiosInstance && dataset) {
-        return (await state.axiosInstance.post(
+        const response = (await state.axiosInstance.post(
           `/datasets/${dataset.id}/subimage`,
           {
             x0: selection[0],
             y0: selection[1],
             x1: selection[2],
             y1: selection[3],
+            investigation: investigation?.id,
           },
         )).data;
+        if (response) {
+          const metadata = (await state.axiosInstance.get(
+            `datasets/${response.id}/tiles/metadata`,
+          )).data;
+          commit.setTileMetadataForDataset({
+            datasetId: response.id,
+            tileMetadata: metadata,
+          });
+        }
+        return response;
       }
       return false;
     },
