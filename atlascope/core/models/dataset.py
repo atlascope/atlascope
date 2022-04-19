@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from large_image_source_ometiff import OMETiffFileTileSource
 from rest_framework import serializers
 
 from atlascope.core.importers import available_importers
@@ -39,17 +40,27 @@ class Dataset(TimeStampedModel, models.Model):
 
     def subimage(self, investigation, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
         metadata = {
-            'x0': x0,
-            'x1': x1,
-            'y0': y0,
-            'y1': y1,
+            'subimage_bbox': {
+                'x0': x0,
+                'x1': x1,
+                'y0': y0,
+                'y1': y1,
+            }
         }
+
+        src = OMETiffFileTileSource(self.content.path)
+        print(src)
+        result, mime = src.getRegion(
+            region=dict(left=x0, right=x1, top=y0, bottom=y1),
+            encoding='TILED',
+        )
+        print(result, mime)
 
         dataset = Dataset(
             name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
             metadata=metadata,
             source_dataset=self,
-            content=self.content,
+            content=result,
             dataset_type="subimage",
         )
         dataset.save()
@@ -128,11 +139,6 @@ class InvestigationRelatedField(serializers.PrimaryKeyRelatedField):
 
 
 class DatasetSubImageSerializer(serializers.Serializer):
-    def get_investigations():
-        from atlascope.core.models import Investigation
-
-        return Investigation.objects.all()
-
     x0 = serializers.IntegerField(required=True)
     y0 = serializers.IntegerField(required=True)
     x1 = serializers.IntegerField(required=True)
