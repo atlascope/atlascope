@@ -133,7 +133,7 @@ const {
       }
     },
     async fetchCurrentInvestigation(context, investigationId: string) {
-      const { commit, state } = rootActionContext(context);
+      const { commit, state, dispatch } = rootActionContext(context);
       if (state.axiosInstance) {
         const investigation = (await state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
@@ -196,11 +196,17 @@ const {
             });
           });
 
-          const pins = (await state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
-          commit.setCurrentPins(pins);
+          dispatch.fetchInvestigationPins();
         }
       } else {
         commit.setCurrentInvestigation(null);
+      }
+    },
+    async fetchInvestigationPins(context) {
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance && state.currentInvestigation) {
+        const pins = (await state.axiosInstance.get(`/investigations/${state.currentInvestigation.id}/pins`)).data;
+        commit.setCurrentPins(pins);
       }
     },
     unsetCurrentInvestigation(context) {

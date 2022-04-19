@@ -7,8 +7,11 @@
       item-text="name"
       clearable
     />
+    <span v-if="selectedDataset && !jobSpawned">
+      Please note that custom channel coloration is not used in image analysis.
+    </span>
     <div
-      v-if="selectedDataset"
+      v-if="selectedDataset && !jobSpawned"
       style="display:flex; justify-content:space-between"
     >
       <v-switch
@@ -42,7 +45,7 @@
         Cancel
       </v-btn>
     </div>
-    <div v-if="selectedDataset">
+    <div v-if="selectedDataset && !jobSpawned">
       <v-select
         v-model="selectedJobType"
         label="Available Job Types"
@@ -83,6 +86,9 @@
           Spawn Job
         </v-btn>
       </div>
+    </div>
+    <div v-if="jobSpawned">
+      Job spawned successfully! Results will appear as a Pin when the job run is complete.
     </div>
   </v-card>
 </template>
@@ -126,6 +132,8 @@ export default defineComponent({
     const selectedJobType = ref();
     const inputFormValid = ref(true);
     const jobInputs = ref({});
+    const jobSpawned = ref(false);
+    const resultPoll = ref();
 
     store.dispatch.fetchJobTypes();
 
@@ -184,9 +192,19 @@ export default defineComponent({
       autoFoldObjects: true,
     };
 
+    async function pollForPinResult(jobId) {
+      if (store.state.axiosInstance) {
+        const response = (await store.state.axiosInstance.get(`/jobs/${jobId}`)).data;
+        if (response.complete) {
+          await store.dispatch.fetchInvestigationPins();
+          clearInterval(resultPoll.value);
+        }
+      }
+    }
+
     async function spawnJob() {
       if (store.state.axiosInstance) {
-        const response = (await store.state.axiosInstance.post('jobs', {
+        const response = (await store.state.axiosInstance.post('/jobs', {
           investigation: store.state.currentInvestigation.id,
           /* eslint-disable */
           original_dataset: store.state.rootDataset.id,
@@ -194,7 +212,11 @@ export default defineComponent({
           additional_inputs: jobInputs.value,
           /* eslint-enable */
         })).data;
-        console.log(response);
+        if (response) {
+          jobSpawned.value = true;
+          setTimeout(() => { jobSpawned.value = false; }, 5000);
+          resultPoll.value = setInterval(() => pollForPinResult(response.id), 5000);
+        }
       }
     }
 
@@ -210,6 +232,7 @@ export default defineComponent({
       schemaOptions,
       inputFormValid,
       jobInputs,
+      jobSpawned,
       jobInputsSchema,
       useSelection,
       spawnJob,
