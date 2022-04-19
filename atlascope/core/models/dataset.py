@@ -5,11 +5,11 @@ import tempfile
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from django.dispatch import receiver
 from django.db import models
+from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
-from large_image_source_ometiff import OMETiffFileTileSource
 from large_image_converter import _output_tiff
+from large_image_source_ometiff import OMETiffFileTileSource
 from rest_framework import serializers
 
 from atlascope.core.importers import available_importers
