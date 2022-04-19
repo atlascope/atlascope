@@ -233,7 +233,7 @@ const {
         )).data;
         if (response) {
           const metadata = (await state.axiosInstance.get(
-            `datasets/${response.id}/tiles/metadata`,
+            `datasets/tile_source/${response.id}/tiles/metadata`,
           )).data;
           commit.setTileMetadataForDataset({
             datasetId: response.id,
