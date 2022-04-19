@@ -10,19 +10,20 @@
         cols="auto"
       >
         <v-select
-          v-if="!loaded || tilesourceDatasets.length > 0"
-          v-model="selectedDataset"
-          class="pr-6"
-          :items="tilesourceDatasets"
+          v-if="!loaded || currentDatasets.length > 0"
+          :value="rootDataset"
+          :items="currentDatasets"
+          class="atlascope-dataset-select"
           item-text="name"
           item-value="id"
           return-object
           single-line
           dense
           hide-details
+          @input="store.commit.setRootDataset"
         />
         <v-banner
-          v-if="loaded && tilesourceDatasets.length === 0"
+          v-if="loaded && currentDatasets.length === 0"
           single-line
         >
           <v-icon left>
@@ -201,7 +202,7 @@ export default defineComponent({
 
     const rootDataset = computed(() => store.state.rootDataset);
     const showEmbeddings = computed(() => store.state.showEmbeddings);
-    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+    const currentDatasets = computed(() => store.state.currentDatasets);
     const selectionMode = computed(() => store.state.selectionMode);
     /* eslint-disable */
     let selectionLayer: any;
@@ -547,10 +548,11 @@ export default defineComponent({
       hoverText,
       toggleSidebar,
       map,
-      tilesourceDatasets,
+      currentDatasets,
       rootDataset,
       selectedPins,
       pinNotes,
+      store,
     };
   },
 });
