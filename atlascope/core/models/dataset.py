@@ -1,6 +1,8 @@
+import os
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.dispatch import receiver
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from large_image_source_ometiff import OMETiffFileTileSource
@@ -49,25 +51,30 @@ class Dataset(TimeStampedModel, models.Model):
         }
 
         src = OMETiffFileTileSource(self.content.path)
-        print(src)
         result, mime = src.getRegion(
             region=dict(left=x0, right=x1, top=y0, bottom=y1),
             encoding='TILED',
         )
-        print(result, mime)
 
         dataset = Dataset(
             name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
             metadata=metadata,
             source_dataset=self,
-            content=result,
             dataset_type="subimage",
         )
         dataset.save()
+        content_filename = f'cropped_{dataset.id}_{self.content.name}'
+        dataset.content.save(content_filename, open(result, 'rb'))
         investigation.datasets.add(dataset)
         investigation.save()
 
         return dataset
+
+
+@receiver(models.signals.post_delete, sender=Dataset)
+def delete_file(sender, instance, *args, **kwargs):
+    if instance.content and os.path.isfile(instance.content.path):
+        os.remove(instance.content.path)
 
 
 class DatasetSerializer(serializers.ModelSerializer):
