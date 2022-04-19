@@ -4,7 +4,7 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  Investigation, Dataset, TileMetadata, Pin, DatasetEmbedding,
+  Investigation, Dataset, TileMetadata, Pin, DatasetEmbedding, JobDetail,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
@@ -30,6 +30,7 @@ export interface State {
     rootDatasetFrames: TiffFrame[];
     selectionMode: boolean;
     subimageSelection: number[] | null;
+    jobTypes: JobDetail[];
 }
 
 interface TileMetadataForDataset {
@@ -58,6 +59,7 @@ const {
     rootDatasetFrames: [],
     selectionMode: false,
     subimageSelection: null,
+    jobTypes: [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -107,6 +109,9 @@ const {
     },
     setSubimageSelection(state, selection: number[] | null) {
       state.subimageSelection = selection;
+    },
+    setJobTypes(state, jobTypes) {
+      state.jobTypes = jobTypes;
     },
   },
   getters: {
@@ -233,7 +238,7 @@ const {
         )).data;
         if (response) {
           const metadata = (await state.axiosInstance.get(
-            `datasets/tile_source/${response.id}/tiles/metadata`,
+            `/datasets/tile_source/${response.id}/tiles/metadata`,
           )).data;
           commit.setTileMetadataForDataset({
             datasetId: response.id,
@@ -243,6 +248,13 @@ const {
         return response;
       }
       return false;
+    },
+    async fetchJobTypes(context) {
+      const { state, commit } = rootActionContext(context);
+      if (state.axiosInstance) {
+        const response = (await state.axiosInstance.get('/jobs/types')).data;
+        commit.setJobTypes(response);
+      }
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
