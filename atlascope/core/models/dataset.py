@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+import tempfile
+
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -6,6 +9,7 @@ from django.dispatch import receiver
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_converter import _output_tiff
 from rest_framework import serializers
 
 from atlascope.core.importers import available_importers
@@ -41,7 +45,7 @@ class Dataset(TimeStampedModel, models.Model):
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
     def subimage(self, investigation, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
-        metadata = {
+        cropped_metadata = {
             'subimage_bbox': {
                 'x0': x0,
                 'x1': x1,
@@ -51,24 +55,42 @@ class Dataset(TimeStampedModel, models.Model):
         }
 
         src = OMETiffFileTileSource(self.content.path)
-        result, mime = src.getRegion(
-            region=dict(left=x0, right=x1, top=y0, bottom=y1),
-            encoding='TILED',
-        )
+        src_metadata = src.getMetadata()
+        cropped_frames_locations = []
+        for frame in src_metadata['frames']:
+            result, mime = src.getRegion(
+                region=dict(left=x0, right=x1, top=y0, bottom=y1),
+                encoding='TILED',
+                frame=frame['Frame'],
+            )
+            cropped_frames_locations.append(result)
 
-        dataset = Dataset(
-            name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
-            metadata=metadata,
-            source_dataset=self,
-            dataset_type="subimage",
-        )
-        dataset.save()
-        content_filename = f'cropped_{dataset.id}_{self.content.name}'
-        dataset.content.save(content_filename, open(result, 'rb'))
-        investigation.datasets.add(dataset)
-        investigation.save()
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            dest = Path(tmpdirname, 'composite.tiff')
+            _output_tiff(
+                cropped_frames_locations,
+                dest,
+                Path(tmpdirname, 'tmp.tiff'),
+                dict(
+                    metadata=src_metadata,
+                    images={},
+                    internal_metadata={},
+                ),
+            )
 
-        return dataset
+            dataset = Dataset(
+                name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
+                metadata=cropped_metadata,
+                source_dataset=self,
+                dataset_type="subimage",
+            )
+            dataset.save()
+            content_filename = f'cropped_{dataset.id}_{self.content.name}'
+            dataset.content.save(content_filename, open(dest, 'rb'))
+            investigation.datasets.add(dataset)
+            investigation.save()
+
+            return dataset
 
 
 @receiver(models.signals.post_delete, sender=Dataset)
