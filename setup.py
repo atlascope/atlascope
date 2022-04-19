@@ -49,7 +49,8 @@ setup(
         'django-click',
         'importlib_metadata>=3.6',
         'jsonschema',
-        'large-image[gdal,ometiff]',
+        'large-image[gdal,ometiff]>=1.13.0',
+        'django-large-image>=0.4.1',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'gunicorn',
