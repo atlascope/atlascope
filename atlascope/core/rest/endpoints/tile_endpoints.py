@@ -1,12 +1,9 @@
-from itertools import cycle
-
 from django_large_image.rest.viewsets import LargeImageDetailMixin
 from large_image.exceptions import TileSourceError
 from large_image.tilesource import FileTileSource
 from large_image_source_ometiff import OMETiffFileTileSource
 from large_image_source_tiff import TiffFileTileSource
 from rest_framework.exceptions import ValidationError
-from rest_framework.request import Request
 from rest_framework.routers import DefaultRouter
 from rest_framework.viewsets import GenericViewSet
 
@@ -35,7 +32,6 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
         except TileSourceError:
             tile_source = TiffFileTileSource(path, *args, **kwargs)
         return tile_source
-
 
 
 router = DefaultRouter(trailing_slash=False)
