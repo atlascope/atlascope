@@ -15,10 +15,12 @@ RUN apt-get update \
         libproj-dev proj-bin proj-data \
         # GEOS library development files (GeoDjango)
         libgeos-dev \
-        # TIFF reading
-        libtiff-dev \
  && pip install --upgrade pip \
  && rm -rf /var/lib/apt/lists/*
+
+RUN pip install \
+        --find-links https://girder.github.io/large_image_wheels \
+        large-image-converter
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
