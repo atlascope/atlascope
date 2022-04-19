@@ -16,10 +16,8 @@ def run(job_id: str, original_dataset_id: str):
 
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     job = Job.objects.get(id=job_id)
-    # TODO: we need a module to parse dataset type and return an image from it
-    #   This is currently only tolerant to Green Cell Image dataset,
-    #   which has PNG content
-    input_image = Image.open(io.BytesIO(original_dataset.content.read()))
+
+    input_image = Image.open(io.BytesIO(original_dataset.content.read())).convert("RGB")
 
     average_color = [int(value) for value in np.average(input_image, axis=(0, 1))]
     output_image = Image.new(mode="RGBA", size=(200, 200), color=tuple(average_color))

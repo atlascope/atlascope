@@ -31,7 +31,7 @@ class JobViewSet(
         job: Job = serializer.save()
         job.spawn()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(JobDetailSerializer(job).data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         request_body=no_body,
