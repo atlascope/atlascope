@@ -151,7 +151,7 @@ const {
           const metadataPromises: Promise<{ datasetId: string | undefined; result: AxiosResponse }>[] = [];
           datasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
-              `/datasets/${dataset.id}/tiles/metadata`).then(
+              `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
                 datasetId: dataset.id,
                 result,
@@ -162,7 +162,7 @@ const {
           });
           embeddings.forEach((embedding) => {
             const promise = state.axiosInstance?.get(
-              `/datasets/${embedding.child}/tiles/metadata`).then(
+              `/datasets/tile_source/${embedding.child}/tiles/metadata`).then(
                 (result: AxiosResponse) => ({
                   datasetId: embedding.child,
                   result,
@@ -173,7 +173,7 @@ const {
           });
           embeddings.forEach((embedding) => {
             const promise = state.axiosInstance?.get(
-              `/datasets/${embedding.parent}/tiles/metadata`).then(
+              `/datasets/tile_source/${embedding.parent}/tiles/metadata`).then(
                 (result: AxiosResponse) => ({
                   datasetId: embedding.parent,
                   result,
