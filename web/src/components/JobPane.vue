@@ -42,16 +42,79 @@
         Cancel
       </v-btn>
     </div>
+    <div v-if="selectedDataset">
+      <v-select
+        v-model="selectedJobType"
+        label="Available Job Types"
+        :items="store.state.jobTypes"
+      >
+        <template v-slot:selection="{ item }">
+          {{ item.name.replace(/_/g, ' ') }}
+        </template>
+        <template v-slot:item="{ item, attrs, on }">
+          <v-list-item
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ item.name.replace(/_/g, ' ') }}
+                <div class="job-type-description">
+                  {{ item.description }}
+                </div>
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+      </v-select>
+      <div v-if="selectedJobType">
+        <v-form v-model="inputFormValid">
+          <v-jsonschema-form
+            :schema="jobInputsSchema(selectedJobType.additional_inputs)"
+            :model="jobInputs"
+            :options="schemaOptions"
+          />
+        </v-form>
+        <v-btn
+          v-if="inputFormValid"
+          color="primary"
+          @click="spawnJob"
+        >
+          Spawn Job
+        </v-btn>
+      </div>
+    </div>
   </v-card>
 </template>
 
+<style scoped>
+.job-type-description {
+  color: gray;
+}
+</style>
+
 <script>
+import Vue from 'vue';
+import Vuetify from 'vuetify';
+import 'vuetify/dist/vuetify.min.css';
+import Draggable from 'vuedraggable';
+import VJsonschemaForm from '@koumoul/vuetify-jsonschema-form';
+import '@koumoul/vuetify-jsonschema-form/dist/main.css';
+import { Sketch } from 'vue-color';
 import {
   defineComponent, computed, ref, watch,
 } from '@vue/composition-api';
 import store from '../store';
 
+Vue.use(Vuetify);
+
+Vue.component('draggable', Draggable);
+Vue.component('color-picker', Sketch);
+
 export default defineComponent({
+  components: {
+    VJsonschemaForm,
+  },
 
   setup() {
     const currentDatasets = computed(() => store.state.currentDatasets);
@@ -60,6 +123,11 @@ export default defineComponent({
     const selection = computed(() => store.state.subimageSelection);
     const selectionMode = computed(() => store.state.selectionMode);
     const savedNotification = ref('');
+    const selectedJobType = ref();
+    const inputFormValid = ref(true);
+    const jobInputs = ref({});
+
+    store.dispatch.fetchJobTypes();
 
     watch(selectedDataset, () => {
       if (selectedDataset.value) {
@@ -88,15 +156,63 @@ export default defineComponent({
       setTimeout(() => { savedNotification.value = ''; }, 3000);
     }
 
+    function jobInputsSchema(inputSpecs) {
+      const inputSchema = {
+        type: 'object',
+        title: '',
+        required: [],
+        properties: {},
+      };
+      const typeMapping = {
+        int: 'integer',
+      };
+      inputSpecs.forEach(
+        (inputSpec) => {
+          if (inputSpec.required) inputSchema.required.push(inputSpec.name);
+          inputSchema.properties[inputSpec.name] = {
+            title: inputSpec.name.toUpperCase(),
+            type: typeMapping[inputSpec.class],
+          };
+        },
+      );
+      return JSON.parse(JSON.stringify(inputSchema));
+    }
+
+    const schemaOptions = {
+      debug: false,
+      disableAll: false,
+      autoFoldObjects: true,
+    };
+
+    async function spawnJob() {
+      if (store.state.axiosInstance) {
+        const response = (await store.state.axiosInstance.post('jobs', {
+          investigation: store.state.currentInvestigation.id,
+          /* eslint-disable */
+          original_dataset: store.state.rootDataset.id,
+          job_type: selectedJobType.value.name,
+          additional_inputs: jobInputs.value,
+          /* eslint-enable */
+        })).data;
+        console.log(response);
+      }
+    }
+
     return {
       currentDatasets,
       selectedDataset,
+      selectedJobType,
       entireImage,
       selection,
       selectionMode,
       savedNotification,
       store,
+      schemaOptions,
+      inputFormValid,
+      jobInputs,
+      jobInputsSchema,
       useSelection,
+      spawnJob,
     };
   },
 });
