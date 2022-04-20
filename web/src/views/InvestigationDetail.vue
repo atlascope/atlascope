@@ -177,6 +177,9 @@ export default defineComponent({
       createLayer,
       geoEvents,
       geoAnnotations,
+      zoomLevel,
+      xCoord,
+      yCoord,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -259,6 +262,10 @@ export default defineComponent({
       });
     }
 
+    watch([zoomLevel, xCoord, yCoord], () => {
+      movePinNoteCards();
+    });
+
     function drawMap(dataset: Dataset | null) {
       tearDownMap();
       if (!dataset || !dataset.id) {
@@ -296,7 +303,7 @@ export default defineComponent({
         url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
-      const geojsMap = createMap(mapParams);
+      createMap(mapParams);
       rootDatasetLayer.value = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
@@ -391,8 +398,6 @@ export default defineComponent({
           /* eslint-enable */
         }
       }
-      geojsMap.geoOn(geoEvents.pan, movePinNoteCards);
-      geojsMap.geoOn(geoEvents.zoom, movePinNoteCards);
       clampBoundsX(false);
     }
 
