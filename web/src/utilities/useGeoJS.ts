@@ -10,6 +10,36 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const xCoord = ref(0);
   const yCoord = ref(0);
 
+  const geoEvents = geo.event;
+  const geoAnnotations = geo.annotation;
+
+  const updateCenter = () => {
+    if (map.value !== null) {
+      const { x, y } = map.value.center();
+      xCoord.value = x;
+      yCoord.value = y;
+    }
+  };
+
+  const createMap = (mapParams?: object) => {
+    const node = { node: element.value };
+    const geojsMap = geo.map({ ...node, ...mapParams });
+    map.value = geojsMap;
+
+    zoomLevel.value = map.value.zoom();
+    const mapCenter = map.value.center();
+    xCoord.value = mapCenter.x;
+    yCoord.value = mapCenter.y;
+
+    geojsMap.geoOn(geoEvents.zoom, (event: any) => {
+      zoomLevel.value = event.zoomLevel;
+    });
+    geojsMap.geoOn(geoEvents.pan, () => {
+      updateCenter();
+    });
+    return geojsMap;
+  };
+
   onMounted(() => {
     // `element.value` should always be an `HTMLElement` (not `null`)
     // by the time `onMounted` is called. However, it will be `null`
@@ -17,8 +47,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
 
     // check if valid DOM element is passed.
     if (element.value !== null) {
-      map.value = geo.map({ node: element.value });
-      zoomLevel.value = map.value.zoom();
+      createMap();
     }
   });
 
@@ -48,13 +77,6 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     map.value.exit();
   };
 
-  const createMap = (mapParams?: object) => {
-    const node = { node: element.value };
-    const geojsMap = geo.map({ ...node, ...mapParams });
-    map.value = geojsMap;
-    return geojsMap;
-  };
-
   const createLayer = (layerType: string, layerParams: object, gcs?: string) => {
     const layer = map.value.createLayer(layerType, layerParams);
     if (gcs !== undefined) {
@@ -62,9 +84,6 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     }
     return layer;
   };
-
-  const geoEvents = geo.event;
-  const geoAnnotations = geo.annotation;
 
   const generatePixelCoordinateParams = (
     width: number,
