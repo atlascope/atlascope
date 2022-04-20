@@ -153,7 +153,7 @@ interface StackFrame {
 
 interface BandSpec {
   frame: number;
-  palette: string[];
+  palette: string;
 }
 
 interface TileLayerStyleDict {
