@@ -6,16 +6,20 @@
     max-height="500px"
   >
     <template
-      v-slot:activator="{ on, attrs }"
+      v-slot:activator="{ on: onMenu, attrs: attrsMenu }"
     >
-      <v-btn
-        color="blue"
-        dark
-        v-bind="attrs"
-        v-on="on"
-      >
-        Frames
-      </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on: onTooltip, attrs: attrsTooltip }">
+          <v-btn
+            icon
+            v-bind="{ ...attrsMenu, ...attrsTooltip }"
+            v-on="{ ...onMenu, ...onTooltip }"
+          >
+            <v-icon>mdi-palette</v-icon>
+          </v-btn>
+        </template>
+        <span>Edit the image style</span>
+      </v-tooltip>
     </template>
     <v-card>
       <v-card-text>
