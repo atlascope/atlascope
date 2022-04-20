@@ -125,7 +125,7 @@ import {
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import { postGisToPoint } from '../utilities/utiltyFunctions';
-import store from '../store';
+import store, { TiffFrame } from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -149,6 +149,15 @@ interface StackFrame {
     };
   };
   treeDepth: number;
+}
+
+interface BandSpec {
+  frame: number;
+  palette: string;
+}
+
+interface TileLayerStyleDict {
+  bands: BandSpec[];
 }
 
 export default defineComponent({
@@ -197,7 +206,7 @@ export default defineComponent({
     const pinNotes: Ref<any[]> = ref([]);
     /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
-    const frames = computed(() => store.state.rootDatasetFrames);
+    const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
     /* eslint-enable */
 
     function rootDatasetChanged(newRootDataset: Dataset) {
@@ -212,20 +221,19 @@ export default defineComponent({
       ));
     }
 
+    function getSelectedFrameStyle(): BandSpec[] {
+      return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
+        frame: frame.frame,
+        palette: `#${frame.color}`,
+      }));
+    }
+
     function buildUrlQueryArgs() {
-      const channels: number[] = [];
-      const colors: string[] = [];
-      /* eslint-disable */
-      const selectedFrames = frames.value.filter((frame: any) => frame.displayed);
-      if (selectedFrames.length === 0) {
-        return '';
-      }
-      selectedFrames.forEach((frame) => {
-        channels.push(frame.frame);
-        colors.push(frame.color);
-      });
-      /* eslint-enable */
-      return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
+      const style: TileLayerStyleDict = {
+        bands: getSelectedFrameStyle(),
+      };
+      const encodedStyle = encodeURIComponent(JSON.stringify(style));
+      return `?style=${encodedStyle}`;
     }
 
     function tearDownMap() {
