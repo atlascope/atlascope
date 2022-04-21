@@ -9,7 +9,7 @@ import {
 
 Vue.use(Vuex);
 
-interface TiffFrame {
+export interface TiffFrame {
   name: string;
   frame: number;
   displayed: boolean;
