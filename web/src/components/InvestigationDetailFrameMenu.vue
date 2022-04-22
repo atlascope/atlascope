@@ -83,7 +83,7 @@ export default defineComponent({
     const showFrames: Ref<boolean> = ref(false);
     const rootDataset = computed(() => store.state.rootDataset);
     const validColors = computed(
-      () => frameInfo.value.every((frame: TiffFrame) => isColorStringRule(frame.color)),
+      () => frameInfo.value.every((frame: TiffFrame) => isColorStringRule(frame.color) === true),
     );
 
     function updateFrameInfo() {
