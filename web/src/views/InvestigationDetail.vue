@@ -225,7 +225,7 @@ export default defineComponent({
       }
       selectedFrames.forEach((frame) => {
         channels.push(frame.frame);
-        colors.push(frame.color);
+        colors.push(frame.color.substring(1));
       });
       /* eslint-enable */
       return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;

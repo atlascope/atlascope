@@ -17,8 +17,3 @@ export function postGisToPoint(location: string): Point | undefined {
   }
   return undefined;
 }
-
-export function isColorStringRule(value: string): boolean | string {
-  const hexRegEx = /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  return hexRegEx.test(value) || 'Enter a valid 3- or 6-digit hex code';
-}
