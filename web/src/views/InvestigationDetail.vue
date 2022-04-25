@@ -187,6 +187,8 @@ export default defineComponent({
       zoomLevel,
       xCoord,
       yCoord,
+      drawLayer,
+      updateLayerUrl,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -204,12 +206,15 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
-    const rootDatasetLayer: Ref<any> = ref(null);
+    /* eslint-enable */
+    // const rootDatasetLayer: Ref<any> = ref(null);
+    let rootDatasetLayerId: number;
     /* eslint-enable */
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames = computed(() => store.state.rootDatasetFrames);
 
     function rootDatasetChanged(newRootDataset: Dataset) {
+      console.log(`in rootDatasetChanged" ${newRootDataset.id}`);
       selectedDataset.value = newRootDataset;
       store.dispatch.updateSelectedPins([]);
       store.dispatch.setRootDataset(newRootDataset);
@@ -323,7 +328,8 @@ export default defineComponent({
         crossDomain: 'use-credentials',
       };
       createMap(mapParams);
-      rootDatasetLayer.value = createLayer('osm', rootLayerParams);
+      rootDatasetLayerId = createLayer('osm', rootLayerParams);
+      console.log(`Root layer ID: ${rootDatasetLayerId}`);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
       const stack: Array<StackFrame> = [];
@@ -425,11 +431,16 @@ export default defineComponent({
     });
 
     watch(frames, () => {
-      if (rootDataset.value && rootDatasetLayer) {
+      console.log('frames changed');
+      if (rootDataset.value && rootDatasetLayerId) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
         const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-        rootDatasetLayer.value.url(newUrl).draw();
+        console.log(`updating url to: ${newUrl}`);
+        updateLayerUrl(rootDatasetLayerId, newUrl);
+        drawLayer(rootDatasetLayerId);
+        // rootDatasetLayer.url(newUrl);
+        // rootDatasetLayer.draw();
       }
     }, { deep: true });
 

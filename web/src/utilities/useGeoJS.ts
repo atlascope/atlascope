@@ -1,7 +1,6 @@
 import {
   ref, onMounted, Ref,
 } from '@vue/composition-api';
-
 import geo from 'geojs';
 
 export default function useGeoJS(element: Ref<HTMLElement | null>) {
@@ -77,12 +76,28 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     map.value.exit();
   };
 
-  const createLayer = (layerType: string, layerParams: object, gcs?: string) => {
+  const createLayer = (layerType: string, layerParams: object, gcs?: string): number => {
     const layer = map.value.createLayer(layerType, layerParams);
     if (gcs !== undefined) {
       layer.gcs(gcs);
     }
-    return layer;
+    return layer.id();
+  };
+
+  const drawLayer = (layerId: number) => {
+    console.log('drawLayer called');
+    const layerToDraw = map.value.layers().find((layer: any) => layer.id() === layerId);
+    if (layerToDraw) {
+      layerToDraw.draw();
+    }
+  };
+
+  const updateLayerUrl = (layerId: number, newUrl: string) => {
+    console.log('updating layer url');
+    const updateLayer = map.value.layers().find((layer: any) => layer.id() === layerId);
+    if (updateLayer && updateLayer.url) {
+      updateLayer.url(newUrl);
+    }
   };
 
   const generatePixelCoordinateParams = (
@@ -112,5 +127,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     geoEvents,
     geoAnnotations,
     clampBoundsX,
+    drawLayer,
+    updateLayerUrl,
   };
 }
