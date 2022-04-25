@@ -35,6 +35,8 @@ class Pin(models.Model):
         max_length=15, choices=PIN_COLORS, default='red', null=False, blank=False
     )
     note = models.TextField(max_length=1000, blank=True)
+    minimum_zoom = models.PositiveIntegerField(default=0)
+    maximum_zoom = models.PositiveIntegerField(default=40)
 
 
 class PinSerializer(serializers.ModelSerializer):
