@@ -26,7 +26,6 @@
         <v-btn
           color="primary"
           text
-          :disabled="!validColors"
           @click="updateFrameInfo"
         >
           Update
@@ -49,10 +48,34 @@
                 <v-text-field
                   v-model="frame.color"
                   :hint="frame.name"
-                  :rules="[isColorStringRule]"
                   persistent-hint
                   maxlength="6"
-                />
+                  readonly
+                >
+                  <template v-slot:prepend>
+                    <v-menu
+                      v-model="frame.menu"
+                      :close-on-content-click="false"
+                    >
+                      <template v-slot:activator="{ on: onSwatch }">
+                        <div
+                          :style="{ 'backgroundColor': frame.color }"
+                          class="swatch"
+                          v-on="onSwatch"
+                        />
+                      </template>
+                      <v-card>
+                        <v-card-text class="pa-0">
+                          <v-color-picker
+                            v-model="frame.color"
+                            mode="hexa"
+                            hide-mode-switch
+                          />
+                        </v-card-text>
+                      </v-card>
+                    </v-menu>
+                  </template>
+                </v-text-field>
               </div>
             </v-list-item>
           </v-list-item>
@@ -66,6 +89,15 @@
   .frame-row {
     display: inline;
   }
+
+  .swatch {
+    border: 1px solid black;
+    border-radius: 4px;
+    margin-bottom: 1px;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+  }
 </style>
 
 <script lang="ts">
@@ -73,7 +105,6 @@ import {
   ref, defineComponent, onMounted, computed, watch, Ref,
 } from '@vue/composition-api';
 import store, { TiffFrame } from '../store';
-import { isColorStringRule } from '../utilities/utiltyFunctions';
 
 export default defineComponent({
   name: 'InvestigationDetailFrameMenu',
@@ -82,9 +113,6 @@ export default defineComponent({
     const frameInfo: Ref<TiffFrame[]> = ref([]);
     const showFrames: Ref<boolean> = ref(false);
     const rootDataset = computed(() => store.state.rootDataset);
-    const validColors = computed(
-      () => frameInfo.value.every((frame: TiffFrame) => isColorStringRule(frame.color) === true),
-    );
 
     function updateFrameInfo() {
       showFrames.value = false;
@@ -104,7 +132,8 @@ export default defineComponent({
           name: frame.Name || 'no name',
           frame: frame.Frame,
           displayed: true,
-          color: 'ffffff',
+          color: '#FFFFFF',
+          menu: false,
         }));
       }
       store.dispatch.updateFrames(JSON.parse(JSON.stringify(frameInfo.value)));
@@ -123,8 +152,6 @@ export default defineComponent({
       updateFrameInfo,
       frameInfo,
       showFrames,
-      isColorStringRule,
-      validColors,
     };
   },
 });
