@@ -76,16 +76,23 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     map.value.exit();
   };
 
-  const createLayer = (layerType: string, layerParams: object, gcs?: string): number => {
+  const createLayer = (
+    layerType: string,
+    layerParams: object,
+    gcs?: string,
+    returnObj = false,
+  ): number | any => {
     const layer = map.value.createLayer(layerType, layerParams);
     if (gcs !== undefined) {
       layer.gcs(gcs);
+    }
+    if (returnObj) {
+      return layer;
     }
     return layer.id();
   };
 
   const drawLayer = (layerId: number) => {
-    console.log('drawLayer called');
     const layerToDraw = map.value.layers().find((layer: any) => layer.id() === layerId);
     if (layerToDraw) {
       layerToDraw.draw();
@@ -93,7 +100,6 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   };
 
   const updateLayerUrl = (layerId: number, newUrl: string) => {
-    console.log('updating layer url');
     const updateLayer = map.value.layers().find((layer: any) => layer.id() === layerId);
     if (updateLayer && updateLayer.url) {
       updateLayer.url(newUrl);
