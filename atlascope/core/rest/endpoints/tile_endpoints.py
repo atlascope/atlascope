@@ -4,6 +4,7 @@ from large_image.tilesource import FileTileSource
 from large_image_source_ometiff import OMETiffFileTileSource
 from large_image_source_tiff import TiffFileTileSource
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.routers import DefaultRouter
 from rest_framework.viewsets import GenericViewSet
 
@@ -25,12 +26,12 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
             # Raise 400-level error as this dataset has no content
             raise ValidationError('Dataset has not content.')
 
-    def open_tile_source(self, path: str, *args, **kwargs) -> FileTileSource:
+    def open_tile_source(self, request: Request, path: str, **kwargs) -> FileTileSource:
         """Override to manually choose tile source class."""
         try:
-            tile_source = OMETiffFileTileSource(path, *args, **kwargs)
+            tile_source = OMETiffFileTileSource(path, **kwargs)
         except TileSourceError:
-            tile_source = TiffFileTileSource(path, *args, **kwargs)
+            tile_source = TiffFileTileSource(path, **kwargs)
         return tile_source
 
 
