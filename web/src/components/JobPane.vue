@@ -73,7 +73,7 @@
       <div v-if="selectedJobType">
         <v-form v-model="inputFormValid">
           <v-jsonschema-form
-            :schema="jobInputsSchema(selectedJobType.additional_inputs)"
+            :schema="selectedJobType.schema"
             :model="jobInputs"
             :options="schemaOptions"
           />
@@ -164,28 +164,6 @@ export default defineComponent({
       setTimeout(() => { savedNotification.value = ''; }, 3000);
     }
 
-    function jobInputsSchema(inputSpecs) {
-      const inputSchema = {
-        type: 'object',
-        title: '',
-        required: [],
-        properties: {},
-      };
-      const typeMapping = {
-        int: 'integer',
-      };
-      inputSpecs.forEach(
-        (inputSpec) => {
-          if (inputSpec.required) inputSchema.required.push(inputSpec.name);
-          inputSchema.properties[inputSpec.name] = {
-            title: inputSpec.name.toUpperCase(),
-            type: typeMapping[inputSpec.class],
-          };
-        },
-      );
-      return JSON.parse(JSON.stringify(inputSchema));
-    }
-
     const schemaOptions = {
       debug: false,
       disableAll: false,
@@ -233,7 +211,6 @@ export default defineComponent({
       inputFormValid,
       jobInputs,
       jobSpawned,
-      jobInputsSchema,
       useSelection,
       spawnJob,
     };
