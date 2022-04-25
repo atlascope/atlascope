@@ -151,6 +151,13 @@ interface StackFrame {
   treeDepth: number;
 }
 
+interface PinNote extends Pin {
+  showNote: boolean;
+  inBounds: boolean;
+  notePositionX: number;
+  notePositionY: number;
+}
+
 export default defineComponent({
   name: 'InvestigationDetail',
 
@@ -197,11 +204,10 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
-    const pinNotes: Ref<any[]> = ref([]);
-    /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
-    const frames = computed(() => store.state.rootDatasetFrames);
     /* eslint-enable */
+    const pinNotes: Ref<PinNote[]> = ref([]);
+    const frames = computed(() => store.state.rootDatasetFrames);
 
     function rootDatasetChanged(newRootDataset: Dataset) {
       selectedDataset.value = newRootDataset;
@@ -249,15 +255,17 @@ export default defineComponent({
         } = map.value?.getBoundingClientRect() || {
           left: 0, top: 0, width: 0, height: 0,
         };
-        note.notePositionX = newScreenCoords.x + left;
-        note.notePositionY = newScreenCoords.y + top;
-        if (note.notePositionX > left + width
-            || note.notePositionY > top + height
-            || note.notePositionX < left
-            || note.notePositionY < top) {
-          note.inBounds = false;
-        } else {
-          note.inBounds = true;
+        if (note) {
+          note.notePositionX = newScreenCoords.x + left;
+          note.notePositionY = newScreenCoords.y + top;
+          if (note.notePositionX > left + width
+              || note.notePositionY > top + height
+              || note.notePositionX < left
+              || note.notePositionY < top) {
+            note.inBounds = false;
+          } else {
+            note.inBounds = true;
+          }
         }
       });
     }
@@ -498,9 +506,11 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-            noteToToggle.showNote = !noteToToggle.showNote;
-            noteToToggle.notePositionX = event.mouse.page.x;
-            noteToToggle.notePositionY = event.mouse.page.y;
+            if (noteToToggle) {
+              noteToToggle.showNote = !noteToToggle.showNote;
+              noteToToggle.notePositionX = event.mouse.page.x;
+              noteToToggle.notePositionY = event.mouse.page.y;
+            }
           }
         });
       } else {
