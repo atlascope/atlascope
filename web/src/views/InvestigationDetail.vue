@@ -125,7 +125,7 @@ import {
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import { postGisToPoint } from '../utilities/utiltyFunctions';
-import store from '../store';
+import store, { TiffFrame } from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -218,8 +218,7 @@ export default defineComponent({
     function buildUrlQueryArgs() {
       const channels: number[] = [];
       const colors: string[] = [];
-      /* eslint-disable */
-      const selectedFrames = frames.value.filter((frame: any) => frame.displayed);
+      const selectedFrames = frames.value.filter((frame: TiffFrame) => frame.displayed);
       if (selectedFrames.length === 0) {
         return '';
       }
@@ -227,7 +226,6 @@ export default defineComponent({
         channels.push(frame.frame);
         colors.push(frame.color.substring(1));
       });
-      /* eslint-enable */
       return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
     }
 
