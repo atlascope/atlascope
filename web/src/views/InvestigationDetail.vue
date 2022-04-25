@@ -12,7 +12,7 @@
         <v-select
           v-if="!loaded || tilesourceDatasets.length > 0"
           v-model="selectedDataset"
-          class="atlascope-dataset-select"
+          class="pr-6"
           :items="tilesourceDatasets"
           item-text="name"
           item-value="id"
