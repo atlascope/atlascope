@@ -214,7 +214,6 @@ export default defineComponent({
     const frames = computed(() => store.state.rootDatasetFrames);
 
     function rootDatasetChanged(newRootDataset: Dataset) {
-      console.log(`in rootDatasetChanged" ${newRootDataset.id}`);
       selectedDataset.value = newRootDataset;
       store.dispatch.updateSelectedPins([]);
       store.dispatch.setRootDataset(newRootDataset);
@@ -329,7 +328,6 @@ export default defineComponent({
       };
       createMap(mapParams);
       rootDatasetLayerId = createLayer('osm', rootLayerParams);
-      console.log(`Root layer ID: ${rootDatasetLayerId}`);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
       const stack: Array<StackFrame> = [];
@@ -431,12 +429,10 @@ export default defineComponent({
     });
 
     watch(frames, () => {
-      console.log('frames changed');
       if (rootDataset.value && rootDatasetLayerId) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
         const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-        console.log(`updating url to: ${newUrl}`);
         updateLayerUrl(rootDatasetLayerId, newUrl);
         drawLayer(rootDatasetLayerId);
         // rootDatasetLayer.url(newUrl);
@@ -473,7 +469,7 @@ export default defineComponent({
         selectionLayer = createLayer('annotation', {
           annotations: ['rectangle'],
           showLabels: false,
-        });
+        }, undefined, true);
         selectionLayer.geoOn(geoEvents.annotation.add, handleSelectionChange);
         selectionLayer.geoOn(geoEvents.annotation.update, handleSelectionChange);
         selectionLayer.geoOn(geoEvents.annotation.remove, handleSelectionChange);
@@ -501,7 +497,7 @@ export default defineComponent({
 
     watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
-        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] }, undefined, true);
       }
       const newPinIds = newPins.map((pin) => pin.id);
       oldPins.forEach((pin) => {
