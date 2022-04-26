@@ -40,5 +40,15 @@
         "note": "A pin with maximum zoom level",
         "color": "red",
         "maximum_zoom": 3
+    },
+    {
+        "investigation":"Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5008,
+        "child_location": [4000, 1250],
+        "note": "I appear at zoom level 2 and disappear at zoom level 5!",
+        "color": "red",
+        "maximum_zoom": 5,
+        "minimum_zoom": 2
     }
 ]
