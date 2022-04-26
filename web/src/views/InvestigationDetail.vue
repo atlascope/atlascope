@@ -261,7 +261,9 @@ export default defineComponent({
           if (note.notePositionX > left + width
               || note.notePositionY > top + height
               || note.notePositionX < left
-              || note.notePositionY < top) {
+              || note.notePositionY < top
+              || zoomLevel.value < (pin.minimum_zoom || 0)
+              || zoomLevel.value > (pin.maximum_zoom || 40)) {
             note.inBounds = false;
           } else {
             note.inBounds = true;
@@ -270,7 +272,22 @@ export default defineComponent({
       });
     }
 
-    watch([zoomLevel, xCoord, yCoord], () => {
+    function showHidePinsForZoomLevel(level: number) {
+      if (pinFeature) {
+        pinFeature.style('fillOpacity', (pin: Pin) => (
+          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+        pinFeature.style('strokeOpacity', (pin: Pin) => (
+          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+        pinFeature.draw();
+      }
+    }
+
+    watch([xCoord, yCoord], () => {
+      movePinNoteCards();
+    });
+
+    watch(zoomLevel, () => {
+      showHidePinsForZoomLevel(zoomLevel.value);
       movePinNoteCards();
     });
 
@@ -516,6 +533,7 @@ export default defineComponent({
       } else {
         pinFeature.data(selectedPins.value).draw();
       }
+      showHidePinsForZoomLevel(zoomLevel.value);
       /* eslint-enable */
     });
 
