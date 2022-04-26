@@ -488,7 +488,7 @@ export default defineComponent({
       pinNotes.value = store.state.currentPins.map((pin) => ({
         ...pin,
         showNote: false,
-        inBounds: true,
+        inBounds: pin.minimum_zoom === 0,
         notePositionX: 0,
         notePositionY: 0,
       }));
@@ -523,7 +523,7 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-            if (noteToToggle) {
+            if (noteToToggle && noteToToggle.inBounds) {
               noteToToggle.showNote = !noteToToggle.showNote;
               noteToToggle.notePositionX = event.mouse.page.x;
               noteToToggle.notePositionY = event.mouse.page.y;
