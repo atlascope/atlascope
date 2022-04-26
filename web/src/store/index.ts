@@ -32,7 +32,7 @@ export interface State {
 }
 
 interface TileMetadataForDataset {
-    datasetId: string;
+    datasetId: number;
     tileMetadata: TileMetadata;
 }
 
@@ -120,7 +120,7 @@ const {
 
         if (state.currentInvestigation) {
           const datasetPromises: Promise<AxiosResponse>[] = [];
-          state.currentInvestigation.datasets.forEach((datasetId: string) => {
+          state.currentInvestigation.datasets.forEach((datasetId: number) => {
             const promise = state.axiosInstance?.get(`/datasets/${datasetId}`);
             if (promise) {
               datasetPromises.push(promise);
@@ -136,7 +136,7 @@ const {
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<{ datasetId: string; result: AxiosResponse }>[] = [];
+          const metadataPromises: Promise<{ datasetId: number; result: AxiosResponse }>[] = [];
           tileSourceDatasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/${dataset.id}/tiles/metadata`).then(
