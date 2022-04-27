@@ -148,5 +148,49 @@
                 }
             }
         }
+    },
+    "tours": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "waypoints"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "minimum": 5000,
+                    "exclusiveMaximum": 6000
+                },
+                "name": {
+                    "type": "string"
+                },
+                "waypoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "location",
+                            "zoom"
+                        ],
+                        "properties": {
+                            "location": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "zoom": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
