@@ -8,7 +8,16 @@ import djclick as click
 from jsonschema import validate
 from rest_framework.serializers import ValidationError
 
-from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin, Waypoint, Tour, TourWaypoints
+from atlascope.core.models import (
+    Dataset,
+    DatasetEmbedding,
+    Investigation,
+    Job,
+    Pin,
+    Tour,
+    TourWaypoints,
+    Waypoint,
+)
 
 POPULATE_DIR = Path('atlascope/core/management/populate/')
 
