@@ -177,6 +177,10 @@ export default defineComponent({
           await store.dispatch.fetchInvestigationPins();
           clearInterval(resultPoll.value);
         }
+        if (response.failure) {
+          clearInterval(resultPoll.value);
+          alert(`The requested ${response.job_type.replace('_', ' ')} job has failed: ${response.failure}`);
+        }
       }
     }
 
