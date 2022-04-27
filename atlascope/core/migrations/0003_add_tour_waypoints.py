@@ -15,15 +15,32 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tour',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('name', models.CharField(default='My Tour', max_length=255)),
-                ('investigation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tour', to='core.investigation')),
+                (
+                    'investigation',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='tour',
+                        to='core.investigation',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='Waypoint',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('location', django.contrib.gis.db.models.fields.PointField(null=True, srid=4326)),
                 ('zoom', models.IntegerField(null=True)),
             ],
@@ -31,10 +48,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TourWaypoints',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('sequence', models.IntegerField(null=True)),
-                ('tour', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.tour')),
-                ('waypoint', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.waypoint')),
+                (
+                    'tour',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='core.tour'
+                    ),
+                ),
+                (
+                    'waypoint',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='core.waypoint'
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
