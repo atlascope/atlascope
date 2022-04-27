@@ -8,11 +8,11 @@ import djclick as click
 from jsonschema import validate
 from rest_framework.serializers import ValidationError
 
-from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin
+from atlascope.core.models import Dataset, DatasetEmbedding, Investigation, Job, Pin, Waypoint, Tour, TourWaypoints
 
 POPULATE_DIR = Path('atlascope/core/management/populate/')
 
-spec_types = ["datasets", "investigations", "embeddings", "jobs", "pins"]
+spec_types = ["datasets", "investigations", "embeddings", "jobs", "pins", "tours"]
 
 
 def validate_all(spec):
@@ -45,7 +45,7 @@ def delete_all():
     print("done")
 
     # Delete the other objects. Go in reverse order of model creation.
-    for model in [Investigation, DatasetEmbedding, Job, Pin]:
+    for model in [Investigation, DatasetEmbedding, Job, Pin, Waypoint, Tour]:
         print(f"  {model.__name__} objects...", end="", flush=True)
         model.objects.all().delete()
         print("done")
@@ -158,6 +158,25 @@ def populate_pins(specs):
         pin.save()
 
 
+@announce("Populating tours")
+def populate_tours(specs):
+    for spec in specs:
+        # add name
+        waypoints = spec["waypoints"]
+        del spec["waypoints"]
+
+        tour = Tour(**spec)
+        tour.save()
+
+        for s, w in enumerate(waypoints):
+            w["location"] = Point(w["location"])
+            waypoint = Waypoint(**w)
+            waypoint.save()
+
+            tw = TourWaypoints(sequence=s, tour=tour, waypoint=waypoint)
+            tw.save()
+
+
 def get_json(jsonfile):
     return json.load(open(jsonfile))
 
@@ -177,3 +196,4 @@ def command():
     populate_embeddings(spec['embeddings'])
     populate_jobs(spec['jobs'])
     populate_pins(spec['pins'])
+    populate_tours(spec['tours'])
