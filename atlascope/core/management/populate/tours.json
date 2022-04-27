@@ -1,6 +1,7 @@
 [{
-    "id": 5000,
-    "name": "test",
+    "investigation": "Pin playground",
+    "id": 6000,
+    "name": "Tour Demo",
     "waypoints": [
         {
             "location": [0.0, 0.0],

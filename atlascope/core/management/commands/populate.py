@@ -170,13 +170,16 @@ def populate_pins(specs):
 @announce("Populating tours")
 def populate_tours(specs):
     for spec in specs:
-        # add name
+        spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
         waypoints = spec["waypoints"]
         del spec["waypoints"]
 
+        # Build and save the Tour object.
+        print(f"""  Tour '{spec["name"]}' """)
         tour = Tour(**spec)
         tour.save()
 
+        # Build and save the Waypoint objects
         for s, w in enumerate(waypoints):
             w["location"] = Point(w["location"])
             waypoint = Waypoint(**w)
