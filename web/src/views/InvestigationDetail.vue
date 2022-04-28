@@ -151,11 +151,10 @@ interface StackFrame {
   treeDepth: number;
 }
 
-interface PinNote extends Pin {
-  showNote: boolean;
-  inBounds: boolean;
-  notePositionX: number;
-  notePositionY: number;
+interface GeoJSLayer {
+  getType: () => string;
+  drawLayer: () => void;
+  updateLayerUrl: (arg0: string) => void;
 }
 
 export default defineComponent({
@@ -208,7 +207,7 @@ export default defineComponent({
     let pinFeature: any;
     /* eslint-enable */
     // const rootDatasetLayer: Ref<any> = ref(null);
-    let rootDatasetLayerId: number;
+    let rootDatasetLayer: GeoJSLayer;
     /* eslint-enable */
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames = computed(() => store.state.rootDatasetFrames);
@@ -327,7 +326,7 @@ export default defineComponent({
         crossDomain: 'use-credentials',
       };
       createMap(mapParams);
-      rootDatasetLayerId = createLayer('osm', rootLayerParams);
+      rootDatasetLayer = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
       const stack: Array<StackFrame> = [];
@@ -429,14 +428,12 @@ export default defineComponent({
     });
 
     watch(frames, () => {
-      if (rootDataset.value && rootDatasetLayerId) {
+      if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
         const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-        updateLayerUrl(rootDatasetLayerId, newUrl);
-        drawLayer(rootDatasetLayerId);
-        // rootDatasetLayer.url(newUrl);
-        // rootDatasetLayer.draw();
+        rootDatasetLayer.updateLayerUrl(newUrl);
+        rootDatasetLayer.drawLayer();
       }
     }, { deep: true });
 
