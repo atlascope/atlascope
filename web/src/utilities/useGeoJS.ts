@@ -2,6 +2,7 @@ import {
   ref, onMounted, Ref,
 } from '@vue/composition-api';
 import geo from 'geojs';
+import useGeoJSLayer from './useGeoJSLayer';
 
 export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const map: Ref<any> = ref(null);
@@ -89,7 +90,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     if (returnObj) {
       return layer;
     }
-    return layer.id();
+    return useGeoJSLayer(layer, layerType);
   };
 
   const drawLayer = (layerId: number) => {
