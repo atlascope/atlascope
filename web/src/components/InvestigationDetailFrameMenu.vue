@@ -1,70 +1,108 @@
 <template>
-  <v-menu
-    v-model="showFrames"
-    :close-on-content-click="false"
-    offset-y
-    max-height="500px"
-  >
-    <template
-      v-slot:activator="{ on: onMenu, attrs: attrsMenu }"
-    >
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on: onTooltip, attrs: attrsTooltip }">
-          <v-btn
-            icon
-            v-bind="{ ...attrsMenu, ...attrsTooltip }"
-            v-on="{ ...onMenu, ...onTooltip }"
-          >
-            <v-icon>mdi-palette</v-icon>
-          </v-btn>
-        </template>
-        <span>Edit the image style</span>
-      </v-tooltip>
-    </template>
-    <v-card>
-      <v-card-actions>
+  <div>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on: onTooltip, attrs: attrsTooltip }">
         <v-btn
-          color="primary"
-          text
-          :disabled="!validColors"
-          @click="updateFrameInfo"
+          icon
+          v-bind="attrsTooltip"
+          v-on="onTooltip"
+          @click="showFrames = !showFrames"
         >
-          Update
+          <v-icon>mdi-palette</v-icon>
         </v-btn>
-      </v-card-actions>
-      <v-card-text class="ma-0 pa-0">
-        <v-list>
-          <v-list-item
-            v-for="frame in frameInfo"
-            :key="frame.frame"
-            :value="frame"
+      </template>
+      <span>Edit the image style</span>
+    </v-tooltip>
+    <v-dialog
+      v-model="showFrames"
+      max-width="400px"
+      persistent
+    >
+      <v-card>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            text
+            @click="updateFrameInfo"
           >
-            <v-list-item-action>
-              <v-switch
-                v-model="frame.displayed"
-              />
-            </v-list-item-action>
-            <v-list-item>
-              <div class="frame-row ma-0 pa-0">
-                <v-text-field
-                  v-model="frame.color"
-                  :hint="frame.name"
-                  :rules="[isColorStringRule]"
-                  persistent-hint
-                  maxlength="6"
+            Update
+          </v-btn>
+          <v-spacer />
+          <v-btn
+            color="error"
+            text
+            @click="cancelChanges"
+          >
+            Cancel
+          </v-btn>
+        </v-card-actions>
+        <v-card-text class="ma-0 pa-0">
+          <v-list>
+            <v-list-item
+              v-for="frame in frameInfo"
+              :key="frame.frame"
+              :value="frame"
+            >
+              <v-list-item-action>
+                <v-switch
+                  v-model="frame.displayed"
                 />
-              </div>
+              </v-list-item-action>
+              <v-list-item>
+                <div class="frame-row ma-0 pa-0">
+                  <v-text-field
+                    v-model="frame.color"
+                    :hint="frame.name"
+                    persistent-hint
+                    maxlength="6"
+                    readonly
+                  >
+                    <template v-slot:prepend>
+                      <v-menu
+                        v-model="frame.menu"
+                        :close-on-content-click="false"
+                      >
+                        <template v-slot:activator="{ on: onSwatch }">
+                          <div
+                            :style="{ 'backgroundColor': frame.color }"
+                            class="swatch"
+                            v-on="onSwatch"
+                          />
+                        </template>
+                        <v-card>
+                          <v-card-text class="pa-0">
+                            <v-color-picker
+                              v-model="frame.color"
+                              mode="hexa"
+                              hide-mode-switch
+                            />
+                          </v-card-text>
+                        </v-card>
+                      </v-menu>
+                    </template>
+                  </v-text-field>
+                </div>
+              </v-list-item>
             </v-list-item>
-          </v-list-item>
-        </v-list>
-      </v-card-text>
-    </v-card>
-  </v-menu>
+          </v-list>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style scoped>
   .frame-row {
     display: inline;
+  }
+
+  .swatch {
+    border: 1px solid black;
+    border-radius: 4px;
+    margin-bottom: 1px;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
   }
 </style>
 
@@ -73,7 +111,6 @@ import {
   ref, defineComponent, onMounted, computed, watch, Ref,
 } from '@vue/composition-api';
 import store, { TiffFrame } from '../store';
-import { isColorStringRule } from '../utilities/utiltyFunctions';
 
 export default defineComponent({
   name: 'InvestigationDetailFrameMenu',
@@ -82,13 +119,15 @@ export default defineComponent({
     const frameInfo: Ref<TiffFrame[]> = ref([]);
     const showFrames: Ref<boolean> = ref(false);
     const rootDataset = computed(() => store.state.rootDataset);
-    const validColors = computed(
-      () => frameInfo.value.every((frame: TiffFrame) => isColorStringRule(frame.color) === true),
-    );
 
     function updateFrameInfo() {
       showFrames.value = false;
       store.dispatch.updateFrames(JSON.parse(JSON.stringify(frameInfo.value)));
+    }
+
+    function cancelChanges() {
+      showFrames.value = false;
+      frameInfo.value = JSON.parse(JSON.stringify(store.state.rootDatasetFrames));
     }
 
     function resetFrameInfo() {
@@ -104,7 +143,8 @@ export default defineComponent({
           name: frame.Name || 'no name',
           frame: frame.Frame,
           displayed: true,
-          color: 'ffffff',
+          color: '#FFFFFF',
+          menu: false,
         }));
       }
       store.dispatch.updateFrames(JSON.parse(JSON.stringify(frameInfo.value)));
@@ -121,10 +161,9 @@ export default defineComponent({
 
     return {
       updateFrameInfo,
+      cancelChanges,
       frameInfo,
       showFrames,
-      isColorStringRule,
-      validColors,
     };
   },
 });
