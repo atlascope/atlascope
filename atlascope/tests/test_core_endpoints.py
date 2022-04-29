@@ -1,5 +1,3 @@
-from inspect import Parameter, signature
-
 import pytest
 
 from atlascope.core import models
@@ -137,34 +135,11 @@ def test_rerun_job(api_client, job):
 
 @pytest.mark.django_db
 def test_list_job_types(api_client):
-    omit_parameters = [
-        'original_dataset_id',
-        'job_id',
-    ]
-    type_mapping = {
-        int: 'integer',
-        float: 'number',
-    }
     expected_results = [
         {
             'name': key,
             'description': module.__doc__,
-            'schema': {
-                "type": "object",
-                "required": [
-                    name
-                    for name, param in signature(module).parameters.items()
-                    if param.default == Parameter.empty and name not in omit_parameters
-                ],
-                "properties": {
-                    name: {
-                        "type": type_mapping.get(param.annotation, "string"),
-                        "title": name.replace('_', ' ').title(),
-                    }
-                    for name, param in signature(module).parameters.items()
-                    if name not in omit_parameters
-                },
-            },
+            'schema': getattr(module, 'schema'),
         }
         for key, module in available_job_types.items()
     ]
