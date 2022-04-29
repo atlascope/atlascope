@@ -123,6 +123,7 @@ import {
   watch,
   Ref,
 } from '@vue/composition-api';
+import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
 import { postGisToPoint } from '../utilities/utiltyFunctions';
 import store, { TiffFrame } from '../store';
@@ -149,12 +150,6 @@ interface StackFrame {
     };
   };
   treeDepth: number;
-}
-
-interface GeoJSLayer {
-  getType: () => string;
-  drawLayer: () => void;
-  updateLayerUrl: (arg0: string) => void;
 }
 
 export default defineComponent({
@@ -186,8 +181,6 @@ export default defineComponent({
       zoomLevel,
       xCoord,
       yCoord,
-      drawLayer,
-      updateLayerUrl,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -203,8 +196,8 @@ export default defineComponent({
     const selectionMode = computed(() => store.state.selectionMode);
     /* eslint-disable */
     let selectionLayer: any;
-    let featureLayer: any;
-    let pinFeature: any;
+    let featureLayer: GeoJSLayer | undefined;
+    let pinFeature: GeoJSFeature | undefined;
     /* eslint-enable */
     // const rootDatasetLayer: Ref<any> = ref(null);
     let rootDatasetLayer: GeoJSLayer;
@@ -241,16 +234,17 @@ export default defineComponent({
     function tearDownMap() {
       exit();
       selectionLayer = null;
-      featureLayer = null;
-      pinFeature = null;
+      featureLayer = undefined;
+      pinFeature = undefined;
     }
 
     function movePinNoteCards() {
       if (!featureLayer || !pinFeature || !map.value) { return; }
-      pinFeature.data().forEach((pin: Pin) => {
-        const { x, y } = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-        const newScreenCoords = pinFeature.featureGcsToDisplay({ x, y });
-        const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+      pinFeature.getData().forEach((pin: object) => {
+        if (!pinFeature) return;
+        const { x, y } = postGisToPoint((pin as Pin).child_location) || { x: 0, y: 0 };
+        const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
+        const note = pinNotes.value.find((pinNote) => pinNote.id === (pin as Pin).id);
         const {
           left, top, width, height,
         } = map.value?.getBoundingClientRect() || {
@@ -494,7 +488,10 @@ export default defineComponent({
 
     watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
-        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] }, undefined, true);
+        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+      }
+      if (!featureLayer) {
+        return;
       }
       const newPinIds = newPins.map((pin) => pin.id);
       oldPins.forEach((pin) => {
@@ -506,33 +503,29 @@ export default defineComponent({
         }
       });
       if (!pinFeature) {
-        /* eslint-disable */
-        pinFeature = featureLayer.createFeature('point')
-          .data(selectedPins.value)
-          .position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }))
-          .style({
-            radius: 10,
-            strokeColor: 'white',
-            fillColor: (pin: Pin) => pin.color,
-          })
-          .draw();
-        pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
+        pinFeature = featureLayer.createFeature('point');
+        pinFeature.data(selectedPins.value);
+        pinFeature.position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }));
+        pinFeature.style({
+          radius: 10,
+          strokeColor: 'white',
+          fillColor: (pin: Pin) => pin.color,
+        });
+        pinFeature.draw();
+        pinFeature.registerClickEvent((event: MouseClickEvent) => {
           if (!map.value) { return; }
 
           if (event.mouse.buttonsDown.left) {
-            const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-            if (noteToToggle && noteToToggle.inBounds) {
-              noteToToggle.showNote = !noteToToggle.showNote;
-              noteToToggle.notePositionX = event.mouse.page.x;
-              noteToToggle.notePositionY = event.mouse.page.y;
-            }
+            const noteToToggle = pinNotes.value.find((note) => note.id === (event.data as Pin).id);
+            noteToToggle.showNote = !noteToToggle.showNote;
+            noteToToggle.notePositionX = event.mouse.page.x;
+            noteToToggle.notePositionY = event.mouse.page.y;
           }
         });
       } else {
-        pinFeature.data(selectedPins.value).draw();
+        pinFeature.data(selectedPins.value);
+        pinFeature.draw();
       }
-      showHidePinsForZoomLevel(zoomLevel.value);
-      /* eslint-enable */
     });
 
     onMounted(async () => {

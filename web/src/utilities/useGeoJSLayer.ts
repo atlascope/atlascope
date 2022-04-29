@@ -1,4 +1,5 @@
 import { ref } from '@vue/composition-api';
+import useGeoJSFeature from './useGeoJSFeature';
 
 export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
   const layer = ref(geoJSLayer);
@@ -13,10 +14,18 @@ export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
     }
     layer.value.url(newUrl);
   };
+  const createFeature = (featureType: string): any => {
+    if (!['feature', 'annotation'].includes(type.value)) {
+      return undefined;
+    }
+    const newFeature = layer.value.createFeature('point');
+    return useGeoJSFeature(newFeature, featureType);
+  };
   return {
     layer,
     getType,
     drawLayer,
     updateLayerUrl,
+    createFeature,
   };
 }
