@@ -1,5 +1,3 @@
-from inspect import Parameter, signature
-
 from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, status
@@ -51,34 +49,11 @@ class JobViewSet(
     )
     @action(detail=False, methods=['GET'])
     def types(self, request, **kwargs):
-        omit_parameters = [
-            'original_dataset_id',
-            'job_id',
-        ]
-        type_mapping = {
-            int: 'integer',
-            float: 'number',
-        }
         payload = [
             {
                 'name': key,
                 'description': module.__doc__,
-                'schema': {
-                    "type": "object",
-                    "required": [
-                        name
-                        for name, param in signature(module).parameters.items()
-                        if param.default == Parameter.empty and name not in omit_parameters
-                    ],
-                    "properties": {
-                        name: {
-                            "type": type_mapping.get(param.annotation, "string"),
-                            "title": name.replace('_', ' ').title(),
-                        }
-                        for name, param in signature(module).parameters.items()
-                        if name not in omit_parameters
-                    },
-                },
+                'schema': getattr(module, 'schema'),
             }
             for key, module in available_job_types.items()
         ]
