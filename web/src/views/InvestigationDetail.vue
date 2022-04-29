@@ -282,11 +282,7 @@ export default defineComponent({
       }
     }
 
-    watch([xCoord, yCoord], () => {
-      movePinNoteCards();
-    });
-
-    watch(zoomLevel, () => {
+    watch([xCoord, yCoord, zoomLevel], () => {
       showHidePinsForZoomLevel(zoomLevel.value);
       movePinNoteCards();
     });
