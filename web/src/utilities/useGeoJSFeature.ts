@@ -42,9 +42,9 @@ export default function useGeoJSFeature(geoJSFeature: any, featureType: string) 
     }
     return { x: 0, y: 0, z: 0 };
   };
-  const registerClickEvent = (handler: ((event: MouseClickEvent) => void) | (() => void)) => {
-    if (feature.value) {
-      feature.value.geoOn(geo.event.feature.mouseclick, handler);
+  const addGeoEventHandler = (event: any, handler: Function) => {
+    if (typeof feature.value.geoOn === 'function') {
+      feature.value.geoOn(event, handler);
     }
   };
   return {
@@ -56,6 +56,6 @@ export default function useGeoJSFeature(geoJSFeature: any, featureType: string) 
     style,
     draw,
     featureGcsToDisplay,
-    registerClickEvent,
+    addGeoEventHandler,
   };
 }

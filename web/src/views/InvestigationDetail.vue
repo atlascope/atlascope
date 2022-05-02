@@ -515,7 +515,7 @@ export default defineComponent({
           fillColor: (pin: Pin) => pin.color,
         });
         pinFeature.draw();
-        pinFeature.registerClickEvent((event: MouseClickEvent) => {
+        pinFeature.addGeoEventHandler(geoEvents.feature.mouseclick, (event: MouseClickEvent) => {
           if (!map.value) { return; }
 
           if (event.mouse.buttonsDown.left) {
