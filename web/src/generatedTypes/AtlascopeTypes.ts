@@ -10,11 +10,8 @@
  */
 
 export interface Dataset {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
+  /** ID */
+  id?: number;
 
   /** Name */
   name: string;
@@ -34,18 +31,15 @@ export interface Dataset {
   /** Dataset type */
   dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage";
 
-  /**
-   * Source dataset
-   * @format uuid
-   */
-  source_dataset?: string | null;
-  derived_datasets: string[];
-  child_embeddings: string[];
-  parent_embeddings: string[];
-  jobs: string[];
-  origin: string[];
-  pins: string[];
-  locations: string[];
+  /** Source dataset */
+  source_dataset?: number | null;
+  derived_datasets: number[];
+  child_embeddings: number[];
+  parent_embeddings: number[];
+  jobs: number[];
+  origin: number[];
+  pins: number[];
+  locations: number[];
 }
 
 export interface DatasetCreate {
@@ -122,19 +116,16 @@ export interface TileMetadata {
 }
 
 export interface Investigation {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
+  /** ID */
+  id?: number;
 
   /** Name */
   name: string;
 
   /** Description */
   description?: string;
-  datasets: string[];
-  pins: string[];
+  datasets: number[];
+  pins: number[];
 
   /** Notes */
   notes?: string;
@@ -150,43 +141,28 @@ export interface Investigation {
    * @format date-time
    */
   modified?: string;
-  embeddings: string[];
-  jobs: string[];
+  embeddings: number[];
+  jobs: number[];
 }
 
 export interface DatasetEmbedding {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
+  /** ID */
+  id?: number;
   child_bounding_box?: number[];
 
-  /**
-   * Investigation
-   * @format uuid
-   */
-  investigation: string;
+  /** Investigation */
+  investigation: number;
 
-  /**
-   * Parent
-   * @format uuid
-   */
-  parent: string;
+  /** Parent */
+  parent: number;
 
-  /**
-   * Child
-   * @format uuid
-   */
-  child: string;
+  /** Child */
+  child: number;
 }
 
 export interface JobDetail {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
+  /** ID */
+  id?: number;
 
   /** Complete */
   complete?: boolean;
@@ -197,26 +173,17 @@ export interface JobDetail {
   /** Additional inputs */
   additional_inputs?: object | null;
 
-  /**
-   * Investigation
-   * @format uuid
-   */
-  investigation: string;
+  /** Investigation */
+  investigation: number;
 
-  /**
-   * Original dataset
-   * @format uuid
-   */
-  original_dataset: string;
-  resulting_datasets: string[];
+  /** Original dataset */
+  original_dataset: number;
+  resulting_datasets: number[];
 }
 
 export interface Pin {
-  /**
-   * Id
-   * @format uuid
-   */
-  id?: string;
+  /** ID */
+  id?: number;
 
   /** Child location */
   child_location: string;
@@ -228,39 +195,38 @@ export interface Pin {
   note?: string;
 
   /**
-   * Investigation
-   * @format uuid
+   * Minimum zoom
+   * @min 0
+   * @max 2147483647
    */
-  investigation: string;
+  minimum_zoom?: number;
 
   /**
-   * Parent
-   * @format uuid
+   * Maximum zoom
+   * @min 0
+   * @max 2147483647
    */
-  parent: string;
+  maximum_zoom?: number;
 
-  /**
-   * Child
-   * @format uuid
-   */
-  child?: string | null;
+  /** Investigation */
+  investigation: number;
+
+  /** Parent */
+  parent: number;
+
+  /** Child */
+  child?: number | null;
 }
 
 export interface JobSpawn {
-  /**
-   * Investigation
-   * @format uuid
-   */
-  investigation: string;
+  /** Investigation */
+  investigation: number;
 
   /** Job type */
   job_type?: string;
 
-  /**
-   * Original dataset
-   * @format uuid
-   */
-  original_dataset: string;
+  /** Original dataset */
+  original_dataset: number;
 
   /** Additional inputs */
   additional_inputs?: object | null;
@@ -335,7 +301,7 @@ export namespace Datasets {
    * @response `200` `Dataset`
    */
   export namespace DatasetsRead {
-    export type RequestParams = { id: string };
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -349,7 +315,7 @@ export namespace Datasets {
    * @response `201` `DatasetSubImage`
    */
   export namespace DatasetsSubimage {
-    export type RequestParams = { id: string };
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = DatasetSubImage;
     export type RequestHeaders = {};
@@ -363,7 +329,7 @@ export namespace Datasets {
    * @response `200` `TileMetadata`
    */
   export namespace DatasetsTilesMetadataRead {
-    export type RequestParams = { id: string };
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -414,7 +380,7 @@ export namespace Investigations {
    * @response `200` `Investigation`
    */
   export namespace InvestigationsRead {
-    export type RequestParams = { id: string };
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -423,12 +389,12 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsEmbeddingsRead
+   * @name InvestigationsEmbeddings
    * @request GET:/investigations/{id}/embeddings
    * @response `200` `(DatasetEmbedding)[]`
    */
-  export namespace InvestigationsEmbeddingsRead {
-    export type RequestParams = { id: string };
+  export namespace InvestigationsEmbeddings {
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -442,7 +408,7 @@ export namespace Investigations {
    * @response `200` `(JobDetail)[]`
    */
   export namespace InvestigationsJobs {
-    export type RequestParams = { id: string };
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -451,12 +417,12 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsPinsRead
+   * @name InvestigationsPins
    * @request GET:/investigations/{id}/pins
    * @response `200` `(Pin)[]`
    */
-  export namespace InvestigationsPinsRead {
-    export type RequestParams = { id: string };
+  export namespace InvestigationsPins {
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -515,7 +481,7 @@ export namespace Jobs {
    * @response `200` `JobDetail`
    */
   export namespace JobsRead {
-    export type RequestParams = { id: string };
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -529,52 +495,7 @@ export namespace Jobs {
    * @response `204` `void` Rerun spawned.
    */
   export namespace JobsRerun {
-    export type RequestParams = { id: string };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-}
-
-export namespace S3Upload {
-  /**
-   * No description
-   * @tags s3-upload
-   * @name S3UploadFinalizeCreate
-   * @request POST:/s3-upload/finalize/
-   * @response `201` `void`
-   */
-  export namespace S3UploadFinalizeCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags s3-upload
-   * @name S3UploadUploadCompleteCreate
-   * @request POST:/s3-upload/upload-complete/
-   * @response `201` `void`
-   */
-  export namespace S3UploadUploadCompleteCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags s3-upload
-   * @name S3UploadUploadInitializeCreate
-   * @request POST:/s3-upload/upload-initialize/
-   * @response `201` `void`
-   */
-  export namespace S3UploadUploadInitializeCreate {
-    export type RequestParams = {};
+    export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
