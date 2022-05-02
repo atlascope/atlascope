@@ -195,7 +195,7 @@ export default defineComponent({
     const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
     const selectionMode = computed(() => store.state.selectionMode);
     /* eslint-disable */
-    let selectionLayer: any;
+    let selectionLayer: GeoJSLayer | undefined;
     let featureLayer: GeoJSLayer | undefined;
     let pinFeature: GeoJSFeature | undefined;
     /* eslint-enable */
@@ -233,7 +233,7 @@ export default defineComponent({
 
     function tearDownMap() {
       exit();
-      selectionLayer = null;
+      selectionLayer = undefined;
       featureLayer = undefined;
       pinFeature = undefined;
     }
@@ -432,9 +432,11 @@ export default defineComponent({
     }, { deep: true });
 
     function handleSelectionChange() {
+      if (selectionLayer === undefined) return;
       const annotations = selectionLayer.annotations();
       /* eslint-disable-next-line */
       annotations.forEach((annotation: any) => {
+        if (selectionLayer === undefined) return;
         annotation.style({
           fillColor: '#00796b',
           strokeColor: '#00796b',
@@ -460,11 +462,12 @@ export default defineComponent({
         selectionLayer = createLayer('annotation', {
           annotations: ['rectangle'],
           showLabels: false,
-        }, undefined, true);
-        selectionLayer.geoOn(geoEvents.annotation.add, handleSelectionChange);
-        selectionLayer.geoOn(geoEvents.annotation.update, handleSelectionChange);
-        selectionLayer.geoOn(geoEvents.annotation.remove, handleSelectionChange);
-        selectionLayer.geoOn(geoEvents.annotation.state, handleSelectionChange);
+        });
+        if (!selectionLayer) return;
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.add, handleSelectionChange);
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.update, handleSelectionChange);
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.remove, handleSelectionChange);
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.state, handleSelectionChange);
       }
       if (!selectionMode.value) {
         selectionLayer.mode(null);

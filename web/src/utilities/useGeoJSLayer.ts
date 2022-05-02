@@ -14,6 +14,34 @@ export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
     }
     layer.value.url(newUrl);
   };
+  const annotations = () => {
+    if (typeof layer.value.annotations === 'function') {
+      return layer.value.annotations();
+    }
+    return undefined;
+  };
+  const removeAnnotation = (annotation: any) => {
+    if (typeof layer.value.removeAnnotations === 'function') {
+      layer.value.removeAnnotation(annotation);
+    }
+  };
+  const removeAllAnnotations = () => {
+    if (typeof layer.value.removeAllAnnotations === 'function') {
+      layer.value.removeAllAnnotations();
+    }
+  };
+  const addGeoEventHandler = (event: any, handler: Function) => {
+    if (typeof layer.value.geoOn === 'function') {
+      layer.value.geoOn(event, handler);
+    }
+  };
+  const mode = (newMode: string | null): string | null => {
+    if (typeof layer.value.mode === 'function') {
+      layer.value.mode(newMode);
+      return layer.value.mode();
+    }
+    return null;
+  };
   const createFeature = (featureType: string): any => {
     if (!['feature', 'annotation'].includes(type.value)) {
       return undefined;
@@ -27,5 +55,10 @@ export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
     drawLayer,
     updateLayerUrl,
     createFeature,
+    annotations,
+    removeAnnotation,
+    removeAllAnnotations,
+    addGeoEventHandler,
+    mode,
   };
 }
