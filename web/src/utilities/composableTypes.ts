@@ -23,6 +23,11 @@ export interface GeoJSLayer {
   drawLayer: () => void;
   updateLayerUrl: (url: string) => void;
   createFeature: (featureType: string) => GeoJSFeature;
+  annotations: () => any[];
+  removeAnnotation: (annotation: any) => void;
+  removeAllAnnotations: () => void;
+  addGeoEventHandler: (event: any, handler: Function) => void;
+  mode: (newMode: string | null) => string | null;
 }
 
 export interface GeoJSFeature {
