@@ -53,7 +53,7 @@ class JobViewSet(
             {
                 'name': key,
                 'description': module.__doc__,
-                'schema': getattr(module, 'schema'),
+                'schema': module.schema,
             }
             for key, module in available_job_types.items()
         ]
