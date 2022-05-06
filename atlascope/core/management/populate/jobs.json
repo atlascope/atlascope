@@ -13,5 +13,11 @@
         "additional_inputs": {
             "n": 5
         }
+    },
+    {
+        "job_type": "nucleus_detection",
+        "id": 4002,
+        "investigation": "Analytics playground",
+        "original_dataset": "HTA9_1_BA_F_ROI02"
     }
 ]

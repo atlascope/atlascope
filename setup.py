@@ -50,7 +50,11 @@ setup(
         'importlib_metadata>=3.6',
         'jsonschema',
         'large-image[gdal,ometiff]>=1.14',
-        'django-large-image==0.5.2',
+        'django-large-image>=0.5.2',
+        'scikit-learn',
+        'imagecodecs',
+        'matplotlib',
+        'histomicstk --find-links https://girder.github.io/large_image_wheels',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'gunicorn',
