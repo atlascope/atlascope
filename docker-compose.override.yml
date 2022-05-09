@@ -39,7 +39,7 @@ services:
       - rabbitmq
 
   yarn:
-    image: node:latest
+    image: node:18
     working_dir: /web
     volumes:
       - ./web:/web
