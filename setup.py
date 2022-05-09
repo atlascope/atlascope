@@ -64,6 +64,7 @@ setup(
     ],
     extras_require={
         'dev': [
+            'pooch',
             'django-composed-configuration[dev]>=0.18',
             'django-debug-toolbar',
             'ipython',
