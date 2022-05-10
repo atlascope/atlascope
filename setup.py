@@ -54,7 +54,6 @@ setup(
         'scikit-learn',
         'imagecodecs',
         'matplotlib',
-        'histomicstk --find-links https://girder.github.io/large_image_wheels',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'gunicorn',
