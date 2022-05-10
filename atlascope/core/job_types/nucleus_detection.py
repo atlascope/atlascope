@@ -1,16 +1,17 @@
 """Detect likely locations of nuclei in the image."""
 import io
+
+from celery import shared_task
 import histomicstk as htk
 import numpy as np
 import scipy as sp
+import skimage.color
 import skimage.io
 import skimage.measure
-import skimage.color
-from celery import shared_task
 
 from atlascope.core.models import Dataset
-from .utils import save_output_dataset
 
+from .utils import save_output_dataset
 
 schema = {
     "type": "object",
