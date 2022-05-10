@@ -1,22 +1,16 @@
 """Detect likely locations of nuclei in the image."""
 import io
-
-# import histomicstk as htk
-
-# import numpy as np
-# import scipy as sp
-
+import histomicstk as htk
+import numpy as np
+import scipy as sp
 import skimage.io
 import skimage.measure
 import skimage.color
-
-# import matplotlib.pyplot as plt
-# import matplotlib.patches as mpatches
 from celery import shared_task
 
 from atlascope.core.models import Dataset
+from .utils import save_output_dataset
 
-# from .utils import save_output_dataset
 
 schema = {
     "type": "object",
@@ -25,34 +19,71 @@ schema = {
 }
 
 
+def detect_nuclei(input_image):
+    # Invert image
+    input_image = skimage.util.invert(input_image)
+    # segment foreground
+    foreground_threshold = 150
+    im_fgnd_mask = sp.ndimage.binary_fill_holes(input_image < foreground_threshold)
+    # Run adaptive multi-scale LoG filter
+    min_radius = 5
+    max_radius = 15
+
+    im_log_max, im_sigma_max = htk.filters.shape.cdog(
+        input_image,
+        im_fgnd_mask,
+        sigma_min=min_radius * np.sqrt(2),
+        sigma_max=max_radius * np.sqrt(2),
+    )
+
+    # detect and segment nuclei using local maximum clustering
+    local_max_search_radius = 5
+    im_nuclei_seg_mask, seeds, maxima = htk.segmentation.nuclear.max_clustering(
+        im_log_max, im_fgnd_mask, local_max_search_radius
+    )
+
+    # filter out small objects
+    min_nucleus_area = 80
+    im_nuclei_seg_mask = htk.segmentation.label.area_open(
+        im_nuclei_seg_mask, min_nucleus_area
+    ).astype(int)
+
+    # compute nuclei properties
+    return skimage.measure.regionprops(im_nuclei_seg_mask)
+
+
 @shared_task
 def run(job_id: str, original_dataset_id: str):
     from atlascope.core.models import Job
-
-    print()
-    print()
 
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     job = Job.objects.get(id=job_id)
 
     try:
-        print('detecting nuclei...')
         input_image = skimage.io.imread(
             io.BytesIO(original_dataset.content.read()),
         )
-        print(input_image)
+        nuclei = detect_nuclei(input_image)
 
-        # output_image = Image.new(mode="RGBA", size=(200, 200), color=tuple(average_color))
-
-        # job.resulting_datasets.add(
-        #     save_output_dataset(
-        #         original_dataset,
-        #         job.investigation,
-        #         'Average Color',
-        #         output_image,
-        #         {'rgba': average_color},
-        #     )
-        # )
+        job.resulting_datasets.add(
+            save_output_dataset(
+                original_dataset,
+                job.investigation,
+                'Detected Nuclei',
+                None,
+                {
+                    'num_nuclei': len(nuclei),
+                    'nucleus_detections': [
+                        {
+                            'centroid': nucleus.centroid,
+                            'bbox': nucleus.bbox,
+                        }
+                        for nucleus in nuclei
+                    ],
+                },
+                dataset_type='nucleus_detection',
+            )
+        )
         job.complete = True
         job.save()
     except Exception as e:
