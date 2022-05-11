@@ -35,7 +35,7 @@ export interface GeoJSFeature {
   data: (newData: object[]) => void;
   getData: () => object[];
   position: (newPosition: Function) => void;
-  style: (newStyle: object | string, newValue?: string) => void;
+  style: (newStyle: object | string, newValue?: string | Function) => void;
   draw: () => void;
   featureGcsToDisplay: (x: number, y: number) => GeoPosition;
   addGeoEventHandler: (event: any, handler: Function) => void;
