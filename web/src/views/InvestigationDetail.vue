@@ -152,6 +152,13 @@ interface StackFrame {
   treeDepth: number;
 }
 
+interface PinNote extends Pin {
+  showNote: boolean;
+  inBounds: boolean;
+  notePositionX: number;
+  notePositionY: number;
+}
+
 export default defineComponent({
   name: 'InvestigationDetail',
 
@@ -257,8 +264,8 @@ export default defineComponent({
               || note.notePositionY > top + height
               || note.notePositionX < left
               || note.notePositionY < top
-              || zoomLevel.value < (pin.minimum_zoom || 0)
-              || zoomLevel.value > (pin.maximum_zoom || 40)) {
+              || zoomLevel.value < ((pin as Pin).minimum_zoom || 0)
+              || zoomLevel.value > ((pin as Pin).maximum_zoom || 40)) {
             note.inBounds = false;
           } else {
             note.inBounds = true;
@@ -520,15 +527,18 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const noteToToggle = pinNotes.value.find((note) => note.id === (event.data as Pin).id);
-            noteToToggle.showNote = !noteToToggle.showNote;
-            noteToToggle.notePositionX = event.mouse.page.x;
-            noteToToggle.notePositionY = event.mouse.page.y;
+            if (noteToToggle) {
+              noteToToggle.showNote = !noteToToggle.showNote;
+              noteToToggle.notePositionX = event.mouse.page.x;
+              noteToToggle.notePositionY = event.mouse.page.y;
+            }
           }
         });
       } else {
         pinFeature.data(selectedPins.value);
         pinFeature.draw();
       }
+      showHidePinsForZoomLevel(zoomLevel.value);
     });
 
     onMounted(async () => {

@@ -22,7 +22,7 @@ export default function useGeoJSFeature(geoJSFeature: any, featureType: string) 
       feature.value.position(newPosition);
     }
   };
-  const style = (newStyle: object | string, newValue?: string) => {
+  const style = (newStyle: object | string, newValue?: string | Function) => {
     if (typeof feature.value.style === 'function') {
       if (typeof style === 'object') {
         feature.value.style(newStyle);
