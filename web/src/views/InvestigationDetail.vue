@@ -159,6 +159,15 @@ interface PinNote extends Pin {
   notePositionY: number;
 }
 
+interface BandSpec {
+  frame: number;
+  palette: string;
+}
+
+interface TileLayerStyleDict {
+  bands: BandSpec[];
+}
+
 export default defineComponent({
   name: 'InvestigationDetail',
 
@@ -210,7 +219,7 @@ export default defineComponent({
     let rootDatasetLayer: GeoJSLayer;
     /* eslint-enable */
     const pinNotes: Ref<PinNote[]> = ref([]);
-    const frames = computed(() => store.state.rootDatasetFrames);
+    const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
 
     function rootDatasetChanged(newRootDataset: Dataset) {
       selectedDataset.value = newRootDataset;
@@ -224,18 +233,19 @@ export default defineComponent({
       ));
     }
 
+    function getSelectedFrameStyle(): BandSpec[] {
+      return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
+        frame: frame.frame,
+        palette: frame.color,
+      }));
+    }
+
     function buildUrlQueryArgs() {
-      const channels: number[] = [];
-      const colors: string[] = [];
-      const selectedFrames = frames.value.filter((frame: TiffFrame) => frame.displayed);
-      if (selectedFrames.length === 0) {
-        return '';
-      }
-      selectedFrames.forEach((frame) => {
-        channels.push(frame.frame);
-        colors.push(frame.color.substring(1));
-      });
-      return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
+      const style: TileLayerStyleDict = {
+        bands: getSelectedFrameStyle(),
+      };
+      const encodedStyle = encodeURIComponent(JSON.stringify(style));
+      return `?style=${encodedStyle}`;
     }
 
     function tearDownMap() {
@@ -323,7 +333,7 @@ export default defineComponent({
       const rootLayerParams = {
         ...rootPixelParams.layer,
         zIndex: 0,
-        url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
+        url: `${apiRoot}/datasets/tile_source/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
       createMap(mapParams);
@@ -398,7 +408,7 @@ export default defineComponent({
           const layerParams = {
             ...pixelParams.layer,
             zIndex: treeDepth,
-            url: `${apiRoot}/datasets/${datasetID}/tiles/{z}/{x}/{y}.png`,
+            url: `${apiRoot}/datasets/tile_source/${datasetID}/tiles/{z}/{x}/{y}.png`,
             crossDomain: 'use-credentials',
           };
           createLayer(
