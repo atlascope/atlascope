@@ -13,7 +13,7 @@ from atlascope.core.models import Dataset, DatasetSerializer
 
 
 class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
-    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
+    queryset = Dataset.objects.filter(content__isnull=False, dataset_type__in=['tile_source', 'non_tiled_image'])
     serializer_class = DatasetSerializer
 
     default_colors = ['#ffffff']
@@ -21,6 +21,7 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
     def get_path(self, *args, **kwargs) -> str:
         """Retreive path to image file from data record."""
         dataset = self.get_object()
+        print(dataset)
         try:
             return str(dataset.content.path)
         except (AttributeError, ValueError):
@@ -29,6 +30,9 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
 
     def open_tile_source(self, request: Request, path: str, **kwargs) -> FileTileSource:
         """Override to manually choose tile source class."""
+        dataset = self.get_object()
+        if dataset.dataset_type == 'non_tiled_image':
+            return PILFileTileSource(path, **kwargs)
         try:
             tile_source = OMETiffFileTileSource(path, **kwargs)
         except TileSourceError:

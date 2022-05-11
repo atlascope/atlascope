@@ -125,7 +125,7 @@ import {
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
 import { getNonTiledImage, postGisToPoint } from '../utilities/utiltyFunctions';
-import store from '../store';
+import store, { TiffFrame } from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -213,6 +213,7 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
+    let nonTiledOverlayFeature: any;
     const rootDatasetLayer: Ref<any> = ref(null);
     /* eslint-enable */
     const pinNotes: Ref<PinNote[]> = ref([]);
@@ -233,7 +234,7 @@ export default defineComponent({
     function getSelectedFrameStyle(): BandSpec[] {
       return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
         frame: frame.frame,
-        palette: frame.color,
+        palette: `${frame.color}`,
       }));
     }
 
@@ -522,7 +523,7 @@ export default defineComponent({
       } else {
         try {
           const urlRoot = process.env.VUE_APP_API_ROOT;
-          const url = `${urlRoot}/datasets/${dataset.id}/tiles/0/0/0.png`;
+          const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
           const image: HTMLImageElement = await getNonTiledImage(url);
           image.crossOrigin = 'Anonymous';
           const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
@@ -596,9 +597,11 @@ export default defineComponent({
             if (!event.data.child && event.data.note) {
               // note-only pins
               const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-              noteToToggle.showNote = !noteToToggle.showNote;
-              noteToToggle.notePositionX = event.mouse.page.x;
-              noteToToggle.notePositionY = event.mouse.page.y;
+              if (noteToToggle) {
+                noteToToggle.showNote = !noteToToggle.showNote;
+                noteToToggle.notePositionX = event.mouse.page.x;
+                noteToToggle.notePositionY = event.mouse.page.y;
+              }
             } else if (event.data.child) {
               // pins with child dataset
               toggleDatasetPin(event.data);
