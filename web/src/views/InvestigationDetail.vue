@@ -233,7 +233,7 @@ export default defineComponent({
     function getSelectedFrameStyle(): BandSpec[] {
       return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
         frame: frame.frame,
-        palette: `#${frame.color}`,
+        palette: frame.color,
       }));
     }
 
