@@ -1,142 +1,42 @@
-import io
-from itertools import cycle
-
-import PIL
-from django.urls import path
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from django_large_image.rest.viewsets import LargeImageDetailMixin
 from large_image.exceptions import TileSourceError
+from large_image.tilesource import FileTileSource
 from large_image_source_ometiff import OMETiffFileTileSource
 from large_image_source_pil import PILFileTileSource
 from large_image_source_tiff import TiffFileTileSource
-import numpy
-from rest_framework import mixins
-from rest_framework.exceptions import APIException, NotFound
-from rest_framework.generics import GenericAPIView
-from rest_framework.renderers import BaseRenderer
-from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
+from rest_framework.routers import DefaultRouter
+from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import Dataset
-from atlascope.core.rest.additional_serializers import TileMetadataSerializer
+from atlascope.core.models import Dataset, DatasetSerializer
 
 
-class TileMetadataView(GenericAPIView, mixins.RetrieveModelMixin):
+class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
     queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
-    serializer_class = TileMetadataSerializer
-
-    def get(self, *args, **kwargs):
-        dataset = self.get_object()
-        content_location = dataset.content.path
-        try:
-            tile_source = OMETiffFileTileSource(content_location)
-        except TileSourceError:
-            tile_source = TiffFileTileSource(content_location)
-        serializer = self.get_serializer(tile_source)
-        return Response(serializer.data)
-
-
-class LargeImageRenderer(BaseRenderer):
-    media_type = 'image/png'
-    format = 'png'
-
-    def render(self, data, media_type=None, renderer_context=None):
-        return data
-
-
-class TileView(GenericAPIView, mixins.RetrieveModelMixin):
-    queryset = Dataset.objects.filter(
-        content__isnull=False, dataset_type__in=['tile_source', 'non_tiled_image']
-    )
-    model = Dataset
-    renderer_classes = [LargeImageRenderer]
+    serializer_class = DatasetSerializer
 
     default_colors = ['#ffffff']
 
-    @swagger_auto_schema(
-        responses={200: 'Image file', 404: 'Image tile not found'},
-        manual_parameters=[
-            openapi.Parameter(
-                'id',
-                openapi.IN_PATH,
-                description='A string identifying this dataset.',
-                type=openapi.TYPE_STRING,
-            ),
-            openapi.Parameter(
-                'z',
-                openapi.IN_PATH,
-                description=(
-                    (
-                        'The Z level of the tile. May range from [0, levels], where 0 '
-                        'is the lowest resolution, single tile for the whole source.'
-                    )
-                ),
-                type=openapi.TYPE_INTEGER,
-            ),
-            openapi.Parameter(
-                'x',
-                openapi.IN_PATH,
-                description='The 0-based x position of the tile on the specified z level.',
-                type=openapi.TYPE_INTEGER,
-            ),
-            openapi.Parameter(
-                'y',
-                openapi.IN_PATH,
-                description='The 0-based y position of the tile on the specified z level.',
-                type=openapi.TYPE_INTEGER,
-            ),
-        ],
-    )
-    def get(self, *args, x=None, y=None, z=None, **kwargs):
+    def get_path(self, *args, **kwargs) -> str:
+        """Retreive path to image file from data record."""
         dataset = self.get_object()
         try:
-            if dataset.dataset_type == 'non_tiled_image':
-                tile_source = PILFileTileSource(dataset.content.path)
-                tile = tile_source.getTile(x, y, z)
-                return Response(tile)
-            try:
-                tile_source = OMETiffFileTileSource(dataset.content.path)
-            except TileSourceError:
-                tile_source = TiffFileTileSource(dataset.content.path)
-            channels = self.request.query_params.get('channels')
-            if channels:
-                channels = channels.split(',')
-            else:
-                channels = range(len(tile_source.getMetadata()['frames']))
-            colors = self.request.query_params.get('colors')
-            if colors:
-                colors = [f'#{color}' for color in colors.split(',')]
-            else:
-                colors = self.default_colors
-            composite = None
-            for channel, color in list(zip(channels, cycle(colors))):
-                tile = tile_source.getTile(
-                    x,
-                    y,
-                    z,
-                    frame=channel,
-                )
-                tile_data = numpy.array(PIL.Image.open(io.BytesIO(tile)))
-                if not composite:
-                    composite = PIL.Image.new('RGBA', tile_data.shape, '#000000')
-                mask_color = PIL.Image.new('RGBA', tile_data.shape, color)
-                mask = PIL.Image.fromarray(tile_data)
-                composite = PIL.Image.composite(mask_color, composite, mask)
-            buf = io.BytesIO()
-            composite.save(buf, format="PNG")
-            return Response(buf.getvalue())
-        except TileSourceError as e:
-            error_msg = str(e)
-            for missing_msg in (
-                'z layer does not exist',
-                'x is outside layer',
-                'y is outside layer',
-            ):
-                if missing_msg in error_msg:
-                    raise NotFound()
-            raise APIException(error_msg)
+            return str(dataset.content.path)
+        except (AttributeError, ValueError):
+            # Raise 400-level error as this dataset has no content
+            raise ValidationError('Dataset has not content.')
+
+    def open_tile_source(self, request: Request, path: str, **kwargs) -> FileTileSource:
+        """Override to manually choose tile source class."""
+        try:
+            tile_source = OMETiffFileTileSource(path, **kwargs)
+        except TileSourceError:
+            tile_source = TiffFileTileSource(path, **kwargs)
+        return tile_source
 
 
-urlpatterns = [
-    path('datasets/<str:pk>/tiles/metadata', TileMetadataView.as_view()),
-    path('datasets/<str:pk>/tiles/<int:z>/<int:x>/<int:y>.png', TileView.as_view()),
-]
+router = DefaultRouter(trailing_slash=False)
+router.register(r'datasets/tile_source', DatasetTileSourceView, basename='tile_source')
+
+urlpatterns = router.urls

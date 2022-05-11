@@ -49,5 +49,33 @@
         "child_location": [2650, 3000],
         "child": "Green Tile",
         "color": "green"
+    },
+    {
+        "investigation":"Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5006,
+        "child_location": [4000, 1000],
+        "note": "A pin with minimum zoom level",
+        "color": "red",
+        "minimum_zoom": 3
+    },
+    {
+        "investigation":"Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5007,
+        "child_location": [4000, 1500],
+        "note": "A pin with maximum zoom level",
+        "color": "red",
+        "maximum_zoom": 3
+    },
+    {
+        "investigation":"Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5008,
+        "child_location": [4000, 1250],
+        "note": "I appear at zoom level 2 and disappear at zoom level 5!",
+        "color": "red",
+        "maximum_zoom": 5,
+        "minimum_zoom": 2
     }
 ]
