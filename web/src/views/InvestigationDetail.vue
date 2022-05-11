@@ -12,7 +12,7 @@
         <v-select
           v-if="!loaded || tilesourceDatasets.length > 0"
           v-model="selectedDataset"
-          class="atlascope-dataset-select"
+          class="pr-6"
           :items="tilesourceDatasets"
           item-text="name"
           item-value="id"
@@ -151,6 +151,13 @@ interface StackFrame {
   treeDepth: number;
 }
 
+interface PinNote extends Pin {
+  showNote: boolean;
+  inBounds: boolean;
+  notePositionX: number;
+  notePositionY: number;
+}
+
 interface BandSpec {
   frame: number;
   palette: string;
@@ -186,6 +193,9 @@ export default defineComponent({
       createLayer,
       geoEvents,
       geoAnnotations,
+      zoomLevel,
+      xCoord,
+      yCoord,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -203,11 +213,10 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
-    const pinNotes: Ref<any[]> = ref([]);
-    /* eslint-enable */
     const rootDatasetLayer: Ref<any> = ref(null);
-    const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
     /* eslint-enable */
+    const pinNotes: Ref<PinNote[]> = ref([]);
+    const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
 
     function rootDatasetChanged(newRootDataset: Dataset) {
       selectedDataset.value = newRootDataset;
@@ -254,18 +263,37 @@ export default defineComponent({
         } = map.value?.getBoundingClientRect() || {
           left: 0, top: 0, width: 0, height: 0,
         };
-        note.notePositionX = newScreenCoords.x + left;
-        note.notePositionY = newScreenCoords.y + top;
-        if (note.notePositionX > left + width
-            || note.notePositionY > top + height
-            || note.notePositionX < left
-            || note.notePositionY < top) {
-          note.inBounds = false;
-        } else {
-          note.inBounds = true;
+        if (note) {
+          note.notePositionX = newScreenCoords.x + left;
+          note.notePositionY = newScreenCoords.y + top;
+          if (note.notePositionX > left + width
+              || note.notePositionY > top + height
+              || note.notePositionX < left
+              || note.notePositionY < top
+              || zoomLevel.value < (pin.minimum_zoom || 0)
+              || zoomLevel.value > (pin.maximum_zoom || 40)) {
+            note.inBounds = false;
+          } else {
+            note.inBounds = true;
+          }
         }
       });
     }
+
+    function showHidePinsForZoomLevel(level: number) {
+      if (pinFeature) {
+        pinFeature.style('fillOpacity', (pin: Pin) => (
+          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+        pinFeature.style('strokeOpacity', (pin: Pin) => (
+          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+        pinFeature.draw();
+      }
+    }
+
+    watch([xCoord, yCoord, zoomLevel], () => {
+      showHidePinsForZoomLevel(zoomLevel.value);
+      movePinNoteCards();
+    });
 
     function drawMap(dataset: Dataset | null) {
       tearDownMap();
@@ -304,7 +332,7 @@ export default defineComponent({
         url: `${apiRoot}/datasets/tile_source/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
-      const geojsMap = createMap(mapParams);
+      createMap(mapParams);
       rootDatasetLayer.value = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
@@ -399,8 +427,6 @@ export default defineComponent({
           /* eslint-enable */
         }
       }
-      geojsMap.geoOn(geoEvents.pan, movePinNoteCards);
-      geojsMap.geoOn(geoEvents.zoom, movePinNoteCards);
       clampBoundsX(false);
     }
 
@@ -466,7 +492,7 @@ export default defineComponent({
       pinNotes.value = store.state.currentPins.map((pin) => ({
         ...pin,
         showNote: false,
-        inBounds: true,
+        inBounds: pin.minimum_zoom === 0,
         notePositionX: 0,
         notePositionY: 0,
       }));
@@ -501,14 +527,17 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
-            noteToToggle.showNote = !noteToToggle.showNote;
-            noteToToggle.notePositionX = event.mouse.page.x;
-            noteToToggle.notePositionY = event.mouse.page.y;
+            if (noteToToggle && noteToToggle.inBounds) {
+              noteToToggle.showNote = !noteToToggle.showNote;
+              noteToToggle.notePositionX = event.mouse.page.x;
+              noteToToggle.notePositionY = event.mouse.page.y;
+            }
           }
         });
       } else {
         pinFeature.data(selectedPins.value).draw();
       }
+      showHidePinsForZoomLevel(zoomLevel.value);
       /* eslint-enable */
     });
 
