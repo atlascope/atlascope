@@ -50,7 +50,7 @@ setup(
         'importlib_metadata>=3.6',
         'jsonschema',
         'large-image[gdal,ometiff]>=1.14',
-        'django-large-image>=0.5.0',
+        'django-large-image==0.5.2',
         # Production-only
         'django-composed-configuration[prod]>=0.18',
         'gunicorn',
