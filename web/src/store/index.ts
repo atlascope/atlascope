@@ -153,7 +153,10 @@ const {
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<{ datasetId: number | undefined; result: AxiosResponse }>[] = [];
+          const metadataPromises: Promise<{
+            datasetId: number | undefined;
+            result: AxiosResponse;
+          }>[] = [];
           datasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
