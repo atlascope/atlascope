@@ -38,6 +38,17 @@ services:
       - postgres
       - rabbitmq
 
+  yarn:
+    image: node:18
+    working_dir: /web
+    volumes:
+      - ./web:/web
+    command: yarn serve
+    ports:
+      - 8080:8080
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
+
   demotiles:
     build:
       context: ./dev/demotiles

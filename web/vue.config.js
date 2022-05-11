@@ -6,4 +6,9 @@ module.exports = {
     //  it has no effect.
     'vuetify',
   ],
+
+  // disable all the progress printout from webpack
+  devServer: {
+    progress: false,
+  },
 };
