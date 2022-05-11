@@ -12,7 +12,7 @@
         <v-select
           v-if="!loaded || tilesourceDatasets.length > 0"
           v-model="selectedDataset"
-          class="atlascope-dataset-select"
+          class="pr-6"
           :items="tilesourceDatasets"
           item-text="name"
           item-value="id"
@@ -151,6 +151,22 @@ interface StackFrame {
   treeDepth: number;
 }
 
+interface PinNote extends Pin {
+  showNote: boolean;
+  inBounds: boolean;
+  notePositionX: number;
+  notePositionY: number;
+}
+
+interface BandSpec {
+  frame: number;
+  palette: string;
+}
+
+interface TileLayerStyleDict {
+  bands: BandSpec[];
+}
+
 export default defineComponent({
   name: 'InvestigationDetail',
 
@@ -177,6 +193,9 @@ export default defineComponent({
       createLayer,
       geoEvents,
       geoAnnotations,
+      zoomLevel,
+      xCoord,
+      yCoord,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -194,12 +213,10 @@ export default defineComponent({
     let selectionLayer: any;
     let featureLayer: any;
     let pinFeature: any;
-    let nonTiledOverlayFeature: any;
-    const pinNotes: Ref<any[]> = ref([]);
     const rootDatasetLayer: Ref<any> = ref(null);
     /* eslint-enable */
-    const frames = computed(() => store.state.rootDatasetFrames);
-    /* eslint-enable */
+    const pinNotes: Ref<PinNote[]> = ref([]);
+    const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
 
     function rootDatasetChanged(newRootDataset: Dataset) {
       selectedDataset.value = newRootDataset;
@@ -213,20 +230,19 @@ export default defineComponent({
       ));
     }
 
+    function getSelectedFrameStyle(): BandSpec[] {
+      return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
+        frame: frame.frame,
+        palette: frame.color,
+      }));
+    }
+
     function buildUrlQueryArgs() {
-      const channels: number[] = [];
-      const colors: string[] = [];
-      /* eslint-disable */
-      const selectedFrames = frames.value.filter((frame: any) => frame.displayed);
-      if (selectedFrames.length === 0) {
-        return '';
-      }
-      selectedFrames.forEach((frame) => {
-        channels.push(frame.frame);
-        colors.push(frame.color);
-      });
-      /* eslint-enable */
-      return `?channels=${channels.join(',')}&colors=${colors.join(',')}`;
+      const style: TileLayerStyleDict = {
+        bands: getSelectedFrameStyle(),
+      };
+      const encodedStyle = encodeURIComponent(JSON.stringify(style));
+      return `?style=${encodedStyle}`;
     }
 
     function tearDownMap() {
@@ -253,7 +269,9 @@ export default defineComponent({
           if (note.notePositionX > left + width
               || note.notePositionY > top + height
               || note.notePositionX < left
-              || note.notePositionY < top) {
+              || note.notePositionY < top
+              || zoomLevel.value < (pin.minimum_zoom || 0)
+              || zoomLevel.value > (pin.maximum_zoom || 40)) {
             note.inBounds = false;
           } else {
             note.inBounds = true;
@@ -261,6 +279,21 @@ export default defineComponent({
         }
       });
     }
+
+    function showHidePinsForZoomLevel(level: number) {
+      if (pinFeature) {
+        pinFeature.style('fillOpacity', (pin: Pin) => (
+          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+        pinFeature.style('strokeOpacity', (pin: Pin) => (
+          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+        pinFeature.draw();
+      }
+    }
+
+    watch([xCoord, yCoord, zoomLevel], () => {
+      showHidePinsForZoomLevel(zoomLevel.value);
+      movePinNoteCards();
+    });
 
     function drawMap(dataset: Dataset | null) {
       tearDownMap();
@@ -296,10 +329,10 @@ export default defineComponent({
       const rootLayerParams = {
         ...rootPixelParams.layer,
         zIndex: 0,
-        url: `${apiRoot}/datasets/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
+        url: `${apiRoot}/datasets/tile_source/${rootDatasetID}/tiles/{z}/{x}/{y}.png`,
         crossDomain: 'use-credentials',
       };
-      const geojsMap = createMap(mapParams);
+      createMap(mapParams);
       rootDatasetLayer.value = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
@@ -371,7 +404,7 @@ export default defineComponent({
           const layerParams = {
             ...pixelParams.layer,
             zIndex: treeDepth,
-            url: `${apiRoot}/datasets/${datasetID}/tiles/{z}/{x}/{y}.png`,
+            url: `${apiRoot}/datasets/tile_source/${datasetID}/tiles/{z}/{x}/{y}.png`,
             crossDomain: 'use-credentials',
           };
           createLayer(
@@ -394,8 +427,6 @@ export default defineComponent({
           /* eslint-enable */
         }
       }
-      geojsMap.geoOn(geoEvents.pan, movePinNoteCards);
-      geojsMap.geoOn(geoEvents.zoom, movePinNoteCards);
       clampBoundsX(false);
     }
 
@@ -407,7 +438,7 @@ export default defineComponent({
       if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        const newUrl = `${apiRoot}/datasets/tile_source/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
         rootDatasetLayer.value.url(newUrl).draw();
       }
     }, { deep: true });
@@ -467,7 +498,7 @@ export default defineComponent({
       pinNotes.value = noteOnlyPins.map((pin) => ({
         ...pin,
         showNote: false,
-        inBounds: true,
+        inBounds: pin.minimum_zoom === 0,
         notePositionX: 0,
         notePositionY: 0,
       }));
@@ -577,6 +608,7 @@ export default defineComponent({
       } else {
         pinFeature.data(selectedPins.value).draw();
       }
+      showHidePinsForZoomLevel(zoomLevel.value);
       /* eslint-enable */
     });
 

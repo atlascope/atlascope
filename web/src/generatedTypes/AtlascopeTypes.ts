@@ -29,7 +29,7 @@ export interface Dataset {
   metadata?: object | null;
 
   /** Dataset type */
-  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage" | "non_tiled_image";
+  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage";
 
   /** Source dataset */
   source_dataset?: number | null;
@@ -194,6 +194,20 @@ export interface Pin {
   /** Note */
   note?: string;
 
+  /**
+   * Minimum zoom
+   * @min 0
+   * @max 2147483647
+   */
+  minimum_zoom?: number;
+
+  /**
+   * Maximum zoom
+   * @min 0
+   * @max 2147483647
+   */
+  maximum_zoom?: number;
+
   /** Investigation */
   investigation: number;
 
@@ -311,7 +325,7 @@ export namespace Datasets {
    * No description
    * @tags datasets
    * @name DatasetsTilesMetadataRead
-   * @request GET:/datasets/{id}/tiles/metadata
+   * @request GET:/datasets/tile_source/{id}/tiles/metadata
    * @response `200` `TileMetadata`
    */
   export namespace DatasetsTilesMetadataRead {
@@ -325,7 +339,7 @@ export namespace Datasets {
    * No description
    * @tags datasets
    * @name DatasetsTilesRead
-   * @request GET:/datasets/{id}/tiles/{z}/{x}/{y}.png
+   * @request GET:/datasets/tile_source/{id}/tiles/{z}/{x}/{y}.png
    * @response `200` `void` Image file
    * @response `404` `void` Image tile not found
    */
@@ -375,11 +389,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsEmbeddingsRead
+   * @name InvestigationsEmbeddings
    * @request GET:/investigations/{id}/embeddings
    * @response `200` `(DatasetEmbedding)[]`
    */
-  export namespace InvestigationsEmbeddingsRead {
+  export namespace InvestigationsEmbeddings {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -403,11 +417,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsPinsRead
+   * @name InvestigationsPins
    * @request GET:/investigations/{id}/pins
    * @response `200` `(Pin)[]`
    */
-  export namespace InvestigationsPinsRead {
+  export namespace InvestigationsPins {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -482,51 +496,6 @@ export namespace Jobs {
    */
   export namespace JobsRerun {
     export type RequestParams = { id: number };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-}
-
-export namespace S3Upload {
-  /**
-   * No description
-   * @tags s3-upload
-   * @name S3UploadFinalizeCreate
-   * @request POST:/s3-upload/finalize/
-   * @response `201` `void`
-   */
-  export namespace S3UploadFinalizeCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags s3-upload
-   * @name S3UploadUploadCompleteCreate
-   * @request POST:/s3-upload/upload-complete/
-   * @response `201` `void`
-   */
-  export namespace S3UploadUploadCompleteCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
-  /**
-   * No description
-   * @tags s3-upload
-   * @name S3UploadUploadInitializeCreate
-   * @request POST:/s3-upload/upload-initialize/
-   * @response `201` `void`
-   */
-  export namespace S3UploadUploadInitializeCreate {
-    export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
