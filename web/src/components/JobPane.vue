@@ -153,8 +153,8 @@ export default defineComponent({
       try {
         const response = await store.dispatch.createSubimageDataset(selection.value);
         if (response) {
-          store.commit.setCurrentDatasets(store.state.currentDatasets.concat([response.data]));
-          selectedDataset.value = response.data.name;
+          store.commit.setCurrentDatasets(store.state.currentDatasets.concat([response]));
+          selectedDataset.value = response.name;
         }
         savedNotification.value = response ? 'Saved!' : 'Failed to Crop.';
       } catch (e) {

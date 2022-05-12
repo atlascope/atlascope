@@ -229,7 +229,7 @@ const {
       const { commit } = rootActionContext(context);
       commit.setRootDatasetFrames(frames);
     },
-    async createSubimageDataset(context, selection): Promise<AxiosResponse<Dataset> | undefined> {
+    async createSubimageDataset(context, selection): Promise<Dataset | undefined> {
       const { state, commit } = rootActionContext(context);
       const dataset = state.rootDataset;
       const investigation = state.currentInvestigation;
