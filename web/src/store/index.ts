@@ -256,6 +256,7 @@ const {
         }
         return response;
       }
+      return undefined;
     },
     async fetchJobTypes(context) {
       const { state, commit } = rootActionContext(context);
