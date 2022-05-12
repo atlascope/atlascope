@@ -106,7 +106,6 @@ import 'vuetify/dist/vuetify.min.css';
 import Draggable from 'vuedraggable';
 import VJsonschemaForm from '@koumoul/vuetify-jsonschema-form';
 import '@koumoul/vuetify-jsonschema-form/dist/main.css';
-import { Sketch } from 'vue-color';
 import {
   defineComponent, computed, ref, watch,
 } from '@vue/composition-api';
@@ -115,7 +114,6 @@ import store from '../store';
 Vue.use(Vuetify);
 
 Vue.component('draggable', Draggable);
-Vue.component('color-picker', Sketch);
 
 export default defineComponent({
   components: {
@@ -142,7 +140,7 @@ export default defineComponent({
         store.commit.setRootDataset(
           currentDatasets.value.find(
             (dataset) => dataset.name === selectedDataset.value,
-          ),
+          ) || null,
         );
         store.commit.setShowEmbeddings(false);
       } else {
@@ -154,7 +152,7 @@ export default defineComponent({
     async function useSelection() {
       try {
         const response = await store.dispatch.createSubimageDataset(selection.value);
-        if(response){
+        if (response) {
           store.commit.setCurrentDatasets(store.state.currentDatasets.concat([response.data]));
           selectedDataset.value = response.data.name;
         }
@@ -172,7 +170,7 @@ export default defineComponent({
       autoFoldObjects: true,
     };
 
-    async function pollForPinResult(jobId) {
+    async function pollForPinResult(jobId: number) {
       if (store.state.axiosInstance) {
         const response = (await store.state.axiosInstance.get(`/jobs/${jobId}`)).data;
         if (response.complete) {
@@ -185,9 +183,9 @@ export default defineComponent({
     async function spawnJob() {
       if (store.state.axiosInstance) {
         const response = (await store.state.axiosInstance.post('/jobs', {
-          investigation: store.state.currentInvestigation.id,
+          investigation: store.state.currentInvestigation?.id,
           /* eslint-disable */
-          original_dataset: store.state.rootDataset.id,
+          original_dataset: store.state.rootDataset?.id,
           job_type: selectedJobType.value.name,
           additional_inputs: jobInputs.value,
           /* eslint-enable */
