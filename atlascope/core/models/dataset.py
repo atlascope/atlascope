@@ -9,7 +9,7 @@ from django.db import models
 from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
 from large_image_converter import _output_tiff
-from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_source_ometiff import OMETiffFileTileSource, TiffFileTileSource, TileSourceError
 from rest_framework import serializers
 
 from atlascope.core.importers import available_importers
@@ -54,7 +54,10 @@ class Dataset(TimeStampedModel, models.Model):
             }
         }
 
-        src = OMETiffFileTileSource(self.content.path)
+        try:
+            src = OMETiffFileTileSource(self.content.path)
+        except TileSourceError:
+            src = TiffFileTileSource(self.content.path)
         src_metadata = src.getMetadata()
         cropped_frames_locations = []
         for frame in src_metadata['frames']:
