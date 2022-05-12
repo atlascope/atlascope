@@ -229,7 +229,7 @@ const {
       const { commit } = rootActionContext(context);
       commit.setRootDatasetFrames(frames);
     },
-    async createSubimageDataset(context, selection): Promise<AxiosResponse | boolean> {
+    async createSubimageDataset(context, selection): Promise<AxiosResponse<Dataset> | undefined> {
       const { state, commit } = rootActionContext(context);
       const dataset = state.rootDataset;
       const investigation = state.currentInvestigation;
@@ -256,7 +256,6 @@ const {
         }
         return response;
       }
-      return false;
     },
     async fetchJobTypes(context) {
       const { state, commit } = rootActionContext(context);

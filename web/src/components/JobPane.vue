@@ -99,7 +99,7 @@
 }
 </style>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
@@ -154,8 +154,10 @@ export default defineComponent({
     async function useSelection() {
       try {
         const response = await store.dispatch.createSubimageDataset(selection.value);
-        store.commit.setCurrentDatasets(store.state.currentDatasets.concat([response]));
-        selectedDataset.value = response.name;
+        if(response){
+          store.commit.setCurrentDatasets(store.state.currentDatasets.concat([response.data]));
+          selectedDataset.value = response.data.name;
+        }
         savedNotification.value = response ? 'Saved!' : 'Failed to Crop.';
       } catch (e) {
         savedNotification.value = 'Failed to Crop.';
