@@ -65,6 +65,7 @@ class Dataset(TimeStampedModel, models.Model):
                 region=dict(left=x0, right=x1, top=y0, bottom=y1),
                 encoding='TILED',
                 frame=frame['Frame'],
+                shrinkMode='mode',
             )
             cropped_frames_locations.append(result)
 
