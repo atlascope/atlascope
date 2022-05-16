@@ -265,13 +265,6 @@ const {
         commit.setJobTypes(response);
       }
     },
-    async fetchJobTypes(context) {
-      const { state, commit } = rootActionContext(context);
-      if (state.axiosInstance) {
-        const response = (await state.axiosInstance.get('/jobs/types')).data;
-        commit.setJobTypes(response);
-      }
-    },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
