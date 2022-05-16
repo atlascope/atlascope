@@ -57,7 +57,7 @@ def run(job_id: str, original_dataset_id: str, n: int):
             )
         )
         job.complete = True
-        job.save()
     except Exception as e:
         job.failure = str(e)
+    finally:
         job.save()
