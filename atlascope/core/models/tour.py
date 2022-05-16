@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db import models
-from atlascope.core.models.waypoint import Waypoint
 from rest_framework import serializers
+
+from atlascope.core.models.waypoint import Waypoint
 
 
 class Tour(models.Model):
