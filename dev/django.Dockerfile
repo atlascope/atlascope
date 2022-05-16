@@ -15,12 +15,21 @@ RUN apt-get update \
         libproj-dev proj-bin proj-data \
         # GEOS library development files (GeoDjango)
         libgeos-dev \
+        # Reading/Writing tiff files
+        libvips-dev \
  && pip install --upgrade pip \
  && rm -rf /var/lib/apt/lists/*
 
 RUN pip install \
+        # pyvips==2.0 \
+        # constrain GDAL for use with Ubuntu Focal library version
+        gdal==3.0.4 \
+        # constrain pyproj for use with Ubuntu Focal library version
+        pyproj~=2.0
+
+RUN pip install \
         --find-links https://girder.github.io/large_image_wheels \
-        large-image-converter
+        large-image-converter==1.14.3
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -30,12 +39,7 @@ ENV PYTHONUNBUFFERED 1
 # over top of this directory, the .egg-link in site-packages resolves to the mounted directory
 # and all package modules are importable.
 COPY ./setup.py /opt/django-project/setup.py
-RUN pip install \
-        --editable /opt/django-project[dev] \
-        # constrain GDAL for use with Ubuntu Focal library version
-        'gdal==3.0.4' \
-        # constrain pyproj for use with Ubuntu Focal library version
-        'pyproj~=2.0'
+RUN pip install -e /opt/django-project[dev]
 
 # Use a directory name which will never be an import name, as isort considers this as first-party.
 WORKDIR /opt/django-project
