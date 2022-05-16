@@ -1,3 +1,5 @@
+"""Return the locations of the N pixels with the greatest RGB values in the input dataset."""
+
 import io
 
 from PIL import Image, ImageDraw
@@ -8,18 +10,27 @@ from atlascope.core.models import Dataset
 
 from .utils import save_output_dataset
 
+schema = {
+    "type": "object",
+    "required": ['n'],
+    "properties": {
+        'n': {
+            "type": 'integer',
+            "title": 'N',
+            'minimum': 1,
+        }
+    },
+}
+
 
 @shared_task
 def run(job_id: str, original_dataset_id: str, n: int):
-    """Return the locations of the N pixels with the greatest RGB values in the input dataset."""
     from atlascope.core.models import Job
 
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     job = Job.objects.get(id=job_id)
-    # TODO: we need a module to parse dataset type and return an image from it
-    #   This is currently only tolerant to Green Cell Image dataset,
-    #   which has PNG content
-    input_image = Image.open(io.BytesIO(original_dataset.content.read()))
+
+    input_image = Image.open(io.BytesIO(original_dataset.content.read())).convert("RGB")
     output_image = input_image.copy()
 
     data = np.array(input_image)

@@ -31,9 +31,11 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     xCoord.value = mapCenter.x;
     yCoord.value = mapCenter.y;
 
+    /* eslint-disable */
     geojsMap.geoOn(geoEvents.zoom, (event: any) => {
       zoomLevel.value = event.zoomLevel;
     });
+    /* eslint-enable */
     geojsMap.geoOn(geoEvents.pan, () => {
       updateCenter();
     });

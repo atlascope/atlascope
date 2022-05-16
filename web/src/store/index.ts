@@ -4,7 +4,7 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  Investigation, Dataset, TileMetadata, Pin, DatasetEmbedding,
+  Investigation, Dataset, TileMetadata, Pin, DatasetEmbedding, JobDetail,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
@@ -25,14 +25,16 @@ export interface State {
     currentPins: Pin[];
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
+    showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
     rootDatasetFrames: TiffFrame[];
     selectionMode: boolean;
     subimageSelection: number[] | null;
+    jobTypes: JobDetail[];
 }
 
 interface TileMetadataForDataset {
-    datasetId: number;
+    datasetId: number | undefined;
     tileMetadata: TileMetadata;
 }
 
@@ -51,11 +53,13 @@ const {
     rootDataset: null,
     currentPins: [],
     selectedPins: [],
+    showEmbeddings: true,
     datasetEmbeddings: [],
     datasetTileMetadata: {},
     rootDatasetFrames: [],
     selectionMode: false,
     subimageSelection: null,
+    jobTypes: [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -75,6 +79,13 @@ const {
       state.selectionMode = false;
       state.subimageSelection = null;
     },
+    resetRootDataset(state) {
+      const tileSourceDatasets = state.currentDatasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
+      const rootDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
+      state.rootDataset = rootDataset;
+      state.selectionMode = false;
+      state.subimageSelection = null;
+    },
     setCurrentPins(state, pins: Pin[]) {
       state.currentPins = pins;
     },
@@ -84,8 +95,11 @@ const {
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
       state.datasetEmbeddings = embeddings;
     },
+    setShowEmbeddings(state, show: boolean) {
+      state.showEmbeddings = show;
+    },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
-      state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
+      if (obj.datasetId) state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
     },
     setRootDatasetFrames(state, frames: TiffFrame[]) {
       state.rootDatasetFrames = frames;
@@ -96,10 +110,16 @@ const {
     setSubimageSelection(state, selection: number[] | null) {
       state.subimageSelection = selection;
     },
+    setJobTypes(state, jobTypes) {
+      state.jobTypes = jobTypes;
+    },
   },
   getters: {
     tilesourceDatasets(state: State): Dataset[] {
       return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'tile_source');
+    },
+    subimageDatasets(state: State): Dataset[] {
+      return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'subimage');
     },
   },
   actions: {
@@ -113,7 +133,7 @@ const {
       }
     },
     async fetchCurrentInvestigation(context, investigationId: string) {
-      const { commit, state } = rootActionContext(context);
+      const { commit, state, dispatch } = rootActionContext(context);
       if (state.axiosInstance) {
         const investigation = (await state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
@@ -128,16 +148,16 @@ const {
           });
           const datasets = (await Promise.all(datasetPromises)).map((response) => response.data);
           commit.setCurrentDatasets(datasets);
-
-          const tileSourceDatasets = datasets.filter((dataset: Dataset) => dataset.dataset_type === 'tile_source');
-          const rootDataset = tileSourceDatasets.length > 0 ? tileSourceDatasets[0] : null;
-          commit.setRootDataset(rootDataset);
+          commit.resetRootDataset();
 
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<{ datasetId: number; result: AxiosResponse }>[] = [];
-          tileSourceDatasets.forEach((dataset) => {
+          const metadataPromises: Promise<{
+            datasetId: number | undefined;
+            result: AxiosResponse;
+          }>[] = [];
+          datasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
@@ -178,11 +198,17 @@ const {
             });
           });
 
-          const pins = (await state.axiosInstance.get(`/investigations/${investigationId}/pins`)).data;
-          commit.setCurrentPins(pins);
+          dispatch.fetchInvestigationPins();
         }
       } else {
         commit.setCurrentInvestigation(null);
+      }
+    },
+    async fetchInvestigationPins(context) {
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance && state.currentInvestigation) {
+        const pins = (await state.axiosInstance.get(`/investigations/${state.currentInvestigation.id}/pins`)).data;
+        commit.setCurrentPins(pins);
       }
     },
     unsetCurrentInvestigation(context) {
@@ -203,24 +229,41 @@ const {
       const { commit } = rootActionContext(context);
       commit.setRootDatasetFrames(frames);
     },
-    async createSubimageDataset(context, selection): Promise<AxiosResponse | boolean> {
-      const { state } = rootActionContext(context);
-
-      // TODO: rewrite when multiple datasets are shown
+    async createSubimageDataset(context, selection): Promise<Dataset | undefined> {
+      const { state, commit } = rootActionContext(context);
       const dataset = state.rootDataset;
+      const investigation = state.currentInvestigation;
 
       if (state.axiosInstance && dataset) {
-        return (await state.axiosInstance.post(
+        const response = (await state.axiosInstance.post(
           `/datasets/${dataset.id}/subimage`,
           {
             x0: selection[0],
             y0: selection[1],
             x1: selection[2],
             y1: selection[3],
+            investigation: investigation?.id,
           },
         )).data;
+        if (response) {
+          const metadata = (await state.axiosInstance.get(
+            `/datasets/tile_source/${response.id}/tiles/metadata`,
+          )).data;
+          commit.setTileMetadataForDataset({
+            datasetId: response.id,
+            tileMetadata: metadata,
+          });
+        }
+        return response;
       }
-      return false;
+      return undefined;
+    },
+    async fetchJobTypes(context) {
+      const { state, commit } = rootActionContext(context);
+      if (state.axiosInstance) {
+        const response = (await state.axiosInstance.get('/jobs/types')).data;
+        commit.setJobTypes(response);
+      }
     },
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);

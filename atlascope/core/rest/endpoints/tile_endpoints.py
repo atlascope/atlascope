@@ -12,7 +12,10 @@ from atlascope.core.models import Dataset, DatasetSerializer
 
 
 class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
-    queryset = Dataset.objects.filter(content__isnull=False, dataset_type='tile_source')
+    queryset = Dataset.objects.filter(
+        content__isnull=False,
+        dataset_type__in=['tile_source', 'subimage'],
+    )
     serializer_class = DatasetSerializer
 
     default_colors = ['#ffffff']
