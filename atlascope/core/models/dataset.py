@@ -1,8 +1,15 @@
+import os
+from pathlib import Path
+import tempfile
+
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
+from large_image_converter import _output_tiff
+from large_image_source_ometiff import OMETiffFileTileSource, TiffFileTileSource, TileSourceError
 from rest_framework import serializers
 
 from atlascope.core.importers import available_importers
@@ -37,23 +44,63 @@ class Dataset(TimeStampedModel, models.Model):
         if not self.name:
             self.name = importer_obj.dataset_name or f'{importer} {self.id}'
 
-    def subimage(self, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
-        metadata = {
-            'x0': x0,
-            'x1': x1,
-            'y0': y0,
-            'y1': y1,
+    def subimage(self, investigation, x0: int, x1: int, y0: int, y1: int) -> 'Dataset':
+        cropped_metadata = {
+            'subimage_bbox': {
+                'x0': x0,
+                'x1': x1,
+                'y0': y0,
+                'y1': y1,
+            }
         }
 
-        dataset = Dataset(
-            name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
-            metadata=metadata,
-            source_dataset=self,
-            content=self.content,
-            dataset_type="subimage",
-        )
+        try:
+            src = OMETiffFileTileSource(self.content.path)
+        except TileSourceError:
+            src = TiffFileTileSource(self.content.path)
+        src_metadata = src.getMetadata()
+        cropped_frames_locations = []
+        for frame in src_metadata['frames']:
+            result, mime = src.getRegion(
+                region=dict(left=x0, right=x1, top=y0, bottom=y1),
+                encoding='TILED',
+                frame=frame['Frame'],
+                shrinkMode='mode',
+            )
+            cropped_frames_locations.append(result)
 
-        return dataset
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            dest = Path(tmpdirname, 'composite.tiff')
+            _output_tiff(
+                cropped_frames_locations,
+                dest,
+                Path(tmpdirname, 'tmp.tiff'),
+                dict(
+                    metadata=src_metadata,
+                    images={},
+                    internal_metadata={},
+                ),
+            )
+
+            dataset = Dataset(
+                name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
+                metadata=cropped_metadata,
+                source_dataset=self,
+                dataset_type="subimage",
+            )
+            dataset.save()
+            content_filename = f'cropped_{dataset.id}_{self.content.name}'
+            dataset.content.save(content_filename, open(dest, 'rb'))
+            investigation.datasets.add(dataset)
+            investigation.save()
+
+            return dataset
+
+
+@receiver(models.signals.post_delete, sender=Dataset)
+def delete_file(sender, instance, *args, **kwargs):
+    if instance.content and os.path.isfile(instance.content.path):
+        os.remove(instance.content.path)
 
 
 class DatasetSerializer(serializers.ModelSerializer):
@@ -117,11 +164,19 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
     )
 
 
+class InvestigationRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        from atlascope.core.models import Investigation
+
+        return Investigation.objects.all()
+
+
 class DatasetSubImageSerializer(serializers.Serializer):
     x0 = serializers.IntegerField(required=True)
     y0 = serializers.IntegerField(required=True)
     x1 = serializers.IntegerField(required=True)
     y1 = serializers.IntegerField(required=True)
+    investigation = InvestigationRelatedField(required=True)
 
 
 @admin.register(Dataset)

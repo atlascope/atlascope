@@ -1,5 +1,3 @@
-from inspect import Parameter, signature
-
 from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, status
@@ -31,7 +29,7 @@ class JobViewSet(
         job: Job = serializer.save()
         job.spawn()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(JobDetailSerializer(job).data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -51,19 +49,12 @@ class JobViewSet(
     )
     @action(detail=False, methods=['GET'])
     def types(self, request, **kwargs):
-        payload = {
-            key: {
+        payload = [
+            {
+                'name': key,
                 'description': module.__doc__,
-                'additional_inputs': [
-                    {
-                        "name": name,
-                        "class": param.annotation.__name__,
-                        "required": param.default == Parameter.empty,
-                    }
-                    for name, param in signature(module).parameters.items()
-                    if name != 'original_dataset_id'
-                ],
+                'schema': module.schema,
             }
             for key, module in available_job_types.items()
-        }
+        ]
         return Response(payload)

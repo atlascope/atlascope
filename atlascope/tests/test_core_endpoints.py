@@ -1,5 +1,3 @@
-from inspect import Parameter, signature
-
 import pytest
 
 from atlascope.core import models
@@ -74,8 +72,13 @@ def test_retrieve_dataset(api_client, dataset):
 
 
 @pytest.mark.django_db
-def test_subimage(api_client, dataset):
-    test_data = {"x0": 1, "x1": 2, "y0": 3, "y1": 4}
+def test_subimage(api_client, dataset_factory, investigation):
+    dataset = dataset_factory()
+    dataset.content.save(
+        'test_dataset.tiff',
+        open('atlascope/core/management/populate/inputs/HTA9_1_BA_F_ROI03.ome.tif', 'rb'),
+    )
+    test_data = {"x0": 1, "x1": 2, "y0": 3, "y1": 4, 'investigation': investigation.id}
     resp = api_client().post(f'/api/v1/datasets/{dataset.id}/subimage', data=test_data)
     assert resp.status_code == 201
 
@@ -132,21 +135,14 @@ def test_rerun_job(api_client, job):
 
 @pytest.mark.django_db
 def test_list_job_types(api_client):
-    expected_results = {
-        key: {
+    expected_results = [
+        {
+            'name': key,
             'description': module.__doc__,
-            'additional_inputs': [
-                {
-                    "name": name,
-                    "class": param.annotation.__name__,
-                    "required": param.default == Parameter.empty,
-                }
-                for name, param in signature(module).parameters.items()
-                if name != 'original_dataset_id'
-            ],
+            'schema': module.schema,
         }
         for key, module in available_job_types.items()
-    }
+    ]
     resp = api_client().get('/api/v1/jobs/types')
     assert resp.status_code == 200
     assert resp.json() == expected_results

@@ -23,6 +23,12 @@
           </span>
         </div>
       </v-tab-item>
+      <v-tab>
+        Jobs
+      </v-tab>
+      <v-tab-item>
+        <job-pane />
+      </v-tab-item>
     </v-tabs>
   </v-sheet>
 </template>
@@ -39,10 +45,12 @@ import {
 } from '@vue/composition-api';
 import store from '../store';
 import PinList from './PinList.vue';
+import JobPane from './JobPane.vue';
 
 export default defineComponent({
   components: {
     PinList,
+    JobPane,
   },
 
   setup() {

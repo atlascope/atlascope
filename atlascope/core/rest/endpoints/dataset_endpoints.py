@@ -46,6 +46,5 @@ class DatasetViewSet(
 
         original = self.get_object()
         subimage = original.subimage(**serializer.validated_data)
-        subimage.save()
 
         return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)
