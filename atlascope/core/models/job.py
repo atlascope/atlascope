@@ -17,6 +17,7 @@ def validate_job_type(value):
 
 class Job(models.Model):
     complete = models.BooleanField(default=False)
+    failure = models.CharField(blank=True, max_length=255)
     investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
