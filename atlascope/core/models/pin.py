@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis.db.models import PointField
 from django.db import models
+from django.db.models import CheckConstraint, F, Q
 from rest_framework import serializers
 
 PIN_COLORS = [
@@ -35,6 +36,16 @@ class Pin(models.Model):
         max_length=15, choices=PIN_COLORS, default='red', null=False, blank=False
     )
     note = models.TextField(max_length=1000, blank=True)
+    minimum_zoom = models.PositiveIntegerField(default=0)
+    maximum_zoom = models.PositiveIntegerField(default=40)
+
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                check=Q(maximum_zoom__gte=F('minimum_zoom')),
+                name='valid_zoom_range',
+            )
+        ]
 
 
 class PinSerializer(serializers.ModelSerializer):

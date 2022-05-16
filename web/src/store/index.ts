@@ -9,7 +9,7 @@ import {
 
 Vue.use(Vuex);
 
-interface TiffFrame {
+export interface TiffFrame {
   name: string;
   frame: number;
   displayed: boolean;
@@ -34,7 +34,7 @@ export interface State {
 }
 
 interface TileMetadataForDataset {
-    datasetId: string | undefined;
+    datasetId: number | undefined;
     tileMetadata: TileMetadata;
 }
 
@@ -140,7 +140,7 @@ const {
 
         if (state.currentInvestigation) {
           const datasetPromises: Promise<AxiosResponse>[] = [];
-          state.currentInvestigation.datasets.forEach((datasetId: string) => {
+          state.currentInvestigation.datasets.forEach((datasetId: number) => {
             const promise = state.axiosInstance?.get(`/datasets/${datasetId}`);
             if (promise) {
               datasetPromises.push(promise);
@@ -153,8 +153,10 @@ const {
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<
-            { datasetId: string | undefined; result: AxiosResponse }>[] = [];
+          const metadataPromises: Promise<{
+            datasetId: number | undefined;
+            result: AxiosResponse;
+          }>[] = [];
           datasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
@@ -227,7 +229,7 @@ const {
       const { commit } = rootActionContext(context);
       commit.setRootDatasetFrames(frames);
     },
-    async createSubimageDataset(context, selection): Promise<AxiosResponse | boolean> {
+    async createSubimageDataset(context, selection): Promise<Dataset | undefined> {
       const { state, commit } = rootActionContext(context);
       const dataset = state.rootDataset;
       const investigation = state.currentInvestigation;
@@ -254,7 +256,14 @@ const {
         }
         return response;
       }
-      return false;
+      return undefined;
+    },
+    async fetchJobTypes(context) {
+      const { state, commit } = rootActionContext(context);
+      if (state.axiosInstance) {
+        const response = (await state.axiosInstance.get('/jobs/types')).data;
+        commit.setJobTypes(response);
+      }
     },
     async fetchJobTypes(context) {
       const { state, commit } = rootActionContext(context);

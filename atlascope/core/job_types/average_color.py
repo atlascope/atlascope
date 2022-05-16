@@ -1,3 +1,5 @@
+"""Return the average among all RGBA values in the input dataset image."""
+
 import io
 
 from PIL import Image
@@ -8,10 +10,15 @@ from atlascope.core.models import Dataset
 
 from .utils import save_output_dataset
 
+schema = {
+    "type": "object",
+    "required": [],
+    "properties": {},
+}
+
 
 @shared_task
 def run(job_id: str, original_dataset_id: str):
-    """Return the average among all RGBA values in the input dataset image."""
     from atlascope.core.models import Job
 
     original_dataset = Dataset.objects.get(id=original_dataset_id)

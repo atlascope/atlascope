@@ -1,5 +1,3 @@
-from itertools import cycle
-
 from django_large_image.rest.viewsets import LargeImageDetailMixin
 from large_image.exceptions import TileSourceError
 from large_image.tilesource import FileTileSource
@@ -15,7 +13,8 @@ from atlascope.core.models import Dataset, DatasetSerializer
 
 class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
     queryset = Dataset.objects.filter(
-        content__isnull=False, dataset_type__in=['tile_source', 'subimage']
+        content__isnull=False,
+        dataset_type__in=['tile_source', 'subimage'],
     )
     serializer_class = DatasetSerializer
 
@@ -30,42 +29,13 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
             # Raise 400-level error as this dataset has no content
             raise ValidationError('Dataset has not content.')
 
-    def open_tile_source(self, path: str, *args, **kwargs) -> FileTileSource:
+    def open_tile_source(self, request: Request, path: str, **kwargs) -> FileTileSource:
         """Override to manually choose tile source class."""
         try:
-            tile_source = OMETiffFileTileSource(path, *args, **kwargs)
+            tile_source = OMETiffFileTileSource(path, **kwargs)
         except TileSourceError:
-            tile_source = TiffFileTileSource(path, *args, **kwargs)
+            tile_source = TiffFileTileSource(path, **kwargs)
         return tile_source
-
-    def get_style(self, request: Request) -> dict:
-        """Override django-large-image style parsing for cutom frame stuff.
-
-        This builds a style dictionary for large-image following:
-
-            https://girder.github.io/large_image/tilesource_options.html#style
-
-        """
-        channels = request.query_params.get('channels')
-        if channels:
-            channels = channels.split(',')
-        else:
-            tile_source = self.open_tile_source(self.get_path())  # TODO: better handle upstream
-            channels = range(len(tile_source.getMetadata()['frames']))
-        colors = request.query_params.get('colors')
-        if colors:
-            colors = [f'#{color}' for color in colors.split(',')]
-        else:
-            colors = self.default_colors
-        style = {'bands': []}
-        for channel, color in list(zip(channels, cycle(colors))):
-            style['bands'].append(
-                {
-                    'frame': channel,
-                    'palette': ['#000', color],
-                }
-            )
-        return style
 
 
 router = DefaultRouter(trailing_slash=False)
