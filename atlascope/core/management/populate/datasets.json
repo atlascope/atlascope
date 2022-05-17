@@ -23,7 +23,8 @@
         "description": "Vandy test dataset 3 (https://styx.neurology.emory.edu/girder/#item/60e84a1968f4fe34fc7eef79), retrieved via Vandy importer",
         "importer": {
             "importer": "VandyImporter",
-            "file_id": "60e84a1868f4fe34fc7eef72"
+            "file_id": "60e84a1868f4fe34fc7eef72",
+            "sha256sum": "4c98465bde02089067d5736126f00a034a17d17b88f00d27d046a63554811b1d"
         }
     },
     {
