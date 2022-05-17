@@ -1,6 +1,6 @@
-import io
 import os
 
+import pooch
 import requests
 
 from .base_importer import AtlascopeImporter
@@ -10,6 +10,7 @@ class VandyImporter(AtlascopeImporter):
     def perform_import(
         self,
         file_id: str,
+        sha256sum: str,
         api_key: str = None,
     ):
         api_key = api_key or os.environ.get("DJANGO_API_TOKEN")
@@ -25,9 +26,13 @@ class VandyImporter(AtlascopeImporter):
         token = token_res["authToken"]["token"]
         headers = {"girder-token": token}
 
-        source_url = f"https://styx.neurology.emory.edu/girder/api/v1/file/{file_id}/download"
-        r = requests.get(source_url, headers=headers, stream=True)
+        file_path = pooch.retrieve(
+            url=f"https://styx.neurology.emory.edu/girder/api/v1/file/{file_id}/download",
+            known_hash=f"sha256:{sha256sum}",
+            downloader=pooch.HTTPDownloader(progressbar=True, headers=headers),
+            fname=file_id,
+        )
 
         # perform_import should save results to class attrs "content" and "metadata"
-        self.content = io.BytesIO(r.content)
+        self.content = open(file_path, "rb")
         self.metadata = {}
