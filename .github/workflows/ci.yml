@@ -59,6 +59,7 @@ jobs:
           pip install --upgrade pip
           pip install tox
           pip install --find-links https://girder.github.io/large_image_wheels large-image-converter
+          pip install --find-links https://girder.github.io/large_image_wheels histomicstk
       - name: Run tests
         run: |
           tox \
