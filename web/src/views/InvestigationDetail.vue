@@ -525,16 +525,22 @@ export default defineComponent({
           const urlRoot = process.env.VUE_APP_API_ROOT;
           const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
           const image: HTMLImageElement = await getNonTiledImage(url);
-          image.crossOrigin = 'Anonymous';
-          const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-          const lr = { x: ul.x + (image.width || 0), y: ul.y + (image.height || 0) };
-          quadData.push({
-            ul,
-            lr,
-            image,
-            pinId: pin.id,
-          });
-          nonTiledOverlayFeature.data(quadData).draw();
+          image.crossOrigin = 'use-credentials';
+          if (store.state.axiosInstance) {
+            const imageMetadata = await (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
+            const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+            const lr = {
+              x: ul.x + (imageMetadata.sizeX || 0),
+              y: ul.y + (imageMetadata.sizeY || 0),
+            };
+            quadData.push({
+              ul,
+              lr,
+              image,
+              pinId: pin.id,
+            });
+            nonTiledOverlayFeature.data(quadData).draw();
+          }
         } catch (error) {
           // eslint-disable-next-line
           console.error(`Failed to show overlay for dataset ${dataset.id}.`);
