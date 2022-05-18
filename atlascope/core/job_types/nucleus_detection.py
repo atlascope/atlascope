@@ -49,8 +49,12 @@ def detect_nuclei(input_image):
         im_nuclei_seg_mask, min_nucleus_area
     ).astype(int)
 
-    # compute nuclei properties
-    return skimage.measure.regionprops(im_nuclei_seg_mask)
+    # return a list of polygons outlining the identified nuclei
+    # each polygon is a list of n points of the form [x, y]
+    return [
+        skimage.measure.find_contours(im_nuclei_seg_mask == index, 0.5)[0].tolist()
+        for index in range(1, im_nuclei_seg_mask.max())
+    ]
 
 
 @shared_task
@@ -59,6 +63,10 @@ def run(job_id: str, original_dataset_id: str):
 
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     job = Job.objects.get(id=job_id)
+
+    from datetime import datetime
+
+    print('start', datetime.now())
 
     try:
         input_image = skimage.io.imread(
@@ -74,19 +82,14 @@ def run(job_id: str, original_dataset_id: str):
                 None,
                 {
                     'num_nuclei': len(nuclei),
-                    'nucleus_detections': [
-                        {
-                            'centroid': nucleus.centroid,
-                            'bbox': nucleus.bbox,
-                        }
-                        for nucleus in nuclei
-                    ],
+                    'nucleus_detections': nuclei,
                 },
                 dataset_type='nucleus_detection',
             )
         )
         job.complete = True
         job.save()
+        print('end', datetime.now())
     except Exception as e:
         print('FAILURE!')
         print(e)
