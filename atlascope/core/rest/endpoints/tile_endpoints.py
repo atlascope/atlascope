@@ -23,7 +23,6 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
     def get_path(self, *args, **kwargs) -> str:
         """Retreive path to image file from data record."""
         dataset = self.get_object()
-        print(dataset)
         try:
             return str(dataset.content.path)
         except (AttributeError, ValueError):
