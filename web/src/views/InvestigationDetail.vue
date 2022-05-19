@@ -489,9 +489,7 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
-    /**
-     * Create note cards for any pins without a child dataset.
-     */
+    // Create note cards for any pins without a child dataset.
     function createPinNotes() {
       const noteOnlyPins = store.state.currentPins.filter(
         (pin: Pin) => (!pin.child && pin.note?.length),
