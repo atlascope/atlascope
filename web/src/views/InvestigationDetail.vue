@@ -504,9 +504,15 @@ export default defineComponent({
     }
 
     async function toggleNonTiledImageOverlay(pin: Pin, dataset: Dataset) {
-      if (!dataset.content) return;
-      if (!featureLayer) return; // sanity check. this should exist
-      if (!store.state.axiosInstance) return;
+      if (!dataset.content) {
+        throw new Error(`Expected dataset of type ${dataset.dataset_type} to have content`);
+      }
+      if (!featureLayer) {
+        throw new Error('Expected a featureLayer to exist');
+      }
+      if (!store.state.axiosInstance) {
+        throw new Error('Expected the store to contain an axios object for feteching metadata');
+      }
       if (!nonTiledOverlayFeature) {
         nonTiledOverlayFeature = featureLayer.createFeature('quad');
       }
@@ -520,29 +526,24 @@ export default defineComponent({
         ).draw();
         nonTiledOverlayFeature.draw();
       } else {
-        try {
-          const urlRoot = process.env.VUE_APP_API_ROOT;
-          const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
-          const image: HTMLImageElement = new Image();
-          image.src = url;
-          image.crossOrigin = 'use-credentials';
-          const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
-          const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-          const lr = {
-            x: ul.x + (imageMetadata.sizeX || 0),
-            y: ul.y + (imageMetadata.sizeY || 0),
-          };
-          quadData.push({
-            ul,
-            lr,
-            image,
-            pinId: pin.id,
-          });
-          nonTiledOverlayFeature.data(quadData).draw();
-        } catch (error) {
-          // eslint-disable-next-line
-          console.error(`Failed to show overlay for dataset ${dataset.id}.`);
-        }
+        const urlRoot = process.env.VUE_APP_API_ROOT;
+        const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
+        const image: HTMLImageElement = new Image();
+        image.src = url;
+        image.crossOrigin = 'use-credentials';
+        const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
+        const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+        const lr = {
+          x: ul.x + (imageMetadata.sizeX || 0),
+          y: ul.y + (imageMetadata.sizeY || 0),
+        };
+        quadData.push({
+          ul,
+          lr,
+          image,
+          pinId: pin.id,
+        });
+        nonTiledOverlayFeature.data(quadData).draw();
       }
     }
 
