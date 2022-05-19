@@ -13,8 +13,7 @@ export function postGisToPoint(location: string): Point | undefined {
       y: parseInt(yPart.substring(0, yPart.length - 1), 10),
     };
   } catch (error) {
-    // eslint-disable-next-line
-    console.error(`Failed to convert location to point ${error}`);
+    throw new Error(`Unable to convert string ${location} to point.`);
   }
   return undefined;
 }
