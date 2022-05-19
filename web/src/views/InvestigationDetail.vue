@@ -527,7 +527,7 @@ export default defineComponent({
           const image: HTMLImageElement = await getNonTiledImage(url);
           image.crossOrigin = 'use-credentials';
           if (store.state.axiosInstance) {
-            const imageMetadata = await (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
+            const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
             const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
             const lr = {
               x: ul.x + (imageMetadata.sizeX || 0),
