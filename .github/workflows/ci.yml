@@ -33,6 +33,12 @@ jobs:
         ports:
           - 5672:5672
     steps:
+      - name: Cache Pooch
+        id: cache-pooch
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pooch
+          key: ${{ runner.os }}-pooch
       - name: Install dependencies
         run: |
           # Install system libraries for Python packages:
