@@ -29,6 +29,12 @@ class AtlascopeMixin(ConfigMixin):
         'subimage',
     ]
 
+    PIN_SCALES = [
+        'tissue',
+        'gland',
+        'cell',
+    ]
+
     # Use PostGIS
     DATABASES = values.DatabaseURLValue(
         environ_name='DATABASE_URL',

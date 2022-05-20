@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.gis.db.models import PointField
 from django.db import models
@@ -38,6 +39,7 @@ class Pin(models.Model):
     note = models.TextField(max_length=1000, blank=True)
     minimum_zoom = models.PositiveIntegerField(default=0)
     maximum_zoom = models.PositiveIntegerField(default=40)
+    scale = models.TextField(choices=[(choice, choice) for choice in settings.PIN_SCALES], null=True, blank=True)
 
     class Meta:
         constraints = [

@@ -30,7 +30,8 @@
         "child_location": [4000, 1000],
         "note": "A pin with minimum zoom level",
         "color": "red",
-        "minimum_zoom": 3
+        "minimum_zoom": 3,
+        "scale": "cell"
     },
     {
         "investigation":"Pin playground",
@@ -39,7 +40,8 @@
         "child_location": [4000, 1500],
         "note": "A pin with maximum zoom level",
         "color": "red",
-        "maximum_zoom": 3
+        "maximum_zoom": 3,
+        "scale": "tissue"
     },
     {
         "investigation":"Pin playground",
@@ -49,6 +51,7 @@
         "note": "I appear at zoom level 2 and disappear at zoom level 5!",
         "color": "red",
         "maximum_zoom": 5,
-        "minimum_zoom": 2
+        "minimum_zoom": 2,
+        "scale": "gland"
     }
 ]
