@@ -55,10 +55,7 @@ def detect_nuclei(input_image):
 
     # return a list of polygons outlining the identified nuclei
     # each polygon is a list of n points of the form [r, c]
-    return [
-        skimage.measure.find_contours(im_nuclei_seg_mask == index, 0.5)[0]
-        for index in range(1, im_nuclei_seg_mask.max())
-    ]
+    return skimage.measure.find_contours(im_nuclei_seg_mask, 0.5)
 
 
 @shared_task
