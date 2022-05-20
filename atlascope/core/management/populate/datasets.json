@@ -32,5 +32,15 @@
         "id": 2004,
         "description": "This is a screenshot of some green cells",
         "content": "green_cell_dataset_selection.png"
+    },
+    {
+        "name": "HTA11_377_20000010115220280030000000000 (remote)",
+        "id": 2005,
+        "description": "Vandy test dataset 4 (https://styx.neurology.emory.edu/girder/#item/61fbe6214874d4ffdf1c8569), retrieved via Vandy importer",
+        "importer": {
+            "importer": "VandyImporter",
+            "file_id": "61fda4af4874d4ffdf90d1ad",
+            "sha256sum": "78b904f3cb18c040ccb9c60e2eaf14924fb380af27a786d2ecd7c7ddf2513963"
+        }
     }
 ]
