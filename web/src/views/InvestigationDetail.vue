@@ -435,7 +435,10 @@ export default defineComponent({
       if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
+        const datasetId = rootDataset.value.id;
+        const newUrl = `
+          ${apiRoot}/datasets/tile_source/${datasetId}/tiles/{z}/{x}/{y}.png${queryString}
+        `;
         rootDatasetLayer.updateLayerUrl(newUrl);
         rootDatasetLayer.drawLayer();
       }
