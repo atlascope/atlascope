@@ -8,9 +8,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
-from tifftools.commands import tiff_concat
 from large_image_source_ometiff import OMETiffFileTileSource, TiffFileTileSource, TileSourceError
 from rest_framework import serializers
+from tifftools.commands import tiff_concat
 
 from atlascope.core.importers import available_importers
 
