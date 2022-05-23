@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
-from large_image_converter import _output_tiff
+from tifftools.commands import tiff_concat
 from large_image_source_ometiff import OMETiffFileTileSource, TiffFileTileSource, TileSourceError
 from rest_framework import serializers
 
@@ -71,16 +71,7 @@ class Dataset(TimeStampedModel, models.Model):
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             dest = Path(tmpdirname, 'composite.tiff')
-            _output_tiff(
-                cropped_frames_locations,
-                dest,
-                Path(tmpdirname, 'tmp.tiff'),
-                dict(
-                    metadata=src_metadata,
-                    images={},
-                    internal_metadata={},
-                ),
-            )
+            tiff_concat(cropped_frames_locations, dest)
 
             dataset = Dataset(
                 name=f'{self.name} Subimage ({x0}, {y0}) -> ({x1}, {y1})',
