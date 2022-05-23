@@ -67,6 +67,8 @@ setup(
     ],
     extras_require={
         'dev': [
+            'pooch',
+            'tqdm',  # for progress bar in pooch
             'django-composed-configuration[dev]>=0.18',
             'django-debug-toolbar',
             'ipython',

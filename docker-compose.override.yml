@@ -1,4 +1,8 @@
 version: '3'
+
+volumes:
+  pooch_cache:
+
 services:
   django:
     build:
@@ -11,6 +15,7 @@ services:
     volumes:
       - .:/opt/django-project
       - ./data:/opt/django-project/data
+      - pooch_cache:/root/.cache/pooch
     ports:
       - 8000:8000
     depends_on:
