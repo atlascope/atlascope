@@ -53,9 +53,20 @@ def detect_nuclei(input_image):
         im_nuclei_seg_mask, min_nucleus_area
     ).astype(int)
 
-    # return a list of polygons outlining the identified nuclei
+    # a list of polygons outlining the identified nuclei
     # each polygon is a list of n points of the form [r, c]
-    return skimage.measure.find_contours(im_nuclei_seg_mask, 0.5)
+    # polygons = [
+    # switch coordinate order to get (x, y) format
+    # [[point[1], point[0]] for point in poly_points]
+    # for poly_points in skimage.measure.find_contours(im_nuclei_seg_mask, 0.5)
+    # ]
+
+    additional_features = htk.features.compute_nuclei_features(
+        im_nuclei_seg_mask,
+        input_image,
+    )
+
+    return additional_features.to_dict("records")
 
 
 @shared_task
@@ -79,11 +90,7 @@ def run(job_id: str, original_dataset_id: str):
                 None,
                 {
                     'num_nuclei': len(nuclei),
-                    'nucleus_detections': [
-                        # switch coordinate order to get (x, y) format
-                        [[point[1], point[0]] for point in poly_points]
-                        for poly_points in nuclei
-                    ],
+                    'nucleus_detections': nuclei,
                 },
                 dataset_type='nucleus_detection',
             )
