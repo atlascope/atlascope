@@ -124,7 +124,7 @@ import {
   Ref,
 } from '@vue/composition-api';
 import useGeoJS from '../utilities/useGeoJS';
-import { postGisToPoint } from '../utilities/utiltyFunctions';
+import { postGisToPoint, Point } from '../utilities/utiltyFunctions';
 import store, { TiffFrame } from '../store';
 import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
@@ -156,6 +156,13 @@ interface PinNote extends Pin {
   inBounds: boolean;
   notePositionX: number;
   notePositionY: number;
+}
+
+interface NonTiledOverlayFeatureData {
+  ul: Point;
+  lr: Point;
+  image: HTMLImageElement;
+  pinId: number | undefined;
 }
 
 interface BandSpec {
@@ -516,13 +523,15 @@ export default defineComponent({
       if (!nonTiledOverlayFeature) {
         nonTiledOverlayFeature = featureLayer.createFeature('quad');
       }
-      const quadData = nonTiledOverlayFeature.data() || [];
-      // eslint-disable-next-line
-      const existingOverlay = quadData.find((overlay: any) => overlay.pinId === pin.id);
+      const quadData = (nonTiledOverlayFeature.data() || []) as NonTiledOverlayFeatureData[];
+      const existingOverlay = quadData.find(
+        (overlay: NonTiledOverlayFeatureData) => overlay.pinId === pin.id,
+      );
       if (existingOverlay) {
         nonTiledOverlayFeature.data(
-          // eslint-disable-next-line
-          nonTiledOverlayFeature.data().filter((overlay: any) => overlay.pinId !== pin.id),
+          nonTiledOverlayFeature.data().filter(
+            (overlay: NonTiledOverlayFeatureData) => overlay.pinId !== pin.id,
+          ),
         ).draw();
         nonTiledOverlayFeature.draw();
       } else {
@@ -574,7 +583,7 @@ export default defineComponent({
       if (nonTiledOverlayFeature) {
         const overlayData = nonTiledOverlayFeature.data();
         const newOverlayData = overlayData.filter(
-          (overlay: any) => !removedPinIds.includes(overlay.pinId),
+          (overlay: NonTiledOverlayFeatureData) => !removedPinIds.includes(overlay.pinId),
         );
         nonTiledOverlayFeature.data(newOverlayData).draw();
       }
