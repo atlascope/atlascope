@@ -37,5 +37,12 @@
         "datasets": [
             "HTA9_1_BA_F_ROI04 (remote)"
         ]
+    },
+    {
+        "name": "Big file",
+        "id": 1005,
+        "datasets": [
+            "HTA11_377_20000010115220280030000000000 (remote)"
+        ]
     }
 ]

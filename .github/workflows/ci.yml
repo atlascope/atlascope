@@ -33,6 +33,12 @@ jobs:
         ports:
           - 5672:5672
     steps:
+      - name: Cache Pooch
+        id: cache-pooch
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pooch
+          key: ${{ runner.os }}-pooch
       - name: Install dependencies
         run: |
           # Install system libraries for Python packages:
@@ -58,6 +64,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install tox
+          pip install --find-links https://girder.github.io/large_image_wheels large-image-converter
       - name: Run tests
         run: |
           tox \

@@ -1,8 +1,8 @@
 import {
   ref, onMounted, Ref,
 } from '@vue/composition-api';
-
 import geo from 'geojs';
+import useGeoJSLayer from './useGeoJSLayer';
 
 export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const map: Ref<any> = ref(null);
@@ -31,9 +31,11 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     xCoord.value = mapCenter.x;
     yCoord.value = mapCenter.y;
 
+    /* eslint-disable */
     geojsMap.geoOn(geoEvents.zoom, (event: any) => {
       zoomLevel.value = event.zoomLevel;
     });
+    /* eslint-enable */
     geojsMap.geoOn(geoEvents.pan, () => {
       updateCenter();
     });
@@ -77,12 +79,34 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     map.value.exit();
   };
 
-  const createLayer = (layerType: string, layerParams: object, gcs?: string) => {
+  const createLayer = (
+    layerType: string,
+    layerParams: object,
+    gcs?: string,
+    returnObj = false,
+  ): number | any => {
     const layer = map.value.createLayer(layerType, layerParams);
     if (gcs !== undefined) {
       layer.gcs(gcs);
     }
-    return layer;
+    if (returnObj) {
+      return layer;
+    }
+    return useGeoJSLayer(layer, layerType);
+  };
+
+  const drawLayer = (layerId: number) => {
+    const layerToDraw = map.value.layers().find((layer: any) => layer.id() === layerId);
+    if (layerToDraw) {
+      layerToDraw.draw();
+    }
+  };
+
+  const updateLayerUrl = (layerId: number, newUrl: string) => {
+    const updateLayer = map.value.layers().find((layer: any) => layer.id() === layerId);
+    if (updateLayer && updateLayer.url) {
+      updateLayer.url(newUrl);
+    }
   };
 
   const generatePixelCoordinateParams = (
@@ -112,5 +136,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     geoEvents,
     geoAnnotations,
     clampBoundsX,
+    drawLayer,
+    updateLayerUrl,
   };
 }

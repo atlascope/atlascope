@@ -1,4 +1,8 @@
 version: '3'
+
+volumes:
+  pooch_cache:
+
 services:
   django:
     build:
@@ -11,6 +15,7 @@ services:
     volumes:
       - .:/opt/django-project
       - ./data:/opt/django-project/data
+      - pooch_cache:/root/.cache/pooch
     ports:
       - 8000:8000
     depends_on:
@@ -37,6 +42,17 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+
+  yarn:
+    image: node:18
+    working_dir: /web
+    volumes:
+      - ./web:/web
+    command: yarn serve
+    ports:
+      - 8080:8080
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
 
   demotiles:
     build:

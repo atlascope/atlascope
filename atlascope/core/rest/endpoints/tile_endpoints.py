@@ -14,7 +14,8 @@ from atlascope.core.models import Dataset, DatasetSerializer
 
 class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
     queryset = Dataset.objects.filter(
-        content__isnull=False, dataset_type__in=['tile_source', 'non_tiled_image']
+        content__isnull=False,
+        dataset_type__in=['tile_source', 'subimage', 'non_tiled_image'],
     )
     serializer_class = DatasetSerializer
 

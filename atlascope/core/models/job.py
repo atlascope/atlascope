@@ -17,6 +17,7 @@ def validate_job_type(value):
 
 class Job(models.Model):
     complete = models.BooleanField(default=False)
+    failure = models.CharField(blank=True, max_length=255)
     investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,
@@ -39,7 +40,7 @@ class Job(models.Model):
     additional_inputs = models.JSONField(null=True)
 
     def spawn(self):
-        runner = available_job_types[self.job_type]
+        runner = available_job_types[self.job_type].run
         runner.delay(
             # celery arguments must be serializable
             self.id,

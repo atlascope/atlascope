@@ -10,6 +10,7 @@
     "generateTypes": "node src/generateTypesFromSchema.js"
   },
   "dependencies": {
+    "@koumoul/vuetify-jsonschema-form": "^0.36.4",
     "@sentry/vue": "^6.2.0",
     "@vue/composition-api": "^1.0.0-rc.2",
     "axios": "^0.21.1",
@@ -17,7 +18,10 @@
     "geojs": "^1.4.3",
     "swagger-typescript-api": "^9.3.1",
     "vue": "^2.6.11",
+    "vue-color": "^2.8.1",
     "vue-router": "^3.2.0",
+    "vue-swatches": "^2.1.1",
+    "vuedraggable": "^2.24.3",
     "vuetify": "^2.4.0",
     "vuex": "^3.6.2"
   },
@@ -33,6 +37,7 @@
     "@vue/eslint-config-airbnb": "^5.0.2",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^1.0.3",
+    "ajv-errors": "^1.0.0",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^6.2.2",
@@ -56,7 +61,9 @@
     "parserOptions": {
       "ecmaVersion": 2020
     },
-    "rules": {},
+    "rules": {
+      "no-console": "warn"
+    },
     "overrides": [
       {
         "files": [
