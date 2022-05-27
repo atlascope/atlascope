@@ -10,5 +10,4 @@ class Migration(migrations.Migration):
         ('core', '0005_add_tour_waypoints'),
     ]
 
-    operations = [
-    ]
+    operations = []
