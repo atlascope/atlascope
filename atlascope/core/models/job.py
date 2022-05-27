@@ -41,7 +41,7 @@ class Job(models.Model):
 
     def spawn(self):
         runner = available_job_types[self.job_type].run
-        runner.delay(
+        runner(
             # celery arguments must be serializable
             self.id,
             self.original_dataset.id,
