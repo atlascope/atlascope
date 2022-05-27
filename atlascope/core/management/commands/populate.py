@@ -47,10 +47,10 @@ def announce(msg):
 
 @announce("Deleting")
 def delete_all():
-    # Delete dataset objects.
+    # Delete dataset objects in reverse order of source dataset references
     print("  Dataset objects...", end="", flush=True)
-    Dataset.objects.filter(source_dataset__isnull=False).delete()
-    Dataset.objects.all().delete()
+    while Dataset.objects.count() > 0:
+        Dataset.objects.filter(derived_datasets=None).delete()
     print("done")
 
     # Delete the other objects. Go in reverse order of model creation.
