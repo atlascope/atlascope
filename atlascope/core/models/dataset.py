@@ -125,7 +125,7 @@ class DatasetSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        """Only include detected_nuclei field on nucleus_detection type Datasets"""
+        """Only include detected_nuclei field on nucleus_detection type Datasets."""
         ret = super().to_representation(instance)
         if ret['dataset_type'] != 'nucleus_detection':
             del ret['detected_nuclei']
