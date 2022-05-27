@@ -28,6 +28,7 @@ export interface GeoJSLayer {
   removeAllAnnotations: () => void;
   addGeoEventHandler: (event: any, handler: Function) => void;
   mode: (newMode: string | null) => string | null;
+  layer: any;
 }
 
 export interface GeoJSFeature {
