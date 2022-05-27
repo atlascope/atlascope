@@ -523,7 +523,7 @@ export default defineComponent({
         throw new Error('Expected the store to contain an axios object for feteching metadata');
       }
       if (!nonTiledOverlayFeature) {
-        nonTiledOverlayFeature = featureLayer.createFeature('quad');
+        nonTiledOverlayFeature = featureLayer.layer.value.createFeature('quad');
       }
       const quadData = (nonTiledOverlayFeature.data() || []) as NonTiledOverlayFeatureData[];
       const existingOverlay = quadData.find(
