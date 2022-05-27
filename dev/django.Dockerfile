@@ -31,6 +31,8 @@ RUN pip install \
         --find-links https://girder.github.io/large_image_wheels \
         large-image-converter==1.14.3
 
+RUN pip install histomicstk --find-links https://girder.github.io/large_image_wheels
+
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
