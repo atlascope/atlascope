@@ -206,7 +206,7 @@ const {
             });
           });
 
-          dispatch.fetchInvestigationPins();
+          await dispatch.fetchInvestigationPins();
         }
       } else {
         commit.setCurrentInvestigation(null);
