@@ -525,7 +525,7 @@ export default defineComponent({
       if (!nonTiledOverlayFeature) {
         nonTiledOverlayFeature = featureLayer.layer.value.createFeature('quad');
       }
-      const quadData = (nonTiledOverlayFeature.data() || []) as NonTiledOverlayFeatureData[];
+      const quadData: NonTiledOverlayFeatureData[] = nonTiledOverlayFeature.data() || [];
       const existingOverlay = quadData.find(
         (overlay: NonTiledOverlayFeatureData) => overlay.pinId === pin.id,
       );
