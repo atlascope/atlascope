@@ -2,6 +2,7 @@
 import io
 
 from celery import shared_task
+from django.contrib.gis.geos import Point, Polygon
 import histomicstk as htk
 import numpy as np
 import scipy as sp
@@ -9,7 +10,7 @@ import skimage.color
 import skimage.io
 import skimage.measure
 
-from atlascope.core.models import Dataset
+from atlascope.core.models import Dataset, DetectedNucleus
 
 from .utils import save_output_dataset
 
@@ -68,25 +69,62 @@ def run(job_id: str, original_dataset_id: str):
     original_dataset = Dataset.objects.get(id=original_dataset_id)
     job = Job.objects.get(id=job_id)
 
+    def nucleus_data_subset(data: dict, subset_name: str):
+        return (
+            {
+                key.replace(subset_name, ''): value
+                for key, value in data.items()
+                if subset_name in key
+            },
+        )
+
     try:
         input_image = skimage.io.imread(
             io.BytesIO(original_dataset.content.read()),
         )
         nuclei = detect_nuclei(input_image)
 
-        job.resulting_datasets.add(
-            save_output_dataset(
-                original_dataset,
-                job.investigation,
-                'Detected Nuclei',
-                None,
-                {
-                    'num_nuclei': len(nuclei),
-                    'nucleus_detections': nuclei,
-                },
-                dataset_type='nucleus_detection',
-            )
+        detection_dataset = save_output_dataset(
+            original_dataset,
+            job.investigation,
+            'Detected Nuclei',
+            None,
+            {
+                'num_nuclei': len(nuclei),
+            },
+            dataset_type='nucleus_detection',
         )
+        for nucleus in nuclei:
+            DetectedNucleus.objects.create(
+                detection_dataset=detection_dataset,
+                label_integer=nucleus['Label'],
+                centroid=Point(
+                    x=nucleus['Identifier.CentroidX'],
+                    y=nucleus['Identifier.CentroidY'],
+                ),
+                weighted_centroid=Point(
+                    x=nucleus['Identifier.WeightedCentroidX'],
+                    y=nucleus['Identifier.WeightedCentroidY'],
+                ),
+                bounding_box=Polygon(
+                    [
+                        (nucleus['Identifier.Xmin'], nucleus['Identifier.Ymin']),
+                        (nucleus['Identifier.Xmax'], nucleus['Identifier.Ymin']),
+                        (nucleus['Identifier.Xmax'], nucleus['Identifier.Ymax']),
+                        (nucleus['Identifier.Xmin'], nucleus['Identifier.Ymax']),
+                        # repeat first point to create linear ring
+                        (nucleus['Identifier.Xmin'], nucleus['Identifier.Ymin']),
+                    ]
+                ),
+                orientation=nucleus['Orientation.Orientation'],
+                nucleus_gradient=nucleus_data_subset(nucleus, 'Nucleus.Gradient.'),
+                nucleus_haralick=nucleus_data_subset(nucleus, 'Nucleus.Haralick.'),
+                nucleus_intensity=nucleus_data_subset(nucleus, 'Nucleus.Intensity.'),
+                shape=nucleus_data_subset(nucleus, 'Shape.'),
+                size=nucleus_data_subset(nucleus, 'Size.'),
+            )
+
+        job.resulting_datasets.add(detection_dataset)
         job.complete = True
         job.save()
     except Exception as e:

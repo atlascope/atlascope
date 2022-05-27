@@ -27,6 +27,7 @@ class AtlascopeMixin(ConfigMixin):
         'tile_overlay',
         'analytics',
         'subimage',
+        'nucleus_detection',
     ]
 
     # Use PostGIS
