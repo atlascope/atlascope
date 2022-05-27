@@ -25,6 +25,7 @@ class InvestigationSerializer(serializers.ModelSerializer):
             'modified',
             'embeddings',
             'jobs',
+            'tours',
         ]
 
 

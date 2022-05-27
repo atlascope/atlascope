@@ -10,20 +10,20 @@
         cols="auto"
       >
         <v-select
-          v-if="!loaded || tilesourceDatasets.length > 0"
-          v-model="selectedDataset"
-          class="pr-6"
-          :items="tilesourceDatasets"
+          v-if="!loaded || currentDatasets.length > 0"
+          :value="rootDataset"
+          :items="currentDatasets"
+          class="atlascope-dataset-select"
           item-text="name"
           item-value="id"
           return-object
           single-line
           dense
           hide-details
-          @change="rootDatasetChanged"
+          @input="store.commit.setRootDataset"
         />
         <v-banner
-          v-if="loaded && tilesourceDatasets.length === 0"
+          v-if="loaded && currentDatasets.length === 0"
           single-line
         >
           <v-icon left>
@@ -35,9 +35,6 @@
       </v-col>
       <v-col cols="auto">
         <investigation-detail-frame-menu />
-      </v-col>
-      <v-col cols="auto">
-        <dataset-subimage-selector />
       </v-col>
     </v-row>
     <v-row class="ma-0 pa-0">
@@ -123,10 +120,10 @@ import {
   watch,
   Ref,
 } from '@vue/composition-api';
+import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
 import { postGisToPoint, Point } from '../utilities/utiltyFunctions';
 import store, { TiffFrame } from '../store';
-import DatasetSubimageSelector from '../components/DatasetSubimageSelector.vue';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
@@ -180,7 +177,6 @@ export default defineComponent({
   components: {
     InvestigationSidebar,
     InvestigationDetailFrameMenu,
-    DatasetSubimageSelector,
   },
 
   props: {
@@ -212,25 +208,19 @@ export default defineComponent({
       sidebarCollapsed.value = !sidebarCollapsed.value;
     }
 
-    const selectedDataset: Ref<Dataset | null> = ref(null);
     const rootDataset = computed(() => store.state.rootDataset);
-    const tilesourceDatasets = computed(() => store.getters.tilesourceDatasets);
+    const showEmbeddings = computed(() => store.state.showEmbeddings);
+    const currentDatasets = computed(() => store.state.currentDatasets);
     const selectionMode = computed(() => store.state.selectionMode);
+    let selectionLayer: GeoJSLayer | undefined;
+    let featureLayer: GeoJSLayer | undefined;
+    let pinFeature: GeoJSFeature | undefined;
     /* eslint-disable */
-    let selectionLayer: any;
-    let featureLayer: any;
-    let pinFeature: any;
     let nonTiledOverlayFeature: any;
-    const rootDatasetLayer: Ref<any> = ref(null);
     /* eslint-enable */
+    let rootDatasetLayer: GeoJSLayer;
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
-
-    function rootDatasetChanged(newRootDataset: Dataset) {
-      selectedDataset.value = newRootDataset;
-      store.dispatch.updateSelectedPins([]);
-      store.dispatch.setRootDataset(newRootDataset);
-    }
 
     function selectPinsForRootDataset() {
       store.dispatch.updateSelectedPins(store.state.currentPins.filter(
@@ -255,31 +245,32 @@ export default defineComponent({
 
     function tearDownMap() {
       exit();
-      selectionLayer = null;
-      featureLayer = null;
-      pinFeature = null;
+      selectionLayer = undefined;
+      featureLayer = undefined;
+      pinFeature = undefined;
     }
 
     function movePinNoteCards() {
       if (!featureLayer || !pinFeature || !map.value) { return; }
-      pinFeature.data().forEach((pin: Pin) => {
-        const { x, y } = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
-        const newScreenCoords = pinFeature.featureGcsToDisplay({ x, y });
-        const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+      pinFeature.getData().forEach((pin: object) => {
+        if (!pinFeature) return;
+        const { x, y } = postGisToPoint((pin as Pin).child_location) || { x: 0, y: 0 };
+        const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
+        const note = pinNotes.value.find((pinNote) => pinNote.id === (pin as Pin).id);
+        const {
+          left, top, width, height,
+        } = map.value?.getBoundingClientRect() || {
+          left: 0, top: 0, width: 0, height: 0,
+        };
         if (note) {
-          const {
-            left, top, width, height,
-          } = map.value?.getBoundingClientRect() || {
-            left: 0, top: 0, width: 0, height: 0,
-          };
           note.notePositionX = newScreenCoords.x + left;
           note.notePositionY = newScreenCoords.y + top;
           if (note.notePositionX > left + width
               || note.notePositionY > top + height
               || note.notePositionX < left
               || note.notePositionY < top
-              || zoomLevel.value < (pin.minimum_zoom || 0)
-              || zoomLevel.value > (pin.maximum_zoom || 40)) {
+              || zoomLevel.value < ((pin as Pin).minimum_zoom || 0)
+              || zoomLevel.value > ((pin as Pin).maximum_zoom || 40)) {
             note.inBounds = false;
           } else {
             note.inBounds = true;
@@ -310,7 +301,7 @@ export default defineComponent({
       }
 
       const apiRoot = process.env.VUE_APP_API_ROOT;
-      const embeddings = store.state.datasetEmbeddings;
+      const embeddings = showEmbeddings.value ? store.state.datasetEmbeddings : [];
       const rootDatasetID = dataset.id;
       const rootTileMetadata = store.state.datasetTileMetadata[rootDatasetID];
 
@@ -341,7 +332,7 @@ export default defineComponent({
         crossDomain: 'use-credentials',
       };
       createMap(mapParams);
-      rootDatasetLayer.value = createLayer('osm', rootLayerParams);
+      rootDatasetLayer = createLayer('osm', rootLayerParams);
 
       const visited: Set<RootDatasetEmbedding | DatasetEmbedding> = new Set();
       const stack: Array<StackFrame> = [];
@@ -442,19 +433,29 @@ export default defineComponent({
       drawMap(newValue);
     });
 
+    watch(showEmbeddings, () => {
+      drawMap(rootDataset.value);
+    });
+
     watch(frames, () => {
       if (rootDataset.value && rootDatasetLayer) {
         const queryString = buildUrlQueryArgs();
         const apiRoot = process.env.VUE_APP_API_ROOT;
-        const newUrl = `${apiRoot}/datasets/tile_source/${rootDataset.value.id}/tiles/{z}/{x}/{y}.png${queryString}`;
-        rootDatasetLayer.value.url(newUrl).draw();
+        const datasetId = rootDataset.value.id;
+        const newUrl = `
+          ${apiRoot}/datasets/tile_source/${datasetId}/tiles/{z}/{x}/{y}.png${queryString}
+        `;
+        rootDatasetLayer.updateLayerUrl(newUrl);
+        rootDatasetLayer.drawLayer();
       }
     }, { deep: true });
 
     function handleSelectionChange() {
+      if (selectionLayer === undefined) return;
       const annotations = selectionLayer.annotations();
       /* eslint-disable-next-line */
       annotations.forEach((annotation: any) => {
+        if (selectionLayer === undefined) return;
         annotation.style({
           fillColor: '#00796b',
           strokeColor: '#00796b',
@@ -481,10 +482,11 @@ export default defineComponent({
           annotations: ['rectangle'],
           showLabels: false,
         });
-        selectionLayer.geoOn(geoEvents.annotation.add, handleSelectionChange);
-        selectionLayer.geoOn(geoEvents.annotation.update, handleSelectionChange);
-        selectionLayer.geoOn(geoEvents.annotation.remove, handleSelectionChange);
-        selectionLayer.geoOn(geoEvents.annotation.state, handleSelectionChange);
+        if (!selectionLayer) return;
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.add, handleSelectionChange);
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.update, handleSelectionChange);
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.remove, handleSelectionChange);
+        selectionLayer.addGeoEventHandler(geoEvents.annotation.state, handleSelectionChange);
       }
       if (!selectionMode.value) {
         selectionLayer.mode(null);
@@ -577,6 +579,9 @@ export default defineComponent({
           { features: ['point', 'line', 'polygon', 'quad.image'] },
         );
       }
+      if (!featureLayer) {
+        return;
+      }
       const newPinIds = newPins.map((pin) => pin.id);
       const removedPinIds = oldPins.filter((pin: Pin) => !newPinIds.includes(pin.id))
         .map((pin: Pin) => pin.id);
@@ -594,44 +599,41 @@ export default defineComponent({
         }
       });
       if (!pinFeature) {
-        /* eslint-disable */
-        pinFeature = featureLayer.createFeature('point')
-          .data(selectedPins.value)
-          .position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }))
-          .style({
-            radius: 10,
-            strokeColor: 'white',
-            fillColor: (pin: Pin) => pin.color,
-          })
-          .draw();
-        pinFeature.geoOn(geoEvents.feature.mouseclick, (event: any) => {
+        pinFeature = featureLayer.createFeature('point');
+        pinFeature.data(selectedPins.value);
+        pinFeature.position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }));
+        pinFeature.style({
+          radius: 10,
+          strokeColor: 'white',
+          fillColor: (pin: Pin) => pin.color,
+        });
+        pinFeature.draw();
+        pinFeature.addGeoEventHandler(geoEvents.feature.mouseclick, (event: MouseClickEvent) => {
           if (!map.value) { return; }
 
           if (event.mouse.buttonsDown.left) {
-            if (!event.data.child && event.data.note) {
-              // note-only pins
-              const noteToToggle = pinNotes.value.find((note) => note.id === event.data.id);
+            const pinClicked = event.data as Pin;
+            if (!pinClicked.child && pinClicked.note) {
+              const noteToToggle = pinNotes.value.find((note) => note.id === pinClicked.id);
               if (noteToToggle) {
                 noteToToggle.showNote = !noteToToggle.showNote;
                 noteToToggle.notePositionX = event.mouse.page.x;
                 noteToToggle.notePositionY = event.mouse.page.y;
               }
-            } else if (event.data.child) {
-              // pins with child dataset
-              toggleDatasetPin(event.data);
+            } else if (pinClicked.child) {
+              toggleDatasetPin(pinClicked);
             }
           }
         });
       } else {
-        pinFeature.data(selectedPins.value).draw();
+        pinFeature.data(selectedPins.value);
+        pinFeature.draw();
       }
       showHidePinsForZoomLevel(zoomLevel.value);
-      /* eslint-enable */
     });
 
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
-      selectedDataset.value = store.state.rootDataset;
       drawMap(store.state.rootDataset);
       createPinNotes();
       selectPinsForRootDataset();
@@ -644,12 +646,11 @@ export default defineComponent({
       hoverText,
       toggleSidebar,
       map,
-      tilesourceDatasets,
+      currentDatasets,
       rootDataset,
-      selectedDataset,
-      rootDatasetChanged,
       selectedPins,
       pinNotes,
+      store,
     };
   },
 });
