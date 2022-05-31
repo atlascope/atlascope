@@ -565,7 +565,13 @@ export default defineComponent({
       if (!childDataset) return;
       switch (childDataset.dataset_type) {
         case 'non_tiled_image':
-          toggleNonTiledImageOverlay(pin, childDataset);
+          toggleNonTiledImageOverlay(pin, childDataset).catch((err) => {
+            if (err.response) {
+              throw new Error(`Unable to fetch metadata for dataset ${childDataset.id}`);
+            } else {
+              throw err;
+            }
+          });
           break;
         default:
           break;
