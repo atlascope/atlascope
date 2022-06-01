@@ -4,7 +4,7 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  Investigation, Dataset, TileMetadata, Pin, DatasetEmbedding, JobDetail,
+  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail,
 } from '../generatedTypes/AtlascopeTypes';
 
 Vue.use(Vuex);
@@ -14,6 +14,14 @@ export interface TiffFrame {
   frame: number;
   displayed: boolean;
   color: string;
+}
+
+export interface TileMetadata {
+  levels: number;
+  size_x: number;
+  size_y: number;
+  tile_size: number;
+  additional_metadata: any;
 }
 
 export interface State {
@@ -198,7 +206,7 @@ const {
             });
           });
 
-          dispatch.fetchInvestigationPins();
+          await dispatch.fetchInvestigationPins();
         }
       } else {
         commit.setCurrentInvestigation(null);

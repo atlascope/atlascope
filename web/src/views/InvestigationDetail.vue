@@ -122,7 +122,7 @@ import {
 } from '@vue/composition-api';
 import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
-import { postGisToPoint } from '../utilities/utiltyFunctions';
+import { postGisToPoint, Point } from '../utilities/utiltyFunctions';
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -133,7 +133,7 @@ interface RootDatasetEmbedding {
   id: null;
   child_bounding_box: number[];
   parent: null;
-  child: string;
+  child: number;
 }
 
 interface StackFrame {
@@ -153,6 +153,13 @@ interface PinNote extends Pin {
   inBounds: boolean;
   notePositionX: number;
   notePositionY: number;
+}
+
+interface NonTiledOverlayFeatureData {
+  ul: Point;
+  lr: Point;
+  image: HTMLImageElement;
+  pinId: number | undefined;
 }
 
 interface BandSpec {
@@ -205,14 +212,13 @@ export default defineComponent({
     const showEmbeddings = computed(() => store.state.showEmbeddings);
     const currentDatasets = computed(() => store.state.currentDatasets);
     const selectionMode = computed(() => store.state.selectionMode);
-    /* eslint-disable */
     let selectionLayer: GeoJSLayer | undefined;
     let featureLayer: GeoJSLayer | undefined;
     let pinFeature: GeoJSFeature | undefined;
+    /* eslint-disable */
+    let nonTiledOverlayFeature: any;
     /* eslint-enable */
-    // const rootDatasetLayer: Ref<any> = ref(null);
     let rootDatasetLayer: GeoJSLayer;
-    /* eslint-enable */
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
 
@@ -225,7 +231,7 @@ export default defineComponent({
     function getSelectedFrameStyle(): BandSpec[] {
       return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
         frame: frame.frame,
-        palette: frame.color,
+        palette: `${frame.color}`,
       }));
     }
 
@@ -492,8 +498,12 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    // Create note cards for any pins without a child dataset.
     function createPinNotes() {
-      pinNotes.value = store.state.currentPins.map((pin) => ({
+      const noteOnlyPins = store.state.currentPins.filter(
+        (pin: Pin) => (!pin.child && pin.note?.length),
+      );
+      pinNotes.value = noteOnlyPins.map((pin) => ({
         ...pin,
         showNote: false,
         inBounds: pin.minimum_zoom === 0,
@@ -502,20 +512,96 @@ export default defineComponent({
       }));
     }
 
+    async function toggleNonTiledImageOverlay(pin: Pin, dataset: Dataset) {
+      if (!dataset.content) {
+        throw new Error(`Expected dataset of type ${dataset.dataset_type} to have content`);
+      }
+      if (!featureLayer) {
+        throw new Error('Expected a featureLayer to exist');
+      }
+      if (!store.state.axiosInstance) {
+        throw new Error('Expected the store to contain an axios object for feteching metadata');
+      }
+      if (!nonTiledOverlayFeature) {
+        nonTiledOverlayFeature = featureLayer.layer.value.createFeature('quad');
+      }
+      const quadData: NonTiledOverlayFeatureData[] = nonTiledOverlayFeature.data() || [];
+      const existingOverlay = quadData.find(
+        (overlay: NonTiledOverlayFeatureData) => overlay.pinId === pin.id,
+      );
+      if (existingOverlay) {
+        nonTiledOverlayFeature.data(
+          nonTiledOverlayFeature.data().filter(
+            (overlay: NonTiledOverlayFeatureData) => overlay.pinId !== pin.id,
+          ),
+        ).draw();
+        nonTiledOverlayFeature.draw();
+      } else {
+        const urlRoot = process.env.VUE_APP_API_ROOT;
+        const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
+        const image: HTMLImageElement = new Image();
+        image.src = url;
+        image.crossOrigin = 'use-credentials';
+        const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
+        const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+        const lr = {
+          x: ul.x + (imageMetadata.sizeX || 0),
+          y: ul.y + (imageMetadata.sizeY || 0),
+        };
+        quadData.push({
+          ul,
+          lr,
+          image,
+          pinId: pin.id,
+        });
+        nonTiledOverlayFeature.data(quadData).draw();
+      }
+    }
+
+    function toggleDatasetPin(pin: Pin) {
+      const childDataset: Dataset | undefined = store.state.currentDatasets.find(
+        (dataset: Dataset) => dataset.id === pin.child,
+      );
+      if (!childDataset) return;
+      switch (childDataset.dataset_type) {
+        case 'non_tiled_image':
+          toggleNonTiledImageOverlay(pin, childDataset).catch((err) => {
+            if (err.response) {
+              throw new Error(`Unable to fetch metadata for dataset ${childDataset.id}`);
+            } else {
+              throw err;
+            }
+          });
+          break;
+        default:
+          break;
+      }
+    }
+
     watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
-        featureLayer = createLayer('feature', { features: ['point', 'line', 'polygon'] });
+        featureLayer = createLayer(
+          'feature',
+          { features: ['point', 'line', 'polygon', 'quad.image'] },
+        );
       }
       if (!featureLayer) {
         return;
       }
       const newPinIds = newPins.map((pin) => pin.id);
-      oldPins.forEach((pin) => {
-        if (!newPinIds.includes(pin.id)) {
-          const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
-          if (note) {
-            note.showNote = false;
-          }
+      const removedPinIds = oldPins.filter((pin: Pin) => !newPinIds.includes(pin.id))
+        .map((pin: Pin) => pin.id);
+      if (nonTiledOverlayFeature) {
+        const overlayData = nonTiledOverlayFeature.data();
+        const newOverlayData = overlayData.filter(
+          (overlay: NonTiledOverlayFeatureData) => !removedPinIds.includes(overlay.pinId),
+        );
+        nonTiledOverlayFeature.data(newOverlayData).draw();
+      }
+      removedPinIds.forEach((pinId) => {
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pinId);
+        if (note) {
+          note.showNote = false;
         }
       });
       if (!pinFeature) {
@@ -532,11 +618,16 @@ export default defineComponent({
           if (!map.value) { return; }
 
           if (event.mouse.buttonsDown.left) {
-            const noteToToggle = pinNotes.value.find((note) => note.id === (event.data as Pin).id);
-            if (noteToToggle) {
-              noteToToggle.showNote = !noteToToggle.showNote;
-              noteToToggle.notePositionX = event.mouse.page.x;
-              noteToToggle.notePositionY = event.mouse.page.y;
+            const pinClicked = event.data as Pin;
+            if (!pinClicked.child && pinClicked.note) {
+              const noteToToggle = pinNotes.value.find((note) => note.id === pinClicked.id);
+              if (noteToToggle) {
+                noteToToggle.showNote = !noteToToggle.showNote;
+                noteToToggle.notePositionX = event.mouse.page.x;
+                noteToToggle.notePositionY = event.mouse.page.y;
+              }
+            } else if (pinClicked.child) {
+              toggleDatasetPin(pinClicked);
             }
           }
         });
