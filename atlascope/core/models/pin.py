@@ -25,17 +25,11 @@ class Pin(models.Model):
         on_delete=models.CASCADE,
         related_name='pins',
     )
-    child = models.ForeignKey(
-        'Dataset',
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='locations',
-    )
-    child_location = PointField()
+    location = PointField()
     color = models.CharField(
         max_length=15, choices=PIN_COLORS, default='red', null=False, blank=False
     )
-    note = models.TextField(max_length=1000, blank=True)
+    description = models.TextField(max_length=1000, blank=True)
     minimum_zoom = models.PositiveIntegerField(default=0)
     maximum_zoom = models.PositiveIntegerField(default=40)
 
@@ -48,12 +42,56 @@ class Pin(models.Model):
         ]
 
 
+class NotePin(Pin):
+    note = models.TextField(max_length=1000)
+
+
+class DatasetPin(Pin):
+    child = models.ForeignKey(
+        'Dataset',
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='locations',
+    )
+
+
+
+class NotePinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotePin
+        fields = '__all__'
+
+
+class DatasetPinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DatasetPin
+        fields = '__all__'
+
+
 class PinSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        try:
+            notepin = instance.notepin
+            return NotePinSerializer(notepin).data
+        except:
+            pass
+        try:
+            datasetpin = instance.datasetpin
+            return DatasetPinSerializer(datasetpin).data
+        except:
+            pass
+        return super().to_representation(instance)
+
     class Meta:
         model = Pin
         fields = '__all__'
 
 
+class InvestigationPinSerializer(serializers.BaseSerializer):
+    note_pins = NotePinSerializer(many=True)
+    dataset_pins = DatasetPinSerializer(many=True)
+
+
 @admin.register(Pin)
 class PinAdmin(admin.ModelAdmin):
-    list_display = ('id', 'color', 'note')
+    list_display = ('id', 'color', 'description')

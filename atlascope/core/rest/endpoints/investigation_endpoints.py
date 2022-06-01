@@ -12,6 +12,7 @@ from atlascope.core.models import (
     PinSerializer,
     TourSerializer,
 )
+from atlascope.core.models.pin import DatasetPinSerializer, NotePinSerializer
 
 
 class InvestigationViewSet(
@@ -25,7 +26,9 @@ class InvestigationViewSet(
     @swagger_auto_schema(responses={200: PinSerializer(many=True)})
     @action(detail=True, methods=['GET'])
     def pins(self, request, pk=None):
-        payload = PinSerializer(self.get_object().pins.all().order_by('id'), many=True).data
+        relatedPins = self.get_object().pins.all().select_related('notepin').select_related('datasetpin').order_by('id')
+        # relatedPins = self.get_object().pins.all().select_subclasses.order_by('id')
+        payload = PinSerializer(relatedPins, many=True).data
         return Response(payload, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(responses={200: JobDetailSerializer(many=True)})
