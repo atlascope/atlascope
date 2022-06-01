@@ -60,7 +60,7 @@
         "type": "array",
         "items": {
             "type": "object",
-            "required": ["investigation", "id", "parent", "child_location", "note", "color"],
+            "required": ["investigation", "id", "parent", "color"],
             "properties": {
                 "investigation": {
                     "type": "string"
@@ -73,7 +73,7 @@
                 "parent": {
                     "type": "string"
                 },
-                "child_location": {
+                "location": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -81,7 +81,7 @@
                     "minItems": 2,
                     "maxItems": 2
                 },
-                "note": {
+                "description": {
                     "type": "string"
                 },
                 "color": {
