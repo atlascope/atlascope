@@ -2,6 +2,7 @@ from django_large_image.rest.viewsets import LargeImageDetailMixin
 from large_image.exceptions import TileSourceError
 from large_image.tilesource import FileTileSource
 from large_image_source_ometiff import OMETiffFileTileSource
+from large_image_source_pil import PILFileTileSource
 from large_image_source_tiff import TiffFileTileSource
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
@@ -14,7 +15,7 @@ from atlascope.core.models import Dataset, DatasetSerializer
 class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
     queryset = Dataset.objects.filter(
         content__isnull=False,
-        dataset_type__in=['tile_source', 'subimage'],
+        dataset_type__in=['tile_source', 'subimage', 'non_tiled_image'],
     )
     serializer_class = DatasetSerializer
 
@@ -31,6 +32,9 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
 
     def open_tile_source(self, request: Request, path: str, **kwargs) -> FileTileSource:
         """Override to manually choose tile source class."""
+        dataset = self.get_object()
+        if dataset.dataset_type == 'non_tiled_image':
+            return PILFileTileSource(path, **kwargs)
         try:
             tile_source = OMETiffFileTileSource(path, **kwargs)
         except TileSourceError:

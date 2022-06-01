@@ -27,6 +27,7 @@ class AtlascopeMixin(ConfigMixin):
         'tile_overlay',
         'analytics',
         'subimage',
+        'non_tiled_image',
     ]
 
     # Use PostGIS

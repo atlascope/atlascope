@@ -24,6 +24,33 @@
         "color": "blue"
     },
     {
+        "investigation": "Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5003,
+        "note": "An overlay of a red image",
+        "child_location": [1300, 3300],
+        "child": "Red Tile",
+        "color": "red"
+    },
+    {
+        "investigation": "Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5004,
+        "note": "An overlay of a blue image",
+        "child_location": [1500, 2300],
+        "child": "Blue Tile",
+        "color": "blue"
+    },
+    {
+        "investigation": "Pin playground",
+        "parent": "HTA9_1_BA_F_ROI02",
+        "id": 5005,
+        "note": "An overlay of a green image",
+        "child_location": [2650, 3000],
+        "child": "Green Tile",
+        "color": "green"
+    },
+    {
         "investigation":"Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5006,

@@ -1,6 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
+from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -10,6 +11,14 @@ from atlascope.core.models import (
     DatasetSerializer,
     DatasetSubImageSerializer,
 )
+
+
+class ContentRenderer(BaseRenderer):
+    media_type = 'image/png'
+    format = 'png'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
 
 
 class DatasetViewSet(
