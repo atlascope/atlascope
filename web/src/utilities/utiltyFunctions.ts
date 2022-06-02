@@ -4,16 +4,16 @@ export interface Point {
 }
 
 export function postGisToPoint(location: string): Point | undefined {
-  try {
-    const stringParts = location.split(' ');
-    const xPart = stringParts[1];
-    const yPart = stringParts[2];
-    return {
-      x: parseInt(xPart.substring(1), 10),
-      y: parseInt(yPart.substring(0, yPart.length - 1), 10),
-    };
-  } catch (error) {
-    console.error(`Failed to convert location to point ${error}`);
+  const stringParts = location.split(' ');
+  const xPart = stringParts[1];
+  const yPart = stringParts[2];
+  if (!xPart || !yPart) {
+    throw new Error(`Unable to convert string ${location} to point.`);
   }
-  return undefined;
+  const xCoord = parseInt(xPart.substring(1), 10);
+  const yCoord = parseInt(yPart.substring(0, yPart.length - 1), 10);
+  if (Number.isNaN(xCoord) || Number.isNaN(yCoord)) {
+    throw new Error(`Unable to convert string ${location} to point.`);
+  }
+  return { x: xCoord, y: yCoord };
 }

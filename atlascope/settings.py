@@ -28,6 +28,7 @@ class AtlascopeMixin(ConfigMixin):
         'analytics',
         'subimage',
         'nucleus_detection',
+        'non_tiled_image',
     ]
 
     # Use PostGIS

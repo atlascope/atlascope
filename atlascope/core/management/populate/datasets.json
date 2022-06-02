@@ -31,7 +31,8 @@
         "name": "Cells Subimage",
         "id": 2004,
         "description": "This is a screenshot of some green cells",
-        "content": "green_cell_dataset_selection.png"
+        "content": "green_cell_dataset_selection.png",
+        "dataset_type": "non_tiled_image"
     },
     {
         "name": "HTA11_377_20000010115220280030000000000 (remote)",
@@ -42,5 +43,26 @@
             "file_id": "61fda4af4874d4ffdf90d1ad",
             "sha256sum": "78b904f3cb18c040ccb9c60e2eaf14924fb380af27a786d2ecd7c7ddf2513963"
         }
+    },
+    {
+        "name":"Blue Tile",
+        "id": 2006,
+        "description": "A speckled blue PNG image",
+        "content": "blue.png",
+        "dataset_type": "non_tiled_image"
+    },
+    {
+        "name":"Red Tile",
+        "id": 2007,
+        "description": "A speckled red PNG image",
+        "content": "red.png",
+        "dataset_type": "non_tiled_image"
+    },
+    {
+        "name":"Green Tile",
+        "id": 2008,
+        "description": "A speckled green PNG image",
+        "content": "green.png",
+        "dataset_type": "non_tiled_image"
     }
 ]
