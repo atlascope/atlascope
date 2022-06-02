@@ -11,6 +11,10 @@ import skimage.io
 import skimage.measure
 
 from atlascope.core.models import Dataset, DetectedNucleus
+from atlascope.core.models.detected_nucleus import (
+    NUCLEUS_ATTRIBUTES,
+    nucleus_attribute_to_field_name,
+)
 
 from .utils import save_output_dataset
 
@@ -116,12 +120,10 @@ def run(job_id: str, original_dataset_id: str):
                         (nucleus['Identifier.Xmin'], nucleus['Identifier.Ymin']),
                     ]
                 ),
-                orientation=nucleus['Orientation.Orientation'],
-                nucleus_gradient=nucleus_data_subset(nucleus, 'Nucleus.Gradient.'),
-                nucleus_haralick=nucleus_data_subset(nucleus, 'Nucleus.Haralick.'),
-                nucleus_intensity=nucleus_data_subset(nucleus, 'Nucleus.Intensity.'),
-                shape=nucleus_data_subset(nucleus, 'Shape.'),
-                size=nucleus_data_subset(nucleus, 'Size.'),
+                **{
+                    nucleus_attribute_to_field_name(attribute): nucleus[attribute]
+                    for attribute in NUCLEUS_ATTRIBUTES
+                },
             )
 
         job.resulting_datasets.add(detection_dataset)
