@@ -42,7 +42,7 @@ def test_get_investigation_pins(api_client, investigation, note_pin_factory, dat
         f'/api/v1/investigations/{investigation.id}/pins'
     )
     assert resp.status_code == 200
-    assert resp.json() == [models.PinPolymorphicSerializer(pin).data for pin in pin_set]
+    assert resp.json() == [models.PinSerializer(pin).data for pin in pin_set]
 
 
 # ------------------------------------------------------------------

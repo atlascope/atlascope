@@ -58,7 +58,7 @@ class DatasetPin(Pin):
     )
 
 
-class PinSerializer(serializers.ModelSerializer):
+class BasePinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pin
         fields = '__all__'
@@ -76,9 +76,9 @@ class DatasetPinSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PinPolymorphicSerializer(PolymorphicSerializer):
+class PinSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
-        Pin: PinSerializer,
+        Pin: BasePinSerializer,
         NotePin: NotePinSerializer,
         DatasetPin: DatasetPinSerializer,
     }
@@ -87,6 +87,16 @@ class PinPolymorphicSerializer(PolymorphicSerializer):
         swagger_schema_fields = {
             'type': openapi.TYPE_OBJECT,
             'title': 'Pin',
+            'required': [
+                'id',
+                'investigation',
+                'parent',
+                'minimum_zoom',
+                'maximum_zoom',
+                'resource_type',
+                'location',
+                'color',
+            ],
             'properties': {
                 'id': openapi.Schema(
                     title='id',
@@ -110,6 +120,10 @@ class PinPolymorphicSerializer(PolymorphicSerializer):
                 ),
                 'location': openapi.Schema(
                     title='location',
+                    type=openapi.TYPE_STRING
+                ),
+                'color': openapi.Schema(
+                    title='color',
                     type=openapi.TYPE_STRING
                 ),
                 'resource_type': openapi.Schema(

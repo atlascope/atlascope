@@ -7,8 +7,8 @@ from .pin import (
     NotePin,
     NotePinSerializer,
     Pin,
-    PinPolymorphicSerializer,
     PinSerializer,
+    BasePinSerializer,
 )
 from .tour import Tour, TourSerializer
 from .tour_waypoints import TourWaypoints
@@ -32,8 +32,8 @@ __all__ = [
     Pin,
     NotePin,
     DatasetPin,
+    BasePinSerializer,
     PinSerializer,
-    PinPolymorphicSerializer,
     NotePinSerializer,
     DatasetPinSerializer,
     Tour,

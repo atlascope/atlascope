@@ -10,7 +10,7 @@ from atlascope.core.models import (
     Investigation,
     InvestigationSerializer,
     JobDetailSerializer,
-    PinPolymorphicSerializer,
+    PinSerializer,
     TourSerializer,
 )
 
@@ -23,10 +23,10 @@ class InvestigationViewSet(
     queryset = Investigation.objects.all().order_by('id')
     serializer_class = InvestigationSerializer
 
-    @swagger_auto_schema(responses={200: PinPolymorphicSerializer(many=True)})
+    @swagger_auto_schema(responses={200: PinSerializer(many=True)})
     @action(detail=True, methods=['GET'])
     def pins(self, request, pk=None):
-        payload = PinPolymorphicSerializer(
+        payload = PinSerializer(
             self.get_object().pins.all().order_by('id'), many=True
         ).data
         return Response(payload, status=status.HTTP_200_OK)
