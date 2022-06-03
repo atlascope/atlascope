@@ -39,7 +39,7 @@ export interface Dataset {
   jobs: number[];
   origin: number[];
   pins: number[];
-  locations: number[];
+  locations: string[];
 }
 
 export interface DatasetCreate {
@@ -77,6 +77,9 @@ export interface DatasetSubImage {
 
   /** Y1 */
   y1: number;
+
+  /** Investigation */
+  investigation: string;
 }
 
 export interface Investigation {
@@ -107,6 +110,7 @@ export interface Investigation {
   modified?: string;
   embeddings: number[];
   jobs: number[];
+  tours: number[];
 }
 
 export interface DatasetEmbedding {
@@ -131,6 +135,9 @@ export interface JobDetail {
   /** Complete */
   complete?: boolean;
 
+  /** Failure */
+  failure?: string;
+
   /** Job type */
   job_type?: string;
 
@@ -146,40 +153,65 @@ export interface JobDetail {
 }
 
 export interface Pin {
+  /** id */
+  id: number;
+
+  /** investigation */
+  investigation: number;
+
+  /** parent */
+  parent: number;
+
+  /** minimum_zoom */
+  minimum_zoom: number;
+
+  /** maximum_zoom */
+  maximum_zoom: number;
+
+  /** location */
+  location: string;
+
+  /** color */
+  color: string;
+
+  /** resource_type */
+  resource_type: string;
+
+  /** description */
+  description?: string;
+
+  /** note */
+  note?: string;
+
+  /** child */
+  child?: number;
+}
+
+export interface Waypoint {
   /** ID */
   id?: number;
 
-  /** Child location */
-  child_location: string;
-
-  /** Color */
-  color?: "red" | "blue" | "green" | "orange" | "purple" | "black";
-
-  /** Note */
-  note?: string;
+  /** Location */
+  location?: string | null;
 
   /**
-   * Minimum zoom
-   * @min 0
+   * Zoom
+   * @min -2147483648
    * @max 2147483647
    */
-  minimum_zoom?: number;
+  zoom?: number | null;
+}
 
-  /**
-   * Maximum zoom
-   * @min 0
-   * @max 2147483647
-   */
-  maximum_zoom?: number;
+export interface Tour {
+  /** ID */
+  id?: number;
+  waypoints: Waypoint[];
+
+  /** Name */
+  name?: string;
 
   /** Investigation */
   investigation: number;
-
-  /** Parent */
-  parent: number;
-
-  /** Child */
-  child?: number | null;
 }
 
 export interface JobSpawn {
@@ -219,6 +251,17 @@ export interface DatasetsTileSourceBandParams {
 }
 
 export interface DatasetsTileSourceBandsParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
+
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceFramesParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -462,7 +505,7 @@ export interface DatasetsTileSourceThumbnailJpegParams {
   id: number;
 }
 
-export interface DatasetsTileSourceThumbnailPngReadParams {
+export interface DatasetsTileSourceThumbnailPngParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -500,7 +543,7 @@ export interface DatasetsTileSourceThumbnailPngReadParams {
   id: number;
 }
 
-export interface DatasetsTileSourceTilesMetadataReadParams {
+export interface DatasetsTileSourceTilesTilesMetadataParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -699,6 +742,21 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
+   * @name DatasetsTileSourceFrames
+   * @summary Retrieve all channels/bands for each frame. This is used to generate a UI to control how the image is displayed.
+   * @request GET:/datasets/tile_source/{id}/frames
+   * @response `200` `Dataset`
+   */
+  export namespace DatasetsTileSourceFrames {
+    export type RequestParams = { id: number };
+    export type RequestQuery = { projection?: string; source?: string };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
    * @name DatasetsTileSourceHistogram
    * @summary Returns histogram
    * @request GET:/datasets/tile_source/{id}/histogram
@@ -888,12 +946,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceThumbnailPngRead
+   * @name DatasetsTileSourceThumbnailPng
    * @summary Returns thumbnail of full image.
    * @request GET:/datasets/tile_source/{id}/thumbnail.png
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceThumbnailPngRead {
+  export namespace DatasetsTileSourceThumbnailPng {
     export type RequestParams = { id: number };
     export type RequestQuery = {
       projection?: string;
@@ -930,12 +988,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceTilesMetadataRead
+   * @name DatasetsTileSourceTilesTilesMetadata
    * @summary Returns tile metadata.
    * @request GET:/datasets/tile_source/{id}/tiles/metadata
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceTilesMetadataRead {
+  export namespace DatasetsTileSourceTilesTilesMetadata {
     export type RequestParams = { id: number };
     export type RequestQuery = { projection?: string; source?: string };
     export type RequestBody = never;
@@ -1112,6 +1170,20 @@ export namespace Investigations {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = Pin[];
+  }
+  /**
+   * No description
+   * @tags investigations
+   * @name InvestigationsTours
+   * @request GET:/investigations/{id}/tours
+   * @response `200` `(Tour)[]`
+   */
+  export namespace InvestigationsTours {
+    export type RequestParams = { id: number };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Tour[];
   }
 }
 
