@@ -32,7 +32,7 @@ def test_retrieve_investigation(api_client, investigation_factory):
 
 
 @pytest.mark.django_db
-def test_get_investigation_pins(api_client, investigation, pin_factory, note_pin_factory, dataset_pin_factory):
+def test_get_investigation_pins(api_client, investigation, note_pin_factory, dataset_pin_factory):
     note_pins = [note_pin_factory() for i in range(5)]
     dataset_pins = [dataset_pin_factory() for i in range(5)]
     pin_set = note_pins + dataset_pins

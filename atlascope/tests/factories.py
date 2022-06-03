@@ -1,5 +1,4 @@
 from django.contrib.gis.geos import Point
-from atlascope.core.models import investigation
 import factory
 
 from atlascope.core import models

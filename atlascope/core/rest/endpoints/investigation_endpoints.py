@@ -1,5 +1,5 @@
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.inspectors import SerializerInspector
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,7 +26,9 @@ class InvestigationViewSet(
     @swagger_auto_schema(responses={200: PinPolymorphicSerializer()})
     @action(detail=True, methods=['GET'])
     def pins(self, request, pk=None):
-        payload = PinPolymorphicSerializer(self.get_object().pins.all().order_by('id'), many=True).data
+        payload = PinPolymorphicSerializer(
+            self.get_object().pins.all().order_by('id'), many=True
+        ).data
         return Response(payload, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(responses={200: JobDetailSerializer(many=True)})

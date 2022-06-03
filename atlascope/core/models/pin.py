@@ -1,10 +1,9 @@
-from drf_yasg import openapi
 from django.contrib import admin
 from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
-from rest_framework import serializers
 from polymorphic.models import PolymorphicModel
+from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 PIN_COLORS = [

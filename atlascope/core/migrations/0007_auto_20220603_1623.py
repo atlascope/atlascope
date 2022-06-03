@@ -28,12 +28,28 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pin',
             name='polymorphic_ctype',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_core.pin_set+', to='contenttypes.contenttype'),
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='polymorphic_core.pin_set+',
+                to='contenttypes.contenttype',
+            ),
         ),
         migrations.CreateModel(
             name='NotePin',
             fields=[
-                ('pin_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='core.pin')),
+                (
+                    'pin_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='core.pin',
+                    ),
+                ),
                 ('note', models.TextField(max_length=1000)),
             ],
             options={
@@ -45,9 +61,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DatasetPin',
             fields=[
-                ('pin_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='core.pin')),
+                (
+                    'pin_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='core.pin',
+                    ),
+                ),
                 ('description', models.TextField(blank=True, max_length=1000)),
-                ('child', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='locations', to='core.dataset')),
+                (
+                    'child',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='locations',
+                        to='core.dataset',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
