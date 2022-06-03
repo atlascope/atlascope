@@ -1,3 +1,4 @@
+from drf_yasg import openapi
 from django.contrib import admin
 from django.contrib.gis.db.models import PointField
 from django.db import models
@@ -81,6 +82,54 @@ class PinPolymorphicSerializer(PolymorphicSerializer):
         NotePin: NotePinSerializer,
         DatasetPin: DatasetPinSerializer,
     }
+
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_OBJECT,
+            'title': 'Pin',
+            'properties': {
+                'id': openapi.Schema(
+                    title='id',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'investigation': openapi.Schema(
+                    title='investigation',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'parent': openapi.Schema(
+                    title='parent',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'minimum_zoom': openapi.Schema(
+                    title='minimum_zoom',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'maximum_zoom': openapi.Schema(
+                    title='maximum_zoom',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'location': openapi.Schema(
+                    title='location',
+                    type=openapi.TYPE_STRING
+                ),
+                'resource_type': openapi.Schema(
+                    title='resource_type',
+                    type=openapi.TYPE_STRING
+                ),
+                'description': openapi.Schema(
+                    title='description',
+                    type=openapi.TYPE_STRING
+                ),
+                'note': openapi.Schema(
+                    title='note',
+                    type=openapi.TYPE_STRING
+                ),
+                'child': openapi.Schema(
+                    title='child',
+                    type=openapi.TYPE_INTEGER
+                )
+            }
+        }
 
 
 @admin.register(Pin)

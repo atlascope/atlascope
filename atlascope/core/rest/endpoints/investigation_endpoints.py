@@ -23,7 +23,7 @@ class InvestigationViewSet(
     queryset = Investigation.objects.all().order_by('id')
     serializer_class = InvestigationSerializer
 
-    @swagger_auto_schema(responses={200: PinPolymorphicSerializer()})
+    @swagger_auto_schema(responses={200: PinPolymorphicSerializer(many=True)})
     @action(detail=True, methods=['GET'])
     def pins(self, request, pk=None):
         payload = PinPolymorphicSerializer(
