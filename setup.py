@@ -64,6 +64,8 @@ setup(
         'pylibtiff',
         # pylibtiff depends on this but it is not listed in its dependencies
         'bitarray',
+        'django-polymorphic',
+        'django-rest-polymorphic',
     ],
     extras_require={
         'dev': [

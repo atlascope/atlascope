@@ -52,6 +52,7 @@ class AtlascopeMixin(ConfigMixin):
         # Install additional apps
         configuration.INSTALLED_APPS += [
             'django.contrib.gis',
+            'polymorphic',
         ]
 
         # Allow CORS requests to use credentials. Necessary for geojs on the client
