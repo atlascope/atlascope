@@ -14,6 +14,8 @@ from atlascope.core.models import (
     Investigation,
     Job,
     Pin,
+    NotePin,
+    DatasetPin,
     Tour,
     TourWaypoints,
     Waypoint,
@@ -157,14 +159,16 @@ def populate_pins(specs):
         # Pull in foreign models and other objects.
         spec["investigation"] = Investigation.objects.get(name=spec["investigation"])
         spec["parent"] = Dataset.objects.get(name=spec["parent"])
+        spec["location"] = Point(spec["location"])
         if "child" in spec:
             spec["child"] = Dataset.objects.get(name=spec["child"])
-        spec["child_location"] = Point(spec["child_location"])
-
-        # Build and save the Pin object.
-        print(f"""  Pin '{spec["parent"].name}' ({spec["investigation"].name})""")
-        pin = Pin(**spec)
-        pin.save()
+            print(f"""  Pin '{spec["parent"].name}' ({spec["investigation"].name})""")
+            pin = DatasetPin(**spec)
+            pin.save()
+        elif "note" in spec:
+            print(f"""  Pin '{spec["parent"].name}' ({spec["investigation"].name})""")
+            pin = NotePin(**spec)
+            pin.save()
 
 
 @announce("Populating tours")
