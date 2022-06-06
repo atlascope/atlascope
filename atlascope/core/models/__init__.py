@@ -1,7 +1,7 @@
 from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer, DatasetSubImageSerializer
 from .dataset_embedding import DatasetEmbedding, DatasetEmbeddingSerializer
 from .investigation import Investigation, InvestigationSerializer
-from .pin import Pin, PinSerializer, NotePin, NotePinSerializer, DatasetPin, DatasetPinSerializer
+from .pin import DatasetPin, DatasetPinSerializer, NotePin, NotePinSerializer, Pin, PinSerializer
 from .tour import Tour, TourSerializer
 from .tour_waypoints import TourWaypoints
 from .waypoint import Waypoint

@@ -27,7 +27,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='NotePin',
             fields=[
-                ('pin_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='core.pin')),
+                (
+                    'pin_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='core.pin',
+                    ),
+                ),
                 ('note', models.TextField(max_length=1000)),
             ],
             bases=('core.pin',),
@@ -35,9 +45,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DatasetPin',
             fields=[
-                ('pin_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='core.pin')),
+                (
+                    'pin_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='core.pin',
+                    ),
+                ),
                 ('description', models.TextField(blank=True, max_length=1000)),
-                ('child', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='locations', to='core.dataset')),
+                (
+                    'child',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='locations',
+                        to='core.dataset',
+                    ),
+                ),
             ],
             bases=('core.pin',),
         ),

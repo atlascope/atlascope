@@ -11,11 +11,11 @@ from rest_framework.serializers import ValidationError
 from atlascope.core.models import (
     Dataset,
     DatasetEmbedding,
+    DatasetPin,
     Investigation,
     Job,
-    Pin,
     NotePin,
-    DatasetPin,
+    Pin,
     Tour,
     TourWaypoints,
     Waypoint,
