@@ -152,11 +152,6 @@ class PinSerializer(serializers.ModelSerializer):
     }
 
 
-class InvestigationPinSerializer(serializers.BaseSerializer):
-    note_pins = NotePinSerializer(many=True)
-    dataset_pins = DatasetPinSerializer(many=True)
-
-
 @admin.register(Pin)
 class PinAdmin(admin.ModelAdmin):
     list_display = ('id', 'color')
