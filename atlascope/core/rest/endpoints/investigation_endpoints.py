@@ -26,8 +26,9 @@ class InvestigationViewSet(
     @swagger_auto_schema(responses={200: PinSerializer(many=True)})
     @action(detail=True, methods=['GET'])
     def pins(self, request, pk=None):
-        relatedPins = self.get_object().pins.all().select_related('notepin').select_related('datasetpin').order_by('id')
-        # relatedPins = self.get_object().pins.all().select_subclasses.order_by('id')
+        relatedPins = (
+            self.get_object().pins.all().select_related('notepin', 'datasetpin').order_by('id')
+        )
         payload = PinSerializer(relatedPins, many=True).data
         return Response(payload, status=status.HTTP_200_OK)
 
