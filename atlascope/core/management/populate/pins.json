@@ -4,7 +4,6 @@
         "id": 5000,
         "parent": "HTA9_1_BA_F_ROI02",
         "location": [1000, 1000],
-        "description": "A red example pin.",
         "note": "A red example pin.",
         "color": "red"
     },
@@ -13,7 +12,6 @@
         "id": 5001,
         "parent": "HTA9_1_BA_F_ROI02",
         "location": [3000, 1000],
-        "description": "A green example pin. Look how green it is.",
         "note": "A green example pin. Look how green it is.",
         "color": "green"
     },
@@ -22,7 +20,6 @@
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5002,
         "location": [2000, 2000],
-        "description": "A blue example pin. Yay!",
         "note": "A blue example pin. Yay!",
         "color": "blue"
     },
@@ -58,7 +55,6 @@
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5006,
         "location": [4000, 1000],
-        "description": "A pin with minimum zoom level",
         "note": "A pin with minimum zoom level",
         "color": "red",
         "minimum_zoom": 3
@@ -68,7 +64,6 @@
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5007,
         "location": [4000, 1500],
-        "description": "A pin with maximum zoom level",
         "note": "A pin with maximum zoom level",
         "color": "red",
         "maximum_zoom": 3
@@ -78,7 +73,6 @@
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5008,
         "location": [4000, 1250],
-        "description": "I appear at zoom level 2 and disappear at zoom level 5!",
         "note": "I appear at zoom level 2 and disappear at zoom level 5!",
         "color": "red",
         "maximum_zoom": 5,

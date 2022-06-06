@@ -81,9 +81,6 @@
                     "minItems": 2,
                     "maxItems": 2
                 },
-                "description": {
-                    "type": "string"
-                },
                 "color": {
                     "type": "string"
                 }
