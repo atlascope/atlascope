@@ -2,13 +2,14 @@
 
 import io
 import math
-import skimage.io
+
 from celery import shared_task
+import skimage.io
+
+from atlascope.core.models import Dataset
 
 from .nucleus_detection import detect_nuclei
-from atlascope.core.models import Dataset
 from .utils import save_output_dataset
-
 
 schema = {
     "type": "object",
