@@ -1,6 +1,6 @@
 """Detect likely locations of nuclei in the image."""
 import io
-
+import PIL
 from celery import shared_task
 from django.contrib.gis.geos import Point, Polygon
 import histomicstk as htk
@@ -63,7 +63,20 @@ def detect_nuclei(input_image):
         input_image,
     )
 
-    return additional_features.to_dict("records")
+    return (
+        additional_features.to_dict("records"),
+        np.vectorize(lambda x: 255 if x > 0 else 0)(im_nuclei_seg_mask).astype(np.uint8),
+    )
+
+
+def get_result_image(input_image, nucleus_mask):
+    nucleus_mask_color = PIL.Image.new(
+        "RGBA", (nucleus_mask.shape[1], nucleus_mask.shape[0]), "#0ead38"
+    )
+    original = PIL.Image.fromarray(input_image, mode="L").convert("RGBA")
+    mask = PIL.Image.fromarray(nucleus_mask, mode="L")
+    composite = PIL.Image.composite(nucleus_mask_color, original, mask)
+    return composite
 
 
 @shared_task
@@ -86,13 +99,14 @@ def run(job_id: str, original_dataset_id: str):
         input_image = skimage.io.imread(
             io.BytesIO(original_dataset.content.read()),
         )
-        nuclei = detect_nuclei(input_image)
+        nuclei, nucleus_mask = detect_nuclei(input_image)
+        output_image = get_result_image(input_image, nucleus_mask)
 
         detection_dataset = save_output_dataset(
             original_dataset,
             job.investigation,
             'Detected Nuclei',
-            None,
+            output_image,
             {
                 'num_nuclei': len(nuclei),
             },
@@ -128,9 +142,9 @@ def run(job_id: str, original_dataset_id: str):
 
         job.resulting_datasets.add(detection_dataset)
         job.complete = True
-        job.save()
     except Exception as e:
         print('FAILURE!')
         print(e)
         job.failure = str(e)
+    finally:
         job.save()
