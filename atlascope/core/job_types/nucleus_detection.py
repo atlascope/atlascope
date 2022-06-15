@@ -1,5 +1,6 @@
 """Detect likely locations of nuclei in the image."""
 import io
+
 import PIL
 from celery import shared_task
 from django.contrib.gis.geos import Point, Polygon

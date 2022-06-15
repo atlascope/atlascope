@@ -2,11 +2,13 @@
 
 import io
 import math
-import cv2
+
 import PIL
 from celery import shared_task
-import skimage.io
+import cv2
 import numpy as np
+import skimage.io
+
 from atlascope.core.models import Dataset
 
 from .nucleus_detection import detect_nuclei
@@ -55,11 +57,11 @@ def get_result_image(input_image, nucleus_mask, gland_mask, distances_mask):
 
 @shared_task
 def run(job_id: str, original_dataset_id: str):
-    from atlascope.core.models import Job
-
     # suppress warnings from high numbers and NaNs in computations
     # we only need this when we are using a randomly generated gland map
     import warnings
+
+    from atlascope.core.models import Job
 
     # TODO: remove this warning suppression
     warnings.filterwarnings("ignore")
