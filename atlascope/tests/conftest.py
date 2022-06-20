@@ -7,6 +7,8 @@ from atlascope.tests import factories
 register(factories.InvestigationFactory)
 register(factories.DatasetFactory)
 register(factories.PinFactory)
+register(factories.NotePinFactory)
+register(factories.DatasetPinFactory)
 register(factories.JobFactory)
 
 

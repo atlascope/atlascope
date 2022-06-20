@@ -48,10 +48,23 @@ class PinFactory(factory.django.DjangoModelFactory):
 
     investigation = factory.SubFactory(InvestigationFactory)
     parent = factory.SubFactory(DatasetFactory)
-    child = factory.SubFactory(DatasetFactory)
-    child_location = Point(5, 5)
+    location = Point(5, 5)
     color = 'red'
+
+
+class NotePinFactory(PinFactory):
+    class Meta:
+        model = models.NotePin
+
     note = factory.Faker('sentence')
+
+
+class DatasetPinFactory(PinFactory):
+    class Meta:
+        model = models.DatasetPin
+
+    description = factory.Faker('sentence')
+    child = factory.SubFactory(DatasetFactory)
 
 
 class JobFactory(factory.django.DjangoModelFactory):
