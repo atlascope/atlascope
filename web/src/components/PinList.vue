@@ -25,7 +25,9 @@
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ pinDisplayTitle(pin) }}</v-list-item-title>
-            <v-list-item-subtitle>{{ pin.note }}</v-list-item-subtitle>
+            <v-list-item-subtitle v-if="pin.pin_type === 'DatasetPin'">
+              {{ pin.description }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </template>
       </v-list-item>
@@ -50,7 +52,7 @@ export default defineComponent({
     }
 
     function pinDisplayTitle(pin: Pin) {
-      return (!pin.child) ? `Note pin: ${pin.note?.substring(0, 25)}...` : `Child dataset: ${pin.child}`;
+      return (pin.pin_type === 'NotePin') ? `Note pin: ${pin.note?.substring(0, 25)}...` : `Child dataset: ${pin.child}`;
     }
 
     watch(rootDataset, () => {
