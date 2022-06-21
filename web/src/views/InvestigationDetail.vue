@@ -122,7 +122,12 @@ import {
 } from '@vue/composition-api';
 import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
-import { postGisToPoint, Point } from '../utilities/utiltyFunctions';
+import {
+  postGisToPoint,
+  Point,
+  radiusForZoomLevel,
+  opacityForZoomLevel,
+} from '../utilities/utiltyFunctions';
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -269,8 +274,8 @@ export default defineComponent({
               || note.notePositionY > top + height
               || note.notePositionX < left
               || note.notePositionY < top
-              || zoomLevel.value < ((pin as Pin).minimum_zoom || 0)
-              || zoomLevel.value > ((pin as Pin).maximum_zoom || 40)) {
+              || radiusForZoomLevel(zoomLevel.value, (pin as Pin).minimum_zoom || 0) === 0
+              || opacityForZoomLevel(zoomLevel.value, (pin as Pin).maximum_zoom || 40) === 0) {
             note.inBounds = false;
           } else {
             note.inBounds = true;
@@ -281,10 +286,15 @@ export default defineComponent({
 
     function showHidePinsForZoomLevel(level: number) {
       if (pinFeature) {
+        pinFeature.style('radius', (pin: Pin) => (
+          radiusForZoomLevel(level, pin.minimum_zoom)
+        ));
         pinFeature.style('fillOpacity', (pin: Pin) => (
-          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+          opacityForZoomLevel(level, pin.maximum_zoom)
+        ));
         pinFeature.style('strokeOpacity', (pin: Pin) => (
-          (level >= (pin.minimum_zoom || 0) && level <= (pin.maximum_zoom || 40)) ? 0.8 : 0));
+          opacityForZoomLevel(level, pin.maximum_zoom)
+        ));
         pinFeature.draw();
       }
     }

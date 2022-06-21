@@ -17,3 +17,27 @@ export function postGisToPoint(location: string): Point | undefined {
   }
   return { x: xCoord, y: yCoord };
 }
+
+export function radiusForZoomLevel(currentZoom: number, minZoom: number): number {
+  const maxRadius = 10;
+  if (currentZoom >= minZoom) {
+    return maxRadius;
+  }
+  const diff = minZoom - currentZoom;
+  if (diff > 2) {
+    return 0;
+  }
+  return maxRadius - (5 * diff);
+}
+
+export function opacityForZoomLevel(currentZoom: number, maxZoom: number): number {
+  const maxOpacity = 0.8;
+  if (currentZoom <= maxZoom) {
+    return maxOpacity;
+  }
+  const diff = currentZoom - maxZoom;
+  if (diff > 2) {
+    return 0;
+  }
+  return maxOpacity - (0.4 * diff);
+}
