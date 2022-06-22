@@ -13,6 +13,7 @@
         "name": "Semantic zoom playground",
         "id": 1001,
         "datasets": [
+            "Human muscular system",
             "HTA9_1_BA_F_ROI02",
             "HTA9_1_BA_F_ROI04",
             "HTA9_1_BA_F_ROI03"
