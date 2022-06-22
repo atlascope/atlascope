@@ -64,5 +64,77 @@
         "description": "A speckled green PNG image",
         "content": "green.png",
         "dataset_type": "non_tiled_image"
+    },
+    {
+        "name": "Human circulatory system",
+        "id": 2988,
+        "description": "A basic anatomical illustration of the circulatory system",
+        "content": "anatomy/circulatory.tiff"
+    },
+    {
+        "name": "Human digestive system",
+        "id": 2989,
+        "description": "A basic anatomical illustration of the digestive system",
+        "content": "anatomy/digestive.tiff"
+    },
+    {
+        "name": "Human endocrine system",
+        "id": 2990,
+        "description": "A basic anatomical illustration of the endocrine system",
+        "content": "anatomy/endocrine.tiff"
+    },
+    {
+        "name": "Human integumentary system",
+        "id": 2991,
+        "description": "A basic anatomical illustration of the integumentary system",
+        "content": "anatomy/integumentary.tiff"
+    },
+    {
+        "name": "Human lymphatic system",
+        "id": 2992,
+        "description": "A basic anatomical illustration of the lymphatic system",
+        "content": "anatomy/lymphatic.tiff"
+    },
+    {
+        "name": "Human muscular system",
+        "id": 2993,
+        "description": "A basic anatomical illustration of the muscular system",
+        "content": "anatomy/muscular.tiff"
+    },
+    {
+        "name": "Human nervous system",
+        "id": 2994,
+        "description": "A basic anatomical illustration of the nervous system",
+        "content": "anatomy/nervous.tiff"
+    },
+    {
+        "name": "Female reproductive system",
+        "id": 2995,
+        "description": "A basic anatomical illustration of the female reproductive system",
+        "content": "anatomy/reproductive_female.tiff"
+    },
+    {
+        "name": "Male reproductive system",
+        "id": 2996,
+        "description": "A basic anatomical illustration of the male reproductive system",
+        "content": "anatomy/reproductive_male.tiff"
+    },
+    {
+        "name": "Human respiratory system",
+        "id": 2997,
+        "description": "A basic anatomical illustration of the respiratory system",
+        "content": "anatomy/respiratory.tiff"
+    },
+    {
+        "name": "Human skeletal system",
+        "id": 2998,
+        "description": "A basic anatomical illustration of the skeletal system",
+        "content": "anatomy/skeletal.tiff"
+    },
+    {
+        "name": "Human urinary system",
+        "id": 2999,
+        "description": "A basic anatomical illustration of the urinary system",
+        "content": "anatomy/urinary.tiff"
     }
 ]
