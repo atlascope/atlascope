@@ -15,9 +15,6 @@
     },
     {
         "investigation": "Semantic zoom playground",
-        "id": 3002,
-        "parent": "HTA9_1_BA_F_ROI02",
-        "child": "HTA9_1_BA_F_ROI03",
-        "child_bounding_box": [600, 500, 200, 200]
+        "id": 3002
     }
 ]
