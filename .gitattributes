@@ -1,1 +1,12 @@
-**/anatomy/* filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/reproductive_male.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/skeletal.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/digestive.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/endocrine.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/integumentary.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/lymphatic.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/muscular.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/reproductive_female.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/circulatory.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/nervous.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/respiratory.tiff filter=lfs diff=lfs merge=lfs -text
+atlascope/core/management/populate/inputs/anatomy/urinary.tiff filter=lfs diff=lfs merge=lfs -text
