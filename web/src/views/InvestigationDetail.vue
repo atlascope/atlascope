@@ -259,9 +259,10 @@ export default defineComponent({
       if (!featureLayer || !pinFeature || !map.value) { return; }
       pinFeature.getData().forEach((pin: object) => {
         if (!pinFeature) return;
-        const { x, y } = postGisToPoint((pin as Pin).location) || { x: 0, y: 0 };
+        const pinObject = pin as Pin;
+        const { x, y } = postGisToPoint(pinObject.location) || { x: 0, y: 0 };
         const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
-        const note = pinNotes.value.find((pinNote) => pinNote.id === (pin as Pin).id);
+        const note = pinNotes.value.find((pinNote) => pinNote.id === pinObject.id);
         const {
           left, top, width, height,
         } = map.value?.getBoundingClientRect() || {
@@ -274,8 +275,12 @@ export default defineComponent({
               || note.notePositionY > top + height
               || note.notePositionX < left
               || note.notePositionY < top
-              || radiusForZoomLevel(zoomLevel.value, (pin as Pin).minimum_zoom || 0) === 0
-              || opacityForZoomLevel(zoomLevel.value, (pin as Pin).maximum_zoom || 40) === 0) {
+              || radiusForZoomLevel(
+                zoomLevel.value,
+                pinObject.minimum_zoom || 0,
+                pinObject.maximum_zoom || 40,
+              ) === 0
+              || opacityForZoomLevel(zoomLevel.value, pinObject.maximum_zoom || 40) === 0) {
             note.inBounds = false;
           } else {
             note.inBounds = true;
@@ -287,7 +292,7 @@ export default defineComponent({
     function showHidePinsForZoomLevel(level: number) {
       if (pinFeature) {
         pinFeature.style('radius', (pin: Pin) => (
-          radiusForZoomLevel(level, pin.minimum_zoom)
+          radiusForZoomLevel(level, pin.minimum_zoom, pin.maximum_zoom)
         ));
         pinFeature.style('fillOpacity', (pin: Pin) => (
           opacityForZoomLevel(level, pin.maximum_zoom)

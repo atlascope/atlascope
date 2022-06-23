@@ -18,16 +18,24 @@ export function postGisToPoint(location: string): Point | undefined {
   return { x: xCoord, y: yCoord };
 }
 
-export function radiusForZoomLevel(currentZoom: number, minZoom: number): number {
-  const maxRadius = 10;
-  if (currentZoom >= minZoom) {
-    return maxRadius;
+export function radiusForZoomLevel(currentZoom: number, minZoom: number, maxZoom: number): number {
+  const inRangeRadius = 10;
+  let diff = 0;
+  if (currentZoom >= minZoom && currentZoom <= maxZoom) {
+    return inRangeRadius;
   }
-  const diff = minZoom - currentZoom;
+  if (currentZoom < minZoom) {
+    diff = minZoom - currentZoom;
+    if (diff > 2) {
+      return 0;
+    }
+    return inRangeRadius - (5 * diff);
+  }
+  diff = currentZoom - maxZoom;
   if (diff > 2) {
-    return 0;
+    return inRangeRadius;
   }
-  return maxRadius - (5 * diff);
+  return inRangeRadius + (8 * diff);
 }
 
 export function opacityForZoomLevel(currentZoom: number, maxZoom: number): number {
