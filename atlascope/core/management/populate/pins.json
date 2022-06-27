@@ -3,7 +3,7 @@
         "investigation": "Pin playground",
         "id": 5000,
         "parent": "HTA9_1_BA_F_ROI02",
-        "child_location": [1000, 1000],
+        "location": [1000, 1000],
         "note": "A red example pin.",
         "color": "red"
     },
@@ -11,7 +11,7 @@
         "investigation": "Pin playground",
         "id": 5001,
         "parent": "HTA9_1_BA_F_ROI02",
-        "child_location": [3000, 1000],
+        "location": [3000, 1000],
         "note": "A green example pin. Look how green it is.",
         "color": "green"
     },
@@ -19,7 +19,7 @@
         "investigation": "Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5002,
-        "child_location": [2000, 2000],
+        "location": [2000, 2000],
         "note": "A blue example pin. Yay!",
         "color": "blue"
     },
@@ -27,8 +27,8 @@
         "investigation": "Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5003,
-        "note": "An overlay of a red image",
-        "child_location": [1300, 3300],
+        "description": "An overlay of a red image",
+        "location": [1300, 3300],
         "child": "Red Tile",
         "color": "red"
     },
@@ -36,8 +36,8 @@
         "investigation": "Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5004,
-        "note": "An overlay of a blue image",
-        "child_location": [1500, 2300],
+        "description": "An overlay of a blue image",
+        "location": [1500, 2300],
         "child": "Blue Tile",
         "color": "blue"
     },
@@ -45,8 +45,8 @@
         "investigation": "Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5005,
-        "note": "An overlay of a green image",
-        "child_location": [2650, 3000],
+        "description": "An overlay of a green image",
+        "location": [2650, 3000],
         "child": "Green Tile",
         "color": "green"
     },
@@ -54,7 +54,7 @@
         "investigation":"Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5006,
-        "child_location": [4000, 1000],
+        "location": [4000, 1000],
         "note": "A pin with minimum zoom level",
         "color": "red",
         "minimum_zoom": 3
@@ -63,7 +63,7 @@
         "investigation":"Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5007,
-        "child_location": [4000, 1500],
+        "location": [4000, 1500],
         "note": "A pin with maximum zoom level",
         "color": "red",
         "maximum_zoom": 3
@@ -72,7 +72,7 @@
         "investigation":"Pin playground",
         "parent": "HTA9_1_BA_F_ROI02",
         "id": 5008,
-        "child_location": [4000, 1250],
+        "location": [4000, 1250],
         "note": "I appear at zoom level 2 and disappear at zoom level 5!",
         "color": "red",
         "maximum_zoom": 5,
