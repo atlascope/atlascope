@@ -25,7 +25,7 @@
         @change="selectionChanged"
       >
         <v-list-item
-          v-for="pin in pins"
+          v-for="pin in sortedPins"
           :key="pin.id"
           :value="pin"
           :disabled="pin.parent !== rootDataset.id"
@@ -52,30 +52,27 @@
 
 <script lang="ts">
 import {
-  computed, defineComponent, onMounted, Ref, ref, watch, PropType,
+  computed, defineComponent, onMounted, Ref, ref, watch,
 } from '@vue/composition-api';
 import store from '../store';
 import { Pin } from '../generatedTypes/AtlascopeTypes';
+import { isInBounds, postGisToPoint } from '../utilities/utiltyFunctions';
 
 export default defineComponent({
-  props: {
-    zoomLevel: {
-      type: Number as PropType<number>,
-      required: false,
-    },
-    xCoord: {
-      type: Number as PropType<number>,
-      required: false,
-    },
-    yCoord: {
-      type: Number as PropType<number>,
-      required: false,
-    },
-  },
-
-  setup(props) {
+  setup() {
     const pins: Ref<Pin[]> = computed(() => store.state.currentPins);
+    const bounds = computed(() => store.state.currentBounds);
     const rootDataset = computed(() => store.state.rootDataset);
+    const sortedPins = computed(() => store.state.currentPins.slice().sort(
+      (firstPin, secondPin) => {
+        const firstPinInBounds = isInBounds(postGisToPoint(firstPin.location), bounds.value);
+        const secondPinInBounds = isInBounds(postGisToPoint(secondPin.location), bounds.value);
+        if (firstPinInBounds && secondPinInBounds) {
+          return firstPin.id - secondPin.id;
+        }
+        return firstPinInBounds ? -1 : 1;
+      },
+    ));
     const selectedPins: Ref<Pin[]> = ref([]);
 
     function selectionChanged(pinList: Pin[]) {
@@ -100,10 +97,6 @@ export default defineComponent({
       selectedPins.value = [];
     });
 
-    watch([props.zoomLevel, props.xCoord, props.yCoord], () => {
-      console.log('map prop changed');
-    });
-
     onMounted(() => {
       // reset selectedPins
       store.state.selectedPins.forEach((pin: Pin) => {
@@ -118,6 +111,7 @@ export default defineComponent({
       selectedPins,
       pinDisplayTitle,
       toggleDisplayAll,
+      sortedPins,
     };
   },
 });

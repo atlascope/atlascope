@@ -1,3 +1,5 @@
+import { GeoBounds } from './composableTypes';
+
 export interface Point {
   x: number;
   y: number;
@@ -16,6 +18,18 @@ export function postGisToPoint(location: string): Point | undefined {
     throw new Error(`Unable to convert string ${location} to point.`);
   }
   return { x: xCoord, y: yCoord };
+}
+
+export function isInBounds(point: Point | undefined, bounds: GeoBounds): boolean {
+  if (!point) {
+    return false;
+  }
+  return (
+    point.x < bounds.right
+    && point.x > bounds.left
+    && point.y > bounds.top
+    && point.y < bounds.bottom
+  );
 }
 
 export function radiusForZoomLevel(currentZoom: number, minZoom: number, maxZoom: number): number {
