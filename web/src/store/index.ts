@@ -6,6 +6,7 @@ import { AxiosInstance, AxiosResponse } from 'axios';
 import {
   Investigation, Dataset, Pin, DatasetEmbedding, JobDetail,
 } from '../generatedTypes/AtlascopeTypes';
+import { GeoBounds } from '../utilities/composableTypes';
 
 Vue.use(Vuex);
 
@@ -31,6 +32,7 @@ export interface State {
     currentDatasets: Dataset[];
     rootDataset: Dataset | null;
     currentPins: Pin[];
+    inBoundsPins: Pin[];
     selectedPins: Pin[];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
@@ -39,6 +41,7 @@ export interface State {
     selectionMode: boolean;
     subimageSelection: number[] | null;
     jobTypes: JobDetail[];
+    currentBounds: GeoBounds;
 }
 
 interface TileMetadataForDataset {
@@ -60,6 +63,7 @@ const {
     currentDatasets: [],
     rootDataset: null,
     currentPins: [],
+    inBoundsPins: [],
     selectedPins: [],
     showEmbeddings: true,
     datasetEmbeddings: [],
@@ -68,6 +72,12 @@ const {
     selectionMode: false,
     subimageSelection: null,
     jobTypes: [],
+    currentBounds: {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    },
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -120,6 +130,9 @@ const {
     },
     setJobTypes(state, jobTypes) {
       state.jobTypes = jobTypes;
+    },
+    setBounds(state, newBounds: GeoBounds) {
+      state.currentBounds = newBounds;
     },
   },
   getters: {
@@ -276,6 +289,10 @@ const {
     storeAxiosInstance(context, axiosInstance) {
       const { commit } = rootActionContext(context);
       commit.setAxiosInstance(axiosInstance);
+    },
+    setBounds(context, newBounds: GeoBounds) {
+      const { commit } = rootActionContext(context);
+      commit.setBounds(newBounds);
     },
   },
 });
