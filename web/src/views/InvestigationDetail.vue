@@ -204,6 +204,7 @@ export default defineComponent({
       zoomLevel,
       xCoord,
       yCoord,
+      bounds,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -307,6 +308,10 @@ export default defineComponent({
     watch([xCoord, yCoord, zoomLevel], () => {
       showHidePinsForZoomLevel(zoomLevel.value);
       movePinNoteCards();
+    });
+
+    watch(bounds, (newBounds) => {
+      store.commit.setBounds(newBounds);
     });
 
     function drawMap(dataset: Dataset | null) {
@@ -656,6 +661,7 @@ export default defineComponent({
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       drawMap(store.state.rootDataset);
+      store.commit.setBounds(bounds.value);
       createPinNotes();
       selectPinsForRootDataset();
       loaded.value = true;
