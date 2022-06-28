@@ -44,7 +44,7 @@
                     icon
                     v-bind="attrs"
                     v-on="on"
-                    @click.prevent.stop="hello(pin)"
+                    @click.prevent.stop="togglePin(pin)"
                   >
                     <v-icon>mdi-eye</v-icon>
                   </v-btn>
@@ -106,10 +106,7 @@ export default defineComponent({
       },
     ));
     const selectedPins: Ref<Pin[]> = ref([]);
-
-    function hello(arg: any) {
-      console.log({ arg });
-    }
+    const togglePin = inject<Function>('togglePin');
 
     function selectionChanged(pinList: Pin[]) {
       store.dispatch.updateSelectedPins(pinList);
@@ -148,7 +145,7 @@ export default defineComponent({
       pinDisplayTitle,
       toggleDisplayAll,
       sortedPins,
-      hello,
+      togglePin,
     };
   },
 });
