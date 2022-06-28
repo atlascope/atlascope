@@ -42,6 +42,7 @@ export interface State {
     subimageSelection: number[] | null;
     jobTypes: JobDetail[];
     currentBounds: GeoBounds;
+    zoomLevel: number;
 }
 
 interface TileMetadataForDataset {
@@ -78,6 +79,7 @@ const {
       bottom: 0,
       left: 0,
     },
+    zoomLevel: 0,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -133,6 +135,9 @@ const {
     },
     setBounds(state, newBounds: GeoBounds) {
       state.currentBounds = newBounds;
+    },
+    setZoomLevel(state, zoomLevel: number) {
+      state.zoomLevel = zoomLevel;
     },
   },
   getters: {
@@ -293,6 +298,10 @@ const {
     setBounds(context, newBounds: GeoBounds) {
       const { commit } = rootActionContext(context);
       commit.setBounds(newBounds);
+    },
+    setZoom(context, zoomLevel: number) {
+      const { commit } = rootActionContext(context);
+      commit.setZoomLevel(zoomLevel);
     },
   },
 });

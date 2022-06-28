@@ -310,6 +310,10 @@ export default defineComponent({
       movePinNoteCards();
     });
 
+    watch(zoomLevel, (newZoom) => {
+      store.commit.setZoomLevel(newZoom);
+    });
+
     watch(bounds, (newBounds) => {
       store.commit.setBounds(newBounds);
     });
