@@ -603,13 +603,12 @@ export default defineComponent({
       }
     }
 
-    function togglePin(pin: Pin, event: MouseClickEvent) {
+    function togglePin(pin: Pin) {
       if (pin.pin_type === 'NotePin') {
         const noteToToggle = pinNotes.value.find((note) => note.id === pin.id);
         if (noteToToggle) {
           noteToToggle.showNote = !noteToToggle.showNote;
-          noteToToggle.notePositionX = event.mouse.page.x;
-          noteToToggle.notePositionY = event.mouse.page.y;
+          movePinNoteCards();
         }
       } else if (pin.pin_type === 'DatasetPin') {
         toggleDatasetPin(pin);
@@ -659,7 +658,7 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const pinClicked = event.data as Pin;
-            togglePin(pinClicked, event);
+            togglePin(pinClicked);
           }
         });
       } else {
