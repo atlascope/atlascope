@@ -69,72 +69,120 @@
         "name": "Human circulatory system",
         "id": 2988,
         "description": "A basic anatomical illustration of the circulatory system",
-        "content": "anatomy/circulatory.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1jO608wmP3-A0SPNUbO3Ot9j4QbRGVh4p",
+            "sha256sum": "5c0793458dfb48d4adf13b0e7f12c648504f0f51e4a9886ec29f2de361c312c4"
+        }
     },
     {
         "name": "Human digestive system",
         "id": 2989,
         "description": "A basic anatomical illustration of the digestive system",
-        "content": "anatomy/digestive.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1wNhB9NNH8TTJsQiTd3qHLBbAtkvEHK7W",
+            "sha256sum": "54c39459e3b157c3bb20912a1aa5ee63478a00fe4e4cfb0c5b4117b750b5a479"
+        }
     },
     {
         "name": "Human endocrine system",
         "id": 2990,
         "description": "A basic anatomical illustration of the endocrine system",
-        "content": "anatomy/endocrine.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1y6bjzbxpoo9bGdu_In9GsQUVH_0Ya1bi",
+            "sha256sum": "52c7bcc9e2e50a96ec207c9e039789d9b78ad46c706588ccbb0f28de86966be7"
+        }
     },
     {
         "name": "Human integumentary system",
         "id": 2991,
         "description": "A basic anatomical illustration of the integumentary system",
-        "content": "anatomy/integumentary.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "11kl6BGQ7UBcBeyjYsFLEQ_N3Y6tx3rfM",
+            "sha256sum": "8cc0d4b6668e7ce20a5f1d66d6ee5964412a37f309edabff4e957bffae6c4a4d"
+        }
     },
     {
         "name": "Human lymphatic system",
         "id": 2992,
         "description": "A basic anatomical illustration of the lymphatic system",
-        "content": "anatomy/lymphatic.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1RvNEGvyjRqJ4Ko-rfPCe9tCcCOJQBdTm",
+            "sha256sum": "82a3c8a816e069bd84d7744048a9cd9bc4d47869ccb391dc3d3141217f244864"
+        }
     },
     {
         "name": "Human muscular system",
         "id": 2993,
         "description": "A basic anatomical illustration of the muscular system",
-        "content": "anatomy/muscular.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "17375rIofCYG4ZxhyV6IM6vO0IiSWhMCB",
+            "sha256sum": "c2fd803b930f956b5539496103b5d22da7745f6d729fdf8cd7fd4a40dcb0e88f"
+        }
     },
     {
         "name": "Human nervous system",
         "id": 2994,
         "description": "A basic anatomical illustration of the nervous system",
-        "content": "anatomy/nervous.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1nJyAfajxQPsdjXFWgl7cuK8aRid1TUmC",
+            "sha256sum": "077776e98fa29d3e2507bf2999aa933bad84b80163ad878ed559dc3d2b9e155c"
+        }
     },
     {
         "name": "Female reproductive system",
         "id": 2995,
         "description": "A basic anatomical illustration of the female reproductive system",
-        "content": "anatomy/reproductive_female.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1NxY6FIVCE6agbG73qJmzzKwBC8Z1P1EC",
+            "sha256sum": "d1c8e0d9970d138279f12c2e9c6c66754c8b0353ba0ee6f3e92b0753dfe4a793"
+        }
     },
     {
         "name": "Male reproductive system",
         "id": 2996,
         "description": "A basic anatomical illustration of the male reproductive system",
-        "content": "anatomy/reproductive_male.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1vU8WSQJQpTqeypzxtHIOKNqVCVrE4cfj",
+            "sha256sum": "127a7faca421d93ce2f31325d434dd26f40b7d8728dcff57cec5cf57b96ec7cb"
+        }
     },
     {
         "name": "Human respiratory system",
         "id": 2997,
         "description": "A basic anatomical illustration of the respiratory system",
-        "content": "anatomy/respiratory.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1YRIU5rNPqZGhhHxO2kZmcDsKwe68tiGZ",
+            "sha256sum": "b7e4bc129ddf135d21d92aeb4b928f2b8968f7f1209fa08a463e171b21127f8f"
+        }
     },
     {
         "name": "Human skeletal system",
         "id": 2998,
         "description": "A basic anatomical illustration of the skeletal system",
-        "content": "anatomy/skeletal.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "19CnrsN5d8Q5wFA0n5I85IcIBhIWYZHzK",
+            "sha256sum": "e3d832842b87a39601c31077b321966405f78226925ae06390ab40b410865efc"
+        }
     },
     {
         "name": "Human urinary system",
         "id": 2999,
         "description": "A basic anatomical illustration of the urinary system",
-        "content": "anatomy/urinary.tiff"
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1zlL6qRI0CONV_txTJ-wmS-5PFmVuqhQw",
+            "sha256sum": "fd6dda7c5b2fc4ef127997a18a6f00c2b51330cea77d07d59dbd4ae211a8abf7"
+        }
     }
 ]

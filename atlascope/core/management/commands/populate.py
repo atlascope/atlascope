@@ -7,6 +7,7 @@ from django.contrib.gis.geos.polygon import Polygon
 import djclick as click
 from jsonschema import validate
 from rest_framework.serializers import ValidationError
+from rest_framework.exceptions import APIException
 
 from atlascope.core.models import (
     Dataset,
@@ -97,6 +98,8 @@ def populate_datasets(specs):
                     print("skipped (DJANGO_API_TOKEN not set)")
                 else:
                     raise
+            except APIException:
+                print('Import method failed.')
 
 
 @announce("Populating investigations")
@@ -104,6 +107,8 @@ def populate_investigations(specs):
     for spec in specs:
         # Pull out the dataset models that are in the investigation.
         datasets = [Dataset.objects.get(name=name) for name in spec["datasets"]]
+        # Only use datasets whose content saved properly
+        datasets = [dataset for dataset in datasets if dataset.content]
         del spec["datasets"]
 
         # Build and save investigation objects.
