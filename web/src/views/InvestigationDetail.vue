@@ -553,11 +553,11 @@ export default defineComponent({
         nonTiledOverlayFeature.draw();
       } else {
         const urlRoot = process.env.VUE_APP_API_ROOT;
-        const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
+        const url = `${urlRoot}/datasets/tile_source/${dataset.id}/data/thumbnail.png`;
         const image: HTMLImageElement = new Image();
         image.src = url;
         image.crossOrigin = 'use-credentials';
-        const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
+        const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/info/metadata`)).data;
         const ul = postGisToPoint(pin.location) || { x: 0, y: 0 };
         const lr = {
           x: ul.x + (imageMetadata.sizeX || 0),
