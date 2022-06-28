@@ -37,6 +37,21 @@
                 :disabled="pin.parent !== rootDataset.id"
               />
             </v-list-item-action>
+            <v-list-item-action>
+              <v-tooltip right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    v-on="on"
+                    @click.prevent.stop="hello(pin)"
+                  >
+                    <v-icon>mdi-eye</v-icon>
+                  </v-btn>
+                </template>
+                <span>Show this pin's data on the map</span>
+              </v-tooltip>
+            </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>{{ pinDisplayTitle(pin) }}</v-list-item-title>
               <v-list-item-subtitle v-if="pin.pin_type === 'DatasetPin'">
@@ -52,7 +67,7 @@
 
 <script lang="ts">
 import {
-  computed, defineComponent, onMounted, Ref, ref, watch,
+  computed, defineComponent, onMounted, Ref, ref, watch, inject,
 } from '@vue/composition-api';
 import store from '../store';
 import { Pin } from '../generatedTypes/AtlascopeTypes';
@@ -92,6 +107,10 @@ export default defineComponent({
     ));
     const selectedPins: Ref<Pin[]> = ref([]);
 
+    function hello(arg: any) {
+      console.log({ arg });
+    }
+
     function selectionChanged(pinList: Pin[]) {
       store.dispatch.updateSelectedPins(pinList);
     }
@@ -129,6 +148,7 @@ export default defineComponent({
       pinDisplayTitle,
       toggleDisplayAll,
       sortedPins,
+      hello,
     };
   },
 });
