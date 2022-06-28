@@ -1,4 +1,4 @@
-from . import average_color, brightest_n_pixels, nucleus_detection
+from . import average_color, brightest_n_pixels, nucleus_detection, nucleus_to_gland_distance
 
 available_job_types = {
     module.__name__.replace(f"{module.__package__}.", ''): module
@@ -6,5 +6,6 @@ available_job_types = {
         average_color,
         brightest_n_pixels,
         nucleus_detection,
+        nucleus_to_gland_distance,
     ]
 }
