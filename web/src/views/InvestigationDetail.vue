@@ -119,6 +119,7 @@ import {
   computed,
   watch,
   Ref,
+  provide,
 } from '@vue/composition-api';
 import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
@@ -602,6 +603,21 @@ export default defineComponent({
       }
     }
 
+    function togglePin(pin: Pin, event: MouseClickEvent) {
+      if (pin.pin_type === 'NotePin') {
+        const noteToToggle = pinNotes.value.find((note) => note.id === pin.id);
+        if (noteToToggle) {
+          noteToToggle.showNote = !noteToToggle.showNote;
+          noteToToggle.notePositionX = event.mouse.page.x;
+          noteToToggle.notePositionY = event.mouse.page.y;
+        }
+      } else if (pin.pin_type === 'DatasetPin') {
+        toggleDatasetPin(pin);
+      }
+    }
+
+    provide('togglePin', togglePin);
+
     watch(selectedPins, (newPins, oldPins) => {
       if (!featureLayer) {
         featureLayer = createLayer(
@@ -643,16 +659,7 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const pinClicked = event.data as Pin;
-            if (pinClicked.pin_type === 'NotePin') {
-              const noteToToggle = pinNotes.value.find((note) => note.id === pinClicked.id);
-              if (noteToToggle) {
-                noteToToggle.showNote = !noteToToggle.showNote;
-                noteToToggle.notePositionX = event.mouse.page.x;
-                noteToToggle.notePositionY = event.mouse.page.y;
-              }
-            } else if (pinClicked.pin_type === 'DatasetPin') {
-              toggleDatasetPin(pinClicked);
-            }
+            togglePin(pinClicked, event);
           }
         });
       } else {
