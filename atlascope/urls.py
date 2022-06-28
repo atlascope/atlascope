@@ -7,6 +7,7 @@ from rest_framework import routers
 
 from atlascope.core.rest.endpoints import (
     DatasetViewSet,
+    DetectedNucleusViewSet,
     InvestigationViewSet,
     JobViewSet,
     PinViewSet,
@@ -23,6 +24,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 for model_name, viewset in [
     ('investigation', InvestigationViewSet),
     ('dataset', DatasetViewSet),
+    ('nucleus-detection', DetectedNucleusViewSet),
     ('pin', PinViewSet),
     ('job', JobViewSet),
 ]:
