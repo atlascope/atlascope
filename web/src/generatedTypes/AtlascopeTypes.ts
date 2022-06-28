@@ -714,7 +714,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceBand
    * @summary Returns bands information.
-   * @request GET:/datasets/tile_source/{id}/band
+   * @request GET:/datasets/tile_source/{id}/info/band
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceBand {
@@ -729,7 +729,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceBands
    * @summary Returns bands information.
-   * @request GET:/datasets/tile_source/{id}/bands
+   * @request GET:/datasets/tile_source/{id}/info/bands
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceBands {
@@ -759,7 +759,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceHistogram
    * @summary Returns histogram
-   * @request GET:/datasets/tile_source/{id}/histogram
+   * @request GET:/datasets/tile_source/{id}/data/histogram
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceHistogram {
@@ -781,7 +781,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceMetadata
    * @summary Returns tile metadata.
-   * @request GET:/datasets/tile_source/{id}/metadata
+   * @request GET:/datasets/tile_source/{id}/info/metadata
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceMetadata {
@@ -796,7 +796,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceMetadataInternal
    * @summary Returns additional known metadata about the tile source.
-   * @request GET:/datasets/tile_source/{id}/metadata_internal
+   * @request GET:/datasets/tile_source/{id}/info/metadata_internal
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceMetadataInternal {
@@ -811,7 +811,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourcePixel
    * @summary Returns single pixel.
-   * @request GET:/datasets/tile_source/{id}/pixel
+   * @request GET:/datasets/tile_source/{id}/data/pixel
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourcePixel {
@@ -838,7 +838,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceRegionJpeg
    * @summary Returns region tile binary.
-   * @request GET:/datasets/tile_source/{id}/region.jpeg
+   * @request GET:/datasets/tile_source/{id}/data/region.jpeg
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceRegionJpeg {
@@ -868,7 +868,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceRegionPng
    * @summary Returns region tile binary.
-   * @request GET:/datasets/tile_source/{id}/region.png
+   * @request GET:/datasets/tile_source/{id}/data/region.png
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceRegionPng {
@@ -898,7 +898,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceRegionTif
    * @summary Returns region tile binary.
-   * @request GET:/datasets/tile_source/{id}/region.tif
+   * @request GET:/datasets/tile_source/{id}/data/region.tif
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceRegionTif {
@@ -921,7 +921,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceThumbnailJpeg
    * @summary Returns thumbnail of full image.
-   * @request GET:/datasets/tile_source/{id}/thumbnail.jpeg
+   * @request GET:/datasets/tile_source/{id}/data/thumbnail.jpeg
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceThumbnailJpeg {
@@ -948,7 +948,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceThumbnailPng
    * @summary Returns thumbnail of full image.
-   * @request GET:/datasets/tile_source/{id}/thumbnail.png
+   * @request GET:/datasets/tile_source/{id}/data/thumbnail.png
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceThumbnailPng {
@@ -975,7 +975,7 @@ export namespace Datasets {
    * @tags datasets
    * @name DatasetsTileSourceTiffdump
    * @summary Returns tifftools tiffdump JSON. This will raise a `ValidationError` if the image is not a Tiff.
-   * @request GET:/datasets/tile_source/{id}/tiffdump
+   * @request GET:/datasets/tile_source/{id}/info/tiffdump
    * @response `200` `Dataset`
    */
   export namespace DatasetsTileSourceTiffdump {
