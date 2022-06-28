@@ -99,6 +99,10 @@ def run(job_id: str, original_dataset_id: str):
             dataset_type='nucleus_detection',
         )
         for nucleus in nuclei:
+            additional_nucleus_attributes = {
+                nucleus_attribute_to_field_name(attribute): nucleus[attribute]
+                for attribute in NUCLEUS_ATTRIBUTES
+            }
             DetectedNucleus.objects.create(
                 detection_dataset=detection_dataset,
                 label_integer=nucleus['Label'],
@@ -120,10 +124,7 @@ def run(job_id: str, original_dataset_id: str):
                         (nucleus['Identifier.Xmin'], nucleus['Identifier.Ymin']),
                     ]
                 ),
-                **{
-                    nucleus_attribute_to_field_name(attribute): nucleus[attribute]
-                    for attribute in NUCLEUS_ATTRIBUTES
-                },
+                **additional_nucleus_attributes,
             )
 
         job.resulting_datasets.add(detection_dataset)
