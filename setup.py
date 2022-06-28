@@ -50,7 +50,7 @@ setup(
         'importlib_metadata>=3.6',
         'jsonschema',
         'large-image[gdal,ometiff,pil]>=1.14',
-        'django-large-image>=0.5.2',
+        'django-large-image>=0.7.0',
         'scikit-learn',
         'imagecodecs',
         'matplotlib',

@@ -2,7 +2,7 @@ from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer, Datase
 from .dataset_embedding import DatasetEmbedding, DatasetEmbeddingSerializer
 from .detected_nucleus import DetectedNucleus, DetectedNucleusSerializer
 from .investigation import Investigation, InvestigationSerializer
-from .pin import Pin, PinSerializer
+from .pin import DatasetPin, DatasetPinSerializer, NotePin, NotePinSerializer, Pin, PinSerializer
 from .tour import Tour, TourSerializer
 from .tour_waypoints import TourWaypoints
 from .waypoint import Waypoint
@@ -26,6 +26,10 @@ __all__ = [
     JobDetailSerializer,
     Pin,
     PinSerializer,
+    NotePin,
+    NotePinSerializer,
+    DatasetPin,
+    DatasetPinSerializer,
     Tour,
     TourSerializer,
     TourWaypoints,

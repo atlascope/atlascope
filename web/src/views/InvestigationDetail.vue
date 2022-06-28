@@ -159,7 +159,7 @@ interface NonTiledOverlayFeatureData {
   ul: Point;
   lr: Point;
   image: HTMLImageElement;
-  pinId: number | undefined;
+  pinId: number;
 }
 
 interface BandSpec {
@@ -254,7 +254,7 @@ export default defineComponent({
       if (!featureLayer || !pinFeature || !map.value) { return; }
       pinFeature.getData().forEach((pin: object) => {
         if (!pinFeature) return;
-        const { x, y } = postGisToPoint((pin as Pin).child_location) || { x: 0, y: 0 };
+        const { x, y } = postGisToPoint((pin as Pin).location) || { x: 0, y: 0 };
         const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
         const note = pinNotes.value.find((pinNote) => pinNote.id === (pin as Pin).id);
         const {
@@ -501,7 +501,7 @@ export default defineComponent({
     // Create note cards for any pins without a child dataset.
     function createPinNotes() {
       const noteOnlyPins = store.state.currentPins.filter(
-        (pin: Pin) => (!pin.child && pin.note?.length),
+        (pin: Pin) => pin.pin_type === 'NotePin',
       );
       pinNotes.value = noteOnlyPins.map((pin) => ({
         ...pin,
@@ -538,12 +538,12 @@ export default defineComponent({
         nonTiledOverlayFeature.draw();
       } else {
         const urlRoot = process.env.VUE_APP_API_ROOT;
-        const url = `${urlRoot}/datasets/tile_source/${dataset.id}/thumbnail.png`;
+        const url = `${urlRoot}/datasets/tile_source/${dataset.id}/data/thumbnail.png`;
         const image: HTMLImageElement = new Image();
         image.src = url;
         image.crossOrigin = 'use-credentials';
-        const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/metadata`)).data;
-        const ul = postGisToPoint(pin.child_location) || { x: 0, y: 0 };
+        const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/info/metadata`)).data;
+        const ul = postGisToPoint(pin.location) || { x: 0, y: 0 };
         const lr = {
           x: ul.x + (imageMetadata.sizeX || 0),
           y: ul.y + (imageMetadata.sizeY || 0),
@@ -607,7 +607,7 @@ export default defineComponent({
       if (!pinFeature) {
         pinFeature = featureLayer.createFeature('point');
         pinFeature.data(selectedPins.value);
-        pinFeature.position((pin: Pin) => (postGisToPoint(pin.child_location) || { x: 0, y: 0 }));
+        pinFeature.position((pin: Pin) => (postGisToPoint(pin.location) || { x: 0, y: 0 }));
         pinFeature.style({
           radius: 10,
           strokeColor: 'white',
@@ -619,14 +619,14 @@ export default defineComponent({
 
           if (event.mouse.buttonsDown.left) {
             const pinClicked = event.data as Pin;
-            if (!pinClicked.child && pinClicked.note) {
+            if (pinClicked.pin_type === 'NotePin') {
               const noteToToggle = pinNotes.value.find((note) => note.id === pinClicked.id);
               if (noteToToggle) {
                 noteToToggle.showNote = !noteToToggle.showNote;
                 noteToToggle.notePositionX = event.mouse.page.x;
                 noteToToggle.notePositionY = event.mouse.page.y;
               }
-            } else if (pinClicked.child) {
+            } else if (pinClicked.pin_type === 'DatasetPin') {
               toggleDatasetPin(pinClicked);
             }
           }
