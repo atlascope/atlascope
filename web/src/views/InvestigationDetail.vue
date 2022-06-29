@@ -264,35 +264,49 @@ export default defineComponent({
       pinFeature = undefined;
     }
 
+    function isPin(obj: object): obj is Pin {
+      return (
+        'id' in obj
+        && 'location' in obj
+        && 'minimum_zoom' in obj
+        && 'maximum_zoom' in obj
+      );
+    }
+
     function movePinNoteCards() {
-      if (!featureLayer || !pinFeature || !map.value) { return; }
+      if (!featureLayer || !pinFeature || !map.value) {
+        return;
+      }
       pinFeature.getData().forEach((pin: object) => {
-        if (!pinFeature) return;
-        const pinObject = pin as Pin;
-        const { x, y } = postGisToPoint(pinObject.location);
-        const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
-        const note = pinNotes.value.find((pinNote) => pinNote.id === pinObject.id);
-        const {
-          left, top, width, height,
-        } = map.value?.getBoundingClientRect() || {
-          left: 0, top: 0, width: 0, height: 0,
-        };
-        if (note) {
-          note.notePositionX = newScreenCoords.x + left;
-          note.notePositionY = newScreenCoords.y + top;
-          if (note.notePositionX > left + width
-              || note.notePositionY > top + height
-              || note.notePositionX < left
-              || note.notePositionY < top
-              || radiusForZoomLevel(
-                zoomLevel.value,
-                pinObject.minimum_zoom || 0,
-                pinObject.maximum_zoom || 40,
-              ) === 0
-              || opacityForZoomLevel(zoomLevel.value, pinObject.maximum_zoom || 40) === 0) {
-            note.inBounds = false;
-          } else {
-            note.inBounds = true;
+        if (!pinFeature) {
+          return;
+        }
+        if (isPin(pin)) {
+          const { x, y } = postGisToPoint(pin.location) || { x: 0, y: 0 };
+          const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
+          const note = pinNotes.value.find((pinNote) => pinNote.id === pin.id);
+          const {
+            left, top, width, height,
+          } = map.value?.getBoundingClientRect() || {
+            left: 0, top: 0, width: 0, height: 0,
+          };
+          if (note) {
+            note.notePositionX = newScreenCoords.x + left;
+            note.notePositionY = newScreenCoords.y + top;
+            if (note.notePositionX > left + width
+                || note.notePositionY > top + height
+                || note.notePositionX < left
+                || note.notePositionY < top
+                || radiusForZoomLevel(
+                  zoomLevel.value,
+                  pin.minimum_zoom || 0,
+                  pin.maximum_zoom || 40,
+                ) === 0
+                || opacityForZoomLevel(zoomLevel.value, pin.maximum_zoom || 40) === 0) {
+              note.inBounds = false;
+            } else {
+              note.inBounds = true;
+            }
           }
         }
       });
