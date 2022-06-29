@@ -18,34 +18,31 @@ export function postGisToPoint(location: string): Point {
   return { x: xCoord, y: yCoord };
 }
 
+const inRangePinRadius = 10;
+const maxPinRadius = 26;
+const maxPinOpacity = 0.8;
+
+function rampRadiusDown(currentZoom: number, minZoom: number) {
+  return Math.max(0, inRangePinRadius - 5 * (minZoom - currentZoom));
+}
+
+function rampRadiusUp(maxZoom: number, currentZoom: number) {
+  return Math.min(maxPinRadius, inRangePinRadius + 8 * (currentZoom - maxZoom));
+}
+
 export function radiusForZoomLevel(currentZoom: number, minZoom: number, maxZoom: number): number {
-  const inRangeRadius = 10;
-  let diff = 0;
-  if (currentZoom >= minZoom && currentZoom <= maxZoom) {
-    return inRangeRadius;
-  }
   if (currentZoom < minZoom) {
-    diff = minZoom - currentZoom;
-    if (diff > 2) {
-      return 0;
-    }
-    return inRangeRadius - (5 * diff);
+    return rampRadiusDown(currentZoom, minZoom);
   }
-  diff = currentZoom - maxZoom;
-  if (diff > 2) {
-    return inRangeRadius;
+  if (currentZoom > maxZoom) {
+    return rampRadiusUp(maxZoom, currentZoom);
   }
-  return inRangeRadius + (8 * diff);
+  return inRangePinRadius;
 }
 
 export function opacityForZoomLevel(currentZoom: number, maxZoom: number): number {
-  const maxOpacity = 0.8;
   if (currentZoom <= maxZoom) {
-    return maxOpacity;
+    return maxPinOpacity;
   }
-  const diff = currentZoom - maxZoom;
-  if (diff > 2) {
-    return 0;
-  }
-  return maxOpacity - (0.4 * diff);
+  return Math.max(0, maxPinOpacity - 0.4 * (currentZoom - maxZoom));
 }
