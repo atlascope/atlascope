@@ -1,30 +1,61 @@
 [{
     "investigation": "Pin playground",
     "id": 6000,
-    "name": "Tour Demo",
+    "name": "Tour Demo 1",
     "waypoints": [
         {
-            "location": [0.0, 0.0],
+            "location": [1200.0, 3000.0],
             "zoom": 1
         },
         {
-            "location": [1.0, 1.0],
+            "location": [2200.0, 2200.0],
             "zoom": 2
         },
         {
-            "location": [2.0, 2.0],
+            "location": [1100.0, 1100.0],
             "zoom": 3
         },
         {
-            "location": [3.0, 3.0],
+            "location": [3300.0, 1100.0],
             "zoom": 1
         },
         {
-            "location": [4.0, 4.0],
+            "location": [3300.0, 3300.0],
             "zoom": 2
         },
         {
-            "location": [5.0, 5.0],
+            "location": [4400.0, 4400.0],
+            "zoom": 3
+        }
+    ]
+},
+{
+    "investigation": "Pin playground",
+    "id": 6001,
+    "name": "Tour Demo 2",
+    "waypoints": [
+        {
+            "location": [1100.0, 1100.0],
+            "zoom": 1
+        },
+        {
+            "location": [1200.0, 3000.0],
+            "zoom": 2
+        },
+        {
+            "location": [2200.0, 2200.0],
+            "zoom": 3
+        },
+        {
+            "location": [3300.0, 3300.0],
+            "zoom": 1
+        },
+        {
+            "location": [4400.0, 4400.0],
+            "zoom": 2
+        },
+        {
+            "location": [3300.0, 1100.0],
             "zoom": 3
         }
     ]
