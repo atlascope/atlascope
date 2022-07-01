@@ -14,6 +14,12 @@
         <pin-list />
       </v-tab-item>
       <v-tab>
+        Tours
+      </v-tab>
+      <v-tab-item>
+        <tour-list />
+      </v-tab-item>
+      <v-tab>
         Metadata
       </v-tab>
       <v-tab-item>
@@ -46,11 +52,13 @@ import {
 import store from '../store';
 import PinList from './PinList.vue';
 import JobPane from './JobPane.vue';
+import TourList from './TourList.vue';
 
 export default defineComponent({
   components: {
     PinList,
     JobPane,
+    TourList,
   },
 
   setup() {
