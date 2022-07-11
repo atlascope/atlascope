@@ -66,7 +66,7 @@ export default defineComponent({
     const rootDataset = computed(() => store.state.rootDataset);
 
     function isInBounds(pin: Pin): boolean {
-      const point: Point = postGisToPoint(pin.location) || { x: 0, y: 0 };
+      const point: Point = postGisToPoint(pin.location);
       const containedInMapBounds = (point.x < bounds.value.right
         && point.x > bounds.value.left
         && point.y > bounds.value.top
