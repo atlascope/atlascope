@@ -75,7 +75,7 @@ export default defineComponent({
       const pinMinZoom = pin.minimum_zoom || 0;
       const visibleAtCurrentZoom = (
         pinMinZoom - 2 <= zoom.value
-        && pinMaxZoom + 2 >= zoom.value
+        && zoom.value <= pinMaxZoom + 2
       );
       return containedInMapBounds && visibleAtCurrentZoom;
     }
