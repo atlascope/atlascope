@@ -45,7 +45,7 @@ export interface State {
     zoomLevel: number;
     tours: Tour[];
     selectedTour: Tour[];
-    selectedWaypoint: Waypoint[];
+    selectedWaypoint: Waypoint;
 }
 
 interface TileMetadataForDataset {
@@ -85,7 +85,7 @@ const {
     zoomLevel: 0,
     tours: [],
     selectedTour: [],
-    selectedWaypoint: [],
+    selectedWaypoint: {},
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -124,7 +124,7 @@ const {
     setSelectedTour(state, tours: Tour[]) {
       state.selectedTour = tours;
     },
-    setSelectedWaypoint(state, waypoint: Waypoint[]) {
+    setSelectedWaypoint(state, waypoint: Waypoint) {
       state.selectedWaypoint = waypoint;
     },
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {

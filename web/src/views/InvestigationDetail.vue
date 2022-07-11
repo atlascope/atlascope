@@ -530,7 +530,7 @@ export default defineComponent({
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
     const selectedTour: Ref<Tour[]> = computed(() => store.state.selectedTour);
-    const selectedWaypoint: Ref<Waypoint[]> = computed(() => store.state.selectedWaypoint);
+    const selectedWaypoint: Ref<Waypoint> = computed(() => store.state.selectedWaypoint);
     // Create note cards for any pins without a child dataset.
     function createPinNotes() {
       const noteOnlyPins = store.state.currentPins.filter(
@@ -705,7 +705,8 @@ export default defineComponent({
 
     watch(selectedWaypoint, () => {
       console.log('before zoom');
-      geoTransition(postGisToPoint(selectedWaypoint.value[0].location as string), 2000, selectedWaypoint.value[0].zoom);
+      console.log(selectedWaypoint.value)
+      geoTransition(postGisToPoint(selectedWaypoint.value.location as string), 2000, selectedWaypoint.value.zoom);
       console.log('afterzoom');
     });
 

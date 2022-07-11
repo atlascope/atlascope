@@ -75,7 +75,7 @@ export default defineComponent({
       get: () => store.state.selectedTour,
       set: (val) => store.commit.setSelectedTour(val),
     });
-    const selectedWaypoint: Ref<Waypoint[]> = computed({
+    const selectedWaypoint: Ref<Waypoint> = computed({
       get: () => store.state.selectedWaypoint,
       set: (val) => store.commit.setSelectedWaypoint(val),
     });
@@ -95,6 +95,10 @@ export default defineComponent({
       currentStep.value=currentStep.value-1;
     }
 
+    watch(currentStep, () => {
+      selectedWaypoint.value = tours.value[tours.value.indexOf(expanded.value[0])].waypoints[currentStep.value-1]
+    })
+
     return {
       tours,
       selectedWaypoint,
@@ -102,7 +106,7 @@ export default defineComponent({
       expanded,
       currentStep,
       nextStep,
-      previousStep
+      previousStep,
     };
   },
 });
