@@ -79,14 +79,12 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
   };
 
   const geoTransition = (center, duration, zoom) => {
-
-      map.value.transition({
-        center,
-        duration,
-        zoom,
-      })
-
-  }
+    map.value.transition({
+      center,
+      duration,
+      zoom,
+    });
+  };
 
   const clampBoundsX = (value: boolean): boolean | undefined => {
     if (map.value) {

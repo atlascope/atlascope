@@ -85,7 +85,7 @@ const {
     zoomLevel: 0,
     tours: [],
     selectedTour: [],
-    selectedWaypoint: []
+    selectedWaypoint: [],
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -253,8 +253,8 @@ const {
         commit.setCurrentPins(pins);
       }
     },
-    async fetchInvestigationTours(context){
-      const { commit, state} = rootActionContext(context);
+    async fetchInvestigationTours(context) {
+      const { commit, state } = rootActionContext(context);
       if (state.axiosInstance && state.currentInvestigation) {
         const tours = (await state.axiosInstance.get(`/investigations/${state.currentInvestigation.id}/tours`)).data;
         commit.setTours(tours);
