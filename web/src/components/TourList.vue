@@ -38,21 +38,14 @@
           </div>
         </template>
         <template v-for="n in item.waypoints.length">
-
           <v-stepper-step
             :key="`${n}-item.waypoints.id`"
             :step="n"
             editable
-            >
+          >
             Waypoint Location: {{ item.waypoints[n-1].location.split(";")[1]}}
-
-
-            </v-stepper-step>
-
+          </v-stepper-step>
         </template>
-
-
-
       </v-stepper>
       </td>
     </template>
@@ -61,7 +54,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, Ref, computed, ref, watch
+  defineComponent, Ref, computed, ref, watch,
 } from '@vue/composition-api';
 import type { DataTableHeader } from 'vuetify';
 
@@ -85,19 +78,19 @@ export default defineComponent({
       { text: '', value: 'data-table-expand' },
     ];
 
-    const currentStep = ref<number>(0)
+    const currentStep = ref<number>(0);
 
     const nextStep = () => {
-      currentStep.value=currentStep.value+1;
-    }
+      currentStep.value = ++currentStep.value;
+    };
 
     const previousStep = () => {
-      currentStep.value=currentStep.value-1;
-    }
+      currentStep.value = --currentStep.value;
+    };
 
     watch(currentStep, () => {
       selectedWaypoint.value = tours.value[tours.value.indexOf(expanded.value[0])].waypoints[currentStep.value-1]
-    })
+    });
 
     return {
       tours,

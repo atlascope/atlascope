@@ -4,6 +4,7 @@ import {
 import geo from 'geojs';
 import useGeoJSLayer from './useGeoJSLayer';
 import { GeoBounds } from './composableTypes';
+import { Point } from '../utilities/utiltyFunctions';
 
 export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const map: Ref<any> = ref(null);
@@ -78,11 +79,11 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     }
   };
 
-  const geoTransition = (center, duration, zoom) => {
+  const geoTransition = (gtCenter: Point | undefined, gtDuration: number, gtZoom: number | undefined | null) => {
     map.value.transition({
-      center,
-      duration,
-      zoom,
+      center:gtCenter,
+      duration:gtDuration,
+      zoom:gtZoom,
     });
   };
 

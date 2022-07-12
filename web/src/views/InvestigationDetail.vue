@@ -666,7 +666,6 @@ export default defineComponent({
         });
       } else {
         pinFeature.data(selectedPins.value);
-        console.log(pinFeature.getData());
         pinFeature.draw();
       }
       showHidePinsForZoomLevel(zoomLevel.value);
@@ -674,7 +673,6 @@ export default defineComponent({
 
     watch(selectedTour, () => {
       if (!featureLayer) {
-        console.log('test1');
         featureLayer = createLayer(
           'feature',
           { features: ['point', 'line', 'polygon', 'quad.image'] },
@@ -684,30 +682,27 @@ export default defineComponent({
         return;
       }
       if (!tourFeature) {
-        console.log('test2');
         tourFeature = featureLayer.createFeature('line');
         tourFeature.data(selectedTour.value[0].waypoints);
-        console.log(tourFeature.getData());
         tourFeature.style({
           radius: 10,
           strokeColor: 'blue',
         });
         tourFeature.draw();
       } else {
-        console.log('test3');
         tourFeature.data(selectedTour.value[0].waypoints);
-        tourFeature.position((waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)));
-        console.log(tourFeature.getData());
+        tourFeature.position((waypoints: Waypoint) =>
+          (postGisToPoint(waypoints.location as string)));
 
         tourFeature.draw();
       }
     }, { deep: true });
 
     watch(selectedWaypoint, () => {
-      console.log('before zoom');
-      console.log(selectedWaypoint.value)
-      geoTransition(postGisToPoint(selectedWaypoint.value.location as string), 2000, selectedWaypoint.value.zoom);
-      console.log('afterzoom');
+      geoTransition(postGisToPoint(selectedWaypoint.value.location as string),
+                    2000,
+                    selectedWaypoint.value.zoom
+                  );
     });
 
     onMounted(async () => {
