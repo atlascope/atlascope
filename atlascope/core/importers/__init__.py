@@ -1,3 +1,4 @@
+from .gdrive import GoogleDriveImporter
 from .upload import UploadImporter
 from .vandy import VandyImporter
 
@@ -6,5 +7,6 @@ available_importers = {
     for cls in [
         UploadImporter,
         VandyImporter,
+        GoogleDriveImporter,
     ]
 }

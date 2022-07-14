@@ -241,6 +241,9 @@ export default defineComponent({
     }
 
     function buildUrlQueryArgs() {
+      if (frames.value.length === 0) {
+        return '';
+      }
       const style: TileLayerStyleDict = {
         bands: getSelectedFrameStyle(),
       };

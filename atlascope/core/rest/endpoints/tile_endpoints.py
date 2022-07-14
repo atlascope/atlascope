@@ -28,7 +28,7 @@ class DatasetTileSourceView(GenericViewSet, LargeImageDetailMixin):
             return str(dataset.content.path)
         except (AttributeError, ValueError):
             # Raise 400-level error as this dataset has no content
-            raise ValidationError('Dataset has not content.')
+            raise ValidationError('Dataset has no content.')
 
     def open_tile_source(self, request: Request, path: str, **kwargs) -> FileTileSource:
         """Override to manually choose tile source class."""

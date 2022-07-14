@@ -13,6 +13,7 @@
         "name": "Semantic zoom playground",
         "id": 1001,
         "datasets": [
+            "Human muscular system",
             "HTA9_1_BA_F_ROI02",
             "HTA9_1_BA_F_ROI04",
             "HTA9_1_BA_F_ROI03"
@@ -43,6 +44,24 @@
         "id": 1005,
         "datasets": [
             "HTA11_377_20000010115220280030000000000 (remote)"
+        ]
+    },
+    {
+        "name": "Anatomy playground",
+        "id": 1006,
+        "datasets": [
+            "Human skeletal system",
+            "Human circulatory system",
+            "Human lymphatic system",
+            "Human endocrine system",
+            "Human nervous system",
+            "Female reproductive system",
+            "Male reproductive system",
+            "Human urinary system",
+            "Human digestive system",
+            "Human respiratory system",
+            "Human muscular system",
+            "Human integumentary system"
         ]
     }
 ]
