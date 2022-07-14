@@ -224,8 +224,8 @@ export default defineComponent({
     let selectionLayer: GeoJSLayer | undefined;
     let featureLayer: GeoJSLayer | undefined;
     let pinFeature: GeoJSFeature | undefined;
-    let tourPointsFeature:  GeoJSFeature | undefined;
-    let tourLineFeature:  GeoJSFeature | undefined;
+    let tourPointsFeature: GeoJSFeature | undefined;
+    let tourLineFeature: GeoJSFeature | undefined;
     /* eslint-disable */
     let nonTiledOverlayFeature: any;
     /* eslint-enable */
@@ -676,7 +676,7 @@ export default defineComponent({
       if (!featureLayer) {
         featureLayer = createLayer(
           'feature',
-          { features:  ['point', 'line', 'polygon', 'quad.image'] },
+          { features: ['point', 'line', 'polygon', 'quad.image'] },
         );
       }
       if (!featureLayer) {
@@ -692,10 +692,8 @@ export default defineComponent({
         });
         tourPointsFeature.draw();
       } else {
-
         tourPointsFeature.data(selectedTour.value[0].waypoints);
-        tourPointsFeature.position((waypoints: Waypoint) =>
-          (postGisToPoint(waypoints.location as string)));
+        tourPointsFeature.position((waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)));
 
         tourPointsFeature.draw();
       }
@@ -715,9 +713,8 @@ export default defineComponent({
 
     watch(selectedWaypoint, () => {
       geoTransition(postGisToPoint(selectedWaypoint.value.location as string),
-                    2000,
-                    selectedWaypoint.value.zoom
-                  );
+        2000,
+        selectedWaypoint.value.zoom);
     });
 
     onMounted(async () => {
