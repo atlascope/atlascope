@@ -631,7 +631,7 @@ export default defineComponent({
       if (!pinFeature) {
         pinFeature = featureLayer.createFeature('point');
         pinFeature.data(selectedPins.value);
-        pinFeature.position((pin: Pin) => (postGisToPoint(pin.location)));
+        pinFeature.position((pin: Pin) => postGisToPoint(pin.location));
         pinFeature.style({
           radius: 10,
           strokeColor: 'white',
