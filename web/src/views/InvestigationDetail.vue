@@ -224,7 +224,8 @@ export default defineComponent({
     let selectionLayer: GeoJSLayer | undefined;
     let featureLayer: GeoJSLayer | undefined;
     let pinFeature: GeoJSFeature | undefined;
-    let tourFeature: GeoJSFeature | undefined;
+    let tourPointsFeature:  GeoJSFeature | undefined;
+    let tourLineFeature:  GeoJSFeature | undefined;
     /* eslint-disable */
     let nonTiledOverlayFeature: any;
     /* eslint-enable */
@@ -675,26 +676,40 @@ export default defineComponent({
       if (!featureLayer) {
         featureLayer = createLayer(
           'feature',
-          { features: ['point', 'line', 'polygon', 'quad.image'] },
+          { features:  ['point', 'line', 'polygon', 'quad.image'] },
         );
       }
       if (!featureLayer) {
         return;
       }
-      if (!tourFeature) {
-        tourFeature = featureLayer.createFeature('line');
-        tourFeature.data(selectedTour.value[0].waypoints);
-        tourFeature.style({
+      if (!tourPointsFeature) {
+        tourPointsFeature = featureLayer.createFeature('point');
+        tourPointsFeature.data(selectedTour.value[0].waypoints);
+        tourPointsFeature.style({
           radius: 10,
           strokeColor: 'blue',
+          fillColor: 'blue',
         });
-        tourFeature.draw();
+        tourPointsFeature.draw();
       } else {
-        tourFeature.data(selectedTour.value[0].waypoints);
-        tourFeature.position((waypoints: Waypoint) =>
+
+        tourPointsFeature.data(selectedTour.value[0].waypoints);
+        tourPointsFeature.position((waypoints: Waypoint) =>
           (postGisToPoint(waypoints.location as string)));
 
-        tourFeature.draw();
+        tourPointsFeature.draw();
+      }
+      if (!tourLineFeature) {
+        tourLineFeature = featureLayer.createFeature('line');
+        tourLineFeature.data([selectedTour.value[0].waypoints.map((element) => postGisToPoint(element.location as string))]);
+        tourLineFeature.style({
+          strokeWidth: 5,
+          strokeColor: 'blue',
+        });
+        tourLineFeature.draw();
+      } else {
+        tourLineFeature.data([selectedTour.value[0].waypoints.map((element) => postGisToPoint(element.location as string))]);
+        tourLineFeature.draw();
       }
     }, { deep: true });
 
