@@ -9,8 +9,14 @@
     item-key="id"
   >
     <template v-slot:expanded-item="{ headers, item }">
-      <td :colspan="headers.length" class="white">
-        <v-stepper v-model="currentStep" vertical>
+      <td
+        :colspan="headers.length"
+        class="white"
+      >
+        <v-stepper
+          v-model="currentStep"
+          vertical
+        >
           <template>
             <div class="d-flex justify-space-between mx-5">
               <v-btn
@@ -30,7 +36,11 @@
             </div>
           </template>
           <template v-for="n in item.waypoints.length">
-            <v-stepper-step :key="`${n}-item.waypoints.id`" :step="n" editable>
+            <v-stepper-step
+              :key="`${n}-item.waypoints.id`"
+              :step="n"
+              editable
+            >
               Waypoint Location: {{ item.waypoints[n - 1].location.split(";")[1] }}
             </v-stepper-step>
           </template>
@@ -41,11 +51,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, Ref, computed, ref, watch } from "@vue/composition-api";
-import type { DataTableHeader } from "vuetify";
+import {
+  defineComponent, Ref, computed, ref, watch,
+} from '@vue/composition-api';
+import type { DataTableHeader } from 'vuetify';
 
-import { Tour, Waypoint } from "@/generatedTypes/AtlascopeTypes";
-import store from "@/store";
+import { Tour, Waypoint } from '@/generatedTypes/AtlascopeTypes';
+import store from '@/store';
 
 export default defineComponent({
   setup() {
@@ -60,8 +72,8 @@ export default defineComponent({
     });
 
     const headers: DataTableHeader[] = [
-      { text: "Tour Name", value: "name" },
-      { text: "", value: "data-table-expand" },
+      { text: 'Tour Name', value: 'name' },
+      { text: '', value: 'data-table-expand' },
     ];
 
     const currentStep = ref<number>(0);
@@ -75,8 +87,9 @@ export default defineComponent({
     };
 
     watch(currentStep, () => {
-      selectedWaypoint.value =
-        tours.value[tours.value.indexOf(expanded.value[0])].waypoints[currentStep.value - 1];
+      selectedWaypoint.value = tours.value[
+        tours.value.indexOf(expanded.value[0])
+      ].waypoints[currentStep.value - 1];
     });
 
     return {

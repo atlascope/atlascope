@@ -79,7 +79,11 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     }
   };
 
-  const geoTransition = (gtCenter: Point | undefined, gtDuration: number, gtZoom: number | undefined | null) => {
+  const geoTransition = (
+    gtCenter: Point | undefined,
+    gtDuration: number,
+    gtZoom: number | undefined | null,
+  ) => {
     map.value.transition({
       center: gtCenter,
       duration: gtDuration,

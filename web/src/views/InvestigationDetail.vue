@@ -693,20 +693,34 @@ export default defineComponent({
         tourPointsFeature.draw();
       } else {
         tourPointsFeature.data(selectedTour.value[0].waypoints);
-        tourPointsFeature.position((waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)));
+        tourPointsFeature.position(
+          (waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)),
+        );
 
         tourPointsFeature.draw();
       }
       if (!tourLineFeature) {
         tourLineFeature = featureLayer.createFeature('line');
-        tourLineFeature.data([selectedTour.value[0].waypoints.map((element) => postGisToPoint(element.location as string))]);
+        tourLineFeature.data(
+          [
+            selectedTour.value[0].waypoints.map(
+              (element) => postGisToPoint(element.location as string),
+            ),
+          ],
+        );
         tourLineFeature.style({
           strokeWidth: 5,
           strokeColor: 'blue',
         });
         tourLineFeature.draw();
       } else {
-        tourLineFeature.data([selectedTour.value[0].waypoints.map((element) => postGisToPoint(element.location as string))]);
+        tourLineFeature.data(
+          [
+            selectedTour.value[0].waypoints.map(
+              (element) => postGisToPoint(element.location as string),
+            ),
+          ],
+        );
         tourLineFeature.draw();
       }
     }, { deep: true });
