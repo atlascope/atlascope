@@ -63,5 +63,15 @@
             "Human muscular system",
             "Human integumentary system"
         ]
+    },
+    {
+        "name": "Tour playground",
+        "id": 1007,
+        "datasets": [
+            "HTA9_1_BA_F_ROI02",
+            "Blue Tile",
+            "Red Tile",
+            "Green Tile"
+        ]
     }
 ]

@@ -1,5 +1,5 @@
 [{
-    "investigation": "Pin playground",
+    "investigation": "Tour playground",
     "id": 6000,
     "name": "Tour Demo 1",
     "waypoints": [
@@ -30,7 +30,7 @@
     ]
 },
 {
-    "investigation": "Pin playground",
+    "investigation": "Tour playground",
     "id": 6001,
     "name": "Tour Demo 2",
     "waypoints": [
