@@ -530,7 +530,7 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
-    const selectedTour: Ref<Tour[]> = computed(() => store.state.selectedTour);
+    const selectedTour: Ref<Tour> = computed(() => store.state.selectedTour);
     const selectedWaypoint: Ref<Waypoint> = computed(() => store.state.selectedWaypoint);
     // Create note cards for any pins without a child dataset.
     function createPinNotes() {
@@ -684,7 +684,11 @@ export default defineComponent({
       }
       if (!tourPointsFeature) {
         tourPointsFeature = featureLayer.createFeature('point');
-        tourPointsFeature.data(selectedTour.value[0].waypoints);
+        tourPointsFeature.data(selectedTour.value.waypoints);
+        tourPointsFeature.position(
+          (waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)),
+        );
+
         tourPointsFeature.style({
           radius: 10,
           strokeColor: 'blue',
@@ -692,7 +696,7 @@ export default defineComponent({
         });
         tourPointsFeature.draw();
       } else {
-        tourPointsFeature.data(selectedTour.value[0].waypoints);
+        tourPointsFeature.data(selectedTour.value.waypoints);
         tourPointsFeature.position(
           (waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)),
         );
@@ -703,7 +707,7 @@ export default defineComponent({
         tourLineFeature = featureLayer.createFeature('line');
         tourLineFeature.data(
           [
-            selectedTour.value[0].waypoints.map(
+            selectedTour.value.waypoints.map(
               (element) => postGisToPoint(element.location as string),
             ),
           ],
@@ -716,7 +720,7 @@ export default defineComponent({
       } else {
         tourLineFeature.data(
           [
-            selectedTour.value[0].waypoints.map(
+            selectedTour.value.waypoints.map(
               (element) => postGisToPoint(element.location as string),
             ),
           ],

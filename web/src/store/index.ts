@@ -44,7 +44,7 @@ export interface State {
     currentBounds: GeoBounds;
     zoomLevel: number;
     tours: Tour[];
-    selectedTour: Tour[];
+    selectedTour: Tour;
     selectedWaypoint: Waypoint;
 }
 
@@ -84,7 +84,7 @@ const {
     },
     zoomLevel: 0,
     tours: [],
-    selectedTour: [],
+    selectedTour: {} as Tour,
     selectedWaypoint: {},
   } as State,
   mutations: {
@@ -121,7 +121,7 @@ const {
     setTours(state, tours: Tour[]) {
       state.tours = tours;
     },
-    setSelectedTour(state, tours: Tour[]) {
+    setSelectedTour(state, tours: Tour) {
       state.selectedTour = tours;
     },
     setSelectedWaypoint(state, waypoint: Waypoint) {

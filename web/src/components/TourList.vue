@@ -21,14 +21,14 @@
             <div class="d-flex justify-space-between mx-5">
               <v-btn
                 color="primary"
-                :disabled="currentStep == 0 || currentStep == 1"
+                :disabled="currentStep === 0 || currentStep === 1"
                 @click="previousStep()"
               >
                 Previous
               </v-btn>
               <v-btn
                 color="primary"
-                :disabled="currentStep == item.waypoints.length"
+                :disabled="currentStep === item.waypoints.length"
                 @click="nextStep()"
               >
                 Next
@@ -63,8 +63,8 @@ export default defineComponent({
   setup() {
     const tours: Ref<Tour[]> = computed(() => store.state.tours);
     const expanded: Ref<Tour[]> = computed({
-      get: () => store.state.selectedTour,
-      set: (val) => store.commit.setSelectedTour(val),
+      get: () => [store.state.selectedTour],
+      set: (val) => store.commit.setSelectedTour(val[0]),
     });
     const selectedWaypoint: Ref<Waypoint> = computed({
       get: () => store.state.selectedWaypoint,
