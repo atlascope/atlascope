@@ -3,7 +3,7 @@ export interface Point {
   y: number;
 }
 
-export function postGisToPoint(location: string): Point | undefined {
+export function postGisToPoint(location: string): Point {
   const stringParts = location.split(' ');
   const xPart = stringParts[1];
   const yPart = stringParts[2];

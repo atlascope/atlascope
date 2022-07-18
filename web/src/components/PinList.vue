@@ -25,7 +25,7 @@
         @change="selectionChanged"
       >
         <v-list-item
-          v-for="pin in pins"
+          v-for="pin in sortedPins"
           :key="pin.id"
           :value="pin"
           :disabled="pin.parent !== rootDataset.id"
@@ -56,11 +56,40 @@ import {
 } from '@vue/composition-api';
 import store from '../store';
 import { Pin } from '../generatedTypes/AtlascopeTypes';
+import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 
 export default defineComponent({
   setup() {
     const pins: Ref<Pin[]> = computed(() => store.state.currentPins);
+    const bounds = computed(() => store.state.currentBounds);
+    const zoom = computed(() => store.state.zoomLevel);
     const rootDataset = computed(() => store.state.rootDataset);
+
+    function isInBounds(pin: Pin): boolean {
+      const point: Point = postGisToPoint(pin.location);
+      const containedInMapBounds = (point.x < bounds.value.right
+        && point.x > bounds.value.left
+        && point.y > bounds.value.top
+        && point.y < bounds.value.bottom);
+      const pinMaxZoom = pin.maximum_zoom || 40;
+      const pinMinZoom = pin.minimum_zoom || 0;
+      const visibleAtCurrentZoom = (
+        pinMinZoom - 2 <= zoom.value
+        && zoom.value <= pinMaxZoom + 2
+      );
+      return containedInMapBounds && visibleAtCurrentZoom;
+    }
+
+    const sortedPins = computed(() => store.state.currentPins.slice().sort(
+      (firstPin, secondPin) => {
+        const firstPinInBounds = isInBounds(firstPin);
+        const secondPinInBounds = isInBounds(secondPin);
+        if (firstPinInBounds && secondPinInBounds) {
+          return firstPin.id - secondPin.id;
+        }
+        return firstPinInBounds ? -1 : 1;
+      },
+    ));
     const selectedPins: Ref<Pin[]> = ref([]);
 
     function selectionChanged(pinList: Pin[]) {
@@ -99,6 +128,7 @@ export default defineComponent({
       selectedPins,
       pinDisplayTitle,
       toggleDisplayAll,
+      sortedPins,
     };
   },
 });
