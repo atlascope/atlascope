@@ -41,9 +41,7 @@ def save_output_dataset(
 
     new_pin_location = [50, 50]
     # find an unoccupied space in the original dataset space
-    existing_nearby_pin_locations = [
-        list(x.child_location.tuple) for x in original_dataset.pins.all()
-    ]
+    existing_nearby_pin_locations = [list(x.location.tuple) for x in original_dataset.pins.all()]
     while new_pin_location in existing_nearby_pin_locations:
         new_pin_location[0] += 50
         if new_pin_location in existing_nearby_pin_locations:
