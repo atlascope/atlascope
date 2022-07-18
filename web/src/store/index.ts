@@ -32,6 +32,7 @@ export interface State {
     rootDataset: Dataset | null;
     currentPins: Pin[];
     selectedPins: Pin[];
+    selectedVisualizations: [];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
@@ -61,6 +62,7 @@ const {
     rootDataset: null,
     currentPins: [],
     selectedPins: [],
+    selectedVisualizations: [],
     showEmbeddings: true,
     datasetEmbeddings: [],
     datasetTileMetadata: {},
@@ -99,6 +101,9 @@ const {
     },
     setSelectedPins(state, pins: Pin[]) {
       state.selectedPins = pins;
+    },
+    setSelectedVisualizations(state, visualizations) {
+      state.selectedVisualizations = visualizations;
     },
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
       state.datasetEmbeddings = embeddings;
@@ -165,7 +170,9 @@ const {
             datasetId: number | undefined;
             result: AxiosResponse;
           }>[] = [];
-          datasets.forEach((dataset) => {
+          datasets.filter(
+            (dataset) => dataset.dataset_type === 'tile_source',
+          ).forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
@@ -231,7 +238,26 @@ const {
     },
     updateSelectedPins(context, pins: Pin[]) {
       const { commit } = rootActionContext(context);
-      commit.setSelectedPins(pins);
+      const circlePinDatasetTypes = [
+        'tile_overlay',
+        'non_tiled_image',
+      ];
+      const isVisualization = pins.map((pin: Pin) => {
+        const childDataset: Dataset | undefined = store.state.currentDatasets.find(
+          (dataset: Dataset) => dataset.id === pin.child,
+        );
+        if (childDataset
+          && childDataset?.dataset_type
+          && !circlePinDatasetTypes.includes(childDataset.dataset_type)) {
+          return [childDataset.dataset_type, childDataset.metadata];
+        }
+        return false;
+      });
+      const circlePins = pins.filter((pin: Pin, index: number) => !isVisualization[index]);
+      const visualizations = isVisualization.filter((vis) => vis !== false);
+
+      commit.setSelectedPins(circlePins);
+      commit.setSelectedVisualizations(visualizations);
     },
     updateFrames(context, frames: TiffFrame[]) {
       const { commit } = rootActionContext(context);

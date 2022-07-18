@@ -57,4 +57,7 @@ def save_output_dataset(
     )
     new_pin.save()
 
+    investigation.datasets.add(new_dataset)
+    investigation.save()
+
     return new_dataset

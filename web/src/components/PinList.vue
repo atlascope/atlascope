@@ -40,7 +40,7 @@ import {
   computed, defineComponent, onMounted, Ref, ref, watch,
 } from '@vue/composition-api';
 import store from '../store';
-import { Pin } from '../generatedTypes/AtlascopeTypes';
+import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
 
 export default defineComponent({
   setup() {

@@ -128,6 +128,7 @@ import {
   radiusForZoomLevel,
   opacityForZoomLevel,
 } from '../utilities/utiltyFunctions';
+import visualize from '../utilities/analyticsVis';
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -226,6 +227,7 @@ export default defineComponent({
     let rootDatasetLayer: GeoJSLayer;
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
+    const selectedVisualizations: Ref<Array<string | Record<string, any>>[]> = computed(() => store.state.selectedVisualizations);
 
     function selectPinsForRootDataset() {
       store.dispatch.updateSelectedPins(store.state.currentPins.filter(
@@ -654,6 +656,10 @@ export default defineComponent({
         pinFeature.draw();
       }
       showHidePinsForZoomLevel(zoomLevel.value);
+    });
+
+    watch(selectedVisualizations, () => {
+      selectedVisualizations.value.forEach((visualization) => visualize(...visualization, featureLayer));
     });
 
     onMounted(async () => {
