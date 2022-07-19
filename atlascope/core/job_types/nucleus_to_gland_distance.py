@@ -2,7 +2,7 @@
 
 import io
 import math
-
+import numpy as np
 from celery import shared_task
 import skimage.io
 
@@ -36,11 +36,12 @@ def run(job_id: str, original_dataset_id: str, gland_map_path: str):
         nucleus_detections = Job.objects.filter(
             original_dataset=original_dataset,
             job_type='nucleus_detection',
+            complete=True,
         )
         if nucleus_detections.count() > 0:
-            nucleus_detections = list(
-                nucleus_detections[0].resulting_datasets.first().detected_nuclei.all()
-            )
+            resulting_dataset = nucleus_detections[0].resulting_datasets.first()
+            nucleus_detections = list(resulting_dataset.detected_nuclei.all())
+            nucleus_mask = np.array(resulting_dataset.metadata['nucleus_mask'])
             nucleus_centroids = [
                 (nucleus.centroid.x, nucleus.centroid.y) for nucleus in nucleus_detections
             ]
@@ -48,14 +49,14 @@ def run(job_id: str, original_dataset_id: str, gland_map_path: str):
             input_image = skimage.io.imread(
                 io.BytesIO(original_dataset.content.read()),
             )
-            nucleus_detections = detect_nuclei(input_image)
+            nucleus_detections, nucleus_mask = detect_nuclei(input_image)
             nucleus_centroids = [
                 (nucleus["Identifier.CentroidX"], nucleus["Identifier.CentroidY"])
                 for nucleus in nucleus_detections
             ]
 
         gland_map = skimage.io.imread(io.BytesIO(open(gland_map_path, 'rb').read()))
-        gland_detections = detect_nuclei(gland_map)
+        gland_detections, gland_mask = detect_nuclei(gland_map)
         gland_centroids = [
             (gland["Identifier.CentroidX"], gland["Identifier.CentroidY"])
             for gland in gland_detections
@@ -73,7 +74,12 @@ def run(job_id: str, original_dataset_id: str, gland_map_path: str):
                 job.investigation,
                 'Average Nucleus to Nearest Gland Distance',
                 None,
-                {'average_distance_in_pixels': average_distance_to_nearest_gland},
+                {
+                    'average_distance_in_pixels': average_distance_to_nearest_gland,
+                    'nucleus_mask': nucleus_mask.tolist(),
+                    'gland_mask': gland_mask.tolist(),
+                },
+                dataset_type='nucleus_gland_dist',
             )
         )
         job.complete = True

@@ -70,6 +70,7 @@ def run(job_id: str, original_dataset_id: str, n: int):
                 f'Brightest {n} Pixels',
                 output_image,
                 {'pixel_locations': brightest},
+                dataset_type='brightest_pixels',
             )
         )
         job.complete = True

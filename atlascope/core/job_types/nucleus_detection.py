@@ -63,7 +63,7 @@ def detect_nuclei(input_image):
         input_image,
     )
 
-    return additional_features.to_dict("records")
+    return additional_features.to_dict("records"), im_nuclei_seg_mask
 
 
 @shared_task
@@ -86,7 +86,7 @@ def run(job_id: str, original_dataset_id: str):
         input_image = skimage.io.imread(
             io.BytesIO(original_dataset.content.read()),
         )
-        nuclei = detect_nuclei(input_image)
+        nuclei, nucleus_mask = detect_nuclei(input_image)
 
         detection_dataset = save_output_dataset(
             original_dataset,
@@ -95,6 +95,7 @@ def run(job_id: str, original_dataset_id: str):
             None,
             {
                 'num_nuclei': len(nuclei),
+                'nucleus_mask': nucleus_mask.tolist(),
             },
             dataset_type='nucleus_detection',
         )

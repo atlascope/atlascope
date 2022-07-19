@@ -41,6 +41,7 @@ def run(job_id: str, original_dataset_id: str):
                 'Average Color',
                 output_image,
                 {'rgba': average_color},
+                dataset_type='average_color',
             )
         )
         job.complete = True
