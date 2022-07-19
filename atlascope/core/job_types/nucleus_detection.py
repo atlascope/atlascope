@@ -10,10 +10,10 @@ import skimage.color
 import skimage.io
 import skimage.measure
 
-from atlascope.core.models import Dataset, DetectedNucleus
-from atlascope.core.models.detected_nucleus import (
-    NUCLEUS_ATTRIBUTES,
-    nucleus_attribute_to_field_name,
+from atlascope.core.models import Dataset, DetectedStructure
+from atlascope.core.models.detected_structure import (
+    STRUCTURE_ATTRIBUTES,
+    structure_attribute_to_field_name,
 )
 
 from .utils import save_output_dataset
@@ -101,10 +101,10 @@ def run(job_id: str, original_dataset_id: str):
         )
         for nucleus in nuclei:
             additional_nucleus_attributes = {
-                nucleus_attribute_to_field_name(attribute): nucleus[attribute]
-                for attribute in NUCLEUS_ATTRIBUTES
+                structure_attribute_to_field_name(attribute): nucleus[attribute]
+                for attribute in STRUCTURE_ATTRIBUTES
             }
-            DetectedNucleus.objects.create(
+            DetectedStructure.objects.create(
                 detection_dataset=detection_dataset,
                 label_integer=nucleus['Label'],
                 centroid=Point(
