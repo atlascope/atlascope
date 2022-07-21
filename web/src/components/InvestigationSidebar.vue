@@ -35,6 +35,19 @@
       <v-tab-item>
         <job-pane />
       </v-tab-item>
+      <v-tab>
+        Visualize
+      </v-tab>
+      <v-tab-item>
+        <div class="ma-2 pa-2">
+          <router-link
+            :to=" { name: 'vtkViewer' }"
+            target="_blank"
+          >
+            Launch VTKjs
+          </router-link>
+        </div>
+      </v-tab-item>
     </v-tabs>
   </v-sheet>
 </template>

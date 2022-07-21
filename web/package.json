@@ -10,6 +10,7 @@
     "generateTypes": "node src/generateTypesFromSchema.js"
   },
   "dependencies": {
+    "@kitware/vtk.js": "^25.2.3",
     "@koumoul/vuetify-jsonschema-form": "^0.36.4",
     "@sentry/vue": "^6.2.0",
     "@vue/composition-api": "^1.0.0-rc.2",
