@@ -3,12 +3,19 @@ import {
 } from '@vue/composition-api';
 import geo from 'geojs';
 import useGeoJSLayer from './useGeoJSLayer';
+import { GeoBounds } from './composableTypes';
 
 export default function useGeoJS(element: Ref<HTMLElement | null>) {
   const map: Ref<any> = ref(null);
   const zoomLevel = ref(0);
   const xCoord = ref(0);
   const yCoord = ref(0);
+  const bounds: Ref<GeoBounds> = ref({
+    right: 0,
+    top: 0,
+    left: 0,
+    bottom: 0,
+  });
 
   const geoEvents = geo.event;
   const geoAnnotations = geo.annotation;
@@ -18,6 +25,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
       const { x, y } = map.value.center();
       xCoord.value = x;
       yCoord.value = y;
+      bounds.value = map.value.bounds();
     }
   };
 
@@ -30,10 +38,12 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     const mapCenter = map.value.center();
     xCoord.value = mapCenter.x;
     yCoord.value = mapCenter.y;
+    bounds.value = map.value.bounds();
 
     /* eslint-disable */
     geojsMap.geoOn(geoEvents.zoom, (event: any) => {
       zoomLevel.value = event.zoomLevel;
+      bounds.value = map.value.bounds();
     });
     /* eslint-enable */
     geojsMap.geoOn(geoEvents.pan, () => {
@@ -129,6 +139,7 @@ export default function useGeoJS(element: Ref<HTMLElement | null>) {
     zoomLevel,
     xCoord,
     yCoord,
+    bounds,
     exit,
     createMap,
     createLayer,
