@@ -29,7 +29,7 @@ export interface Dataset {
   metadata?: object | null;
 
   /** Dataset type */
-  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage" | "non_tiled_image";
+  dataset_type?: string;
 
   /** Source dataset */
   source_dataset?: number | null;

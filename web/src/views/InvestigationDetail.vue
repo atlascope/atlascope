@@ -614,7 +614,7 @@ export default defineComponent({
       if (!featureLayer) {
         featureLayer = createLayer(
           'feature',
-          { features: ['point', 'line', 'polygon', 'quad.image'] },
+          { features: ['grid', 'point', 'line', 'polygon', 'quad.image'] },
         );
       }
       if (!featureLayer) {
@@ -671,7 +671,9 @@ export default defineComponent({
     });
 
     watch(selectedVisualizations, () => {
-      selectedVisualizations.value.forEach(visualize);
+      selectedVisualizations.value.forEach(
+        (visDataset) => visualize(visDataset, featureLayer),
+      );
     });
 
     onMounted(async () => {
