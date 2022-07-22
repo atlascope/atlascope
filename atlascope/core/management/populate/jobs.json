@@ -19,5 +19,11 @@
         "id": 4002,
         "investigation": "Analytics playground",
         "original_dataset": "HTA9_1_BA_F_ROI04"
+    },
+    {
+        "job_type": "gland_detection",
+        "id": 4003,
+        "investigation": "Analytics playground",
+        "original_dataset": "HTA9_1_BA_F_ROI04"
     }
 ]
