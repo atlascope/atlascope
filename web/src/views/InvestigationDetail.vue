@@ -228,7 +228,10 @@ export default defineComponent({
     let rootDatasetLayer: GeoJSLayer;
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
-    const selectedVisualizations: Ref<Array<string | Record<string, any>>[]> = computed(() => store.state.selectedVisualizations);
+    const selectedVisualizations:
+    Ref<Array<string | Record<string, any>>[]> = computed(
+      () => store.state.selectedVisualizations,
+    );
 
     function selectPinsForRootDataset() {
       store.dispatch.updateSelectedPins(store.state.currentPins.filter(
@@ -668,7 +671,9 @@ export default defineComponent({
     });
 
     watch(selectedVisualizations, () => {
-      selectedVisualizations.value.forEach((visualization) => visualize(...visualization, featureLayer));
+      selectedVisualizations.value.forEach(
+        (visualization) => visualize(...visualization, featureLayer),
+      );
     });
 
     onMounted(async () => {
