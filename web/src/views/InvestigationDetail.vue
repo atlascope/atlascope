@@ -229,7 +229,7 @@ export default defineComponent({
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
     const selectedVisualizations:
-    Ref<Array<string | Record<string, any>>[]> = computed(
+    Ref<Array<Dataset>> = computed(
       () => store.state.selectedVisualizations,
     );
 
@@ -671,9 +671,7 @@ export default defineComponent({
     });
 
     watch(selectedVisualizations, () => {
-      selectedVisualizations.value.forEach(
-        (visualization) => visualize(...visualization, featureLayer),
-      );
+      selectedVisualizations.value.forEach(visualize);
     });
 
     onMounted(async () => {

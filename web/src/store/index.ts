@@ -34,7 +34,7 @@ export interface State {
     currentPins: Pin[];
     inBoundsPins: Pin[];
     selectedPins: Pin[];
-    selectedVisualizations: [];
+    selectedVisualizations: Dataset[];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
@@ -260,14 +260,14 @@ const {
         'tile_overlay',
         'non_tiled_image',
       ];
-      const isVisualization = pins.map((pin: Pin) => {
+      const isVisualization: Array<boolean | Dataset> = pins.map((pin: Pin) => {
         const childDataset: Dataset | undefined = store.state.currentDatasets.find(
           (dataset: Dataset) => dataset.id === pin.child,
         );
         if (childDataset
           && childDataset?.dataset_type
           && !circlePinDatasetTypes.includes(childDataset.dataset_type)) {
-          return [childDataset.dataset_type, childDataset.metadata];
+          return childDataset;
         }
         return false;
       });
