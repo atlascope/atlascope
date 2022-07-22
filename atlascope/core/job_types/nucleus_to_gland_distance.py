@@ -1,12 +1,13 @@
 """Return the average distance from nucleus centroid to nearest gland centroid."""
 
 import math
+
 from celery import shared_task
 
 from atlascope.core.models import Dataset
 
-from .nucleus_detection import run as run_detect_nuclei
 from .gland_detection import run as run_detect_glands
+from .nucleus_detection import run as run_detect_nuclei
 from .utils import save_output_dataset
 
 schema = {

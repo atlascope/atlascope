@@ -15,7 +15,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DetectedStructure',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('label_integer', models.IntegerField()),
                 ('centroid', django.contrib.gis.db.models.fields.PointField(srid=4326)),
                 ('weighted_centroid', django.contrib.gis.db.models.fields.PointField(srid=4326)),
@@ -104,7 +109,18 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='dataset',
             name='dataset_type',
-            field=models.CharField(choices=[('tile_source', 'tile_source'), ('tile_overlay', 'tile_overlay'), ('analytics', 'analytics'), ('subimage', 'subimage'), ('structure_detection', 'structure_detection'), ('non_tiled_image', 'non_tiled_image')], default='tile_source', max_length=20),
+            field=models.CharField(
+                choices=[
+                    ('tile_source', 'tile_source'),
+                    ('tile_overlay', 'tile_overlay'),
+                    ('analytics', 'analytics'),
+                    ('subimage', 'subimage'),
+                    ('structure_detection', 'structure_detection'),
+                    ('non_tiled_image', 'non_tiled_image'),
+                ],
+                default='tile_source',
+                max_length=20,
+            ),
         ),
         migrations.DeleteModel(
             name='DetectedNucleus',
@@ -112,6 +128,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='detectedstructure',
             name='detection_dataset',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='detected_structures', to='core.dataset'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='detected_structures',
+                to='core.dataset',
+            ),
         ),
     ]

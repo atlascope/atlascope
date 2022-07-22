@@ -12,6 +12,7 @@ from atlascope.core.models.detected_structure import (
     STRUCTURE_ATTRIBUTES,
     structure_attribute_to_field_name,
 )
+
 from .nucleus_detection import detect_nuclei
 from .utils import save_output_dataset
 
