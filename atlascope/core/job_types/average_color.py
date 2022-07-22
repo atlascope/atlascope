@@ -1,13 +1,15 @@
 """Return the average among all RGBA values in the input dataset image."""
 
 import io
+
 from PIL import Image
 from celery import shared_task
 import numpy as np
-import skimage.io
 import skimage.color
+import skimage.io
 
 from atlascope.core.models import Dataset
+
 from .utils import save_output_dataset
 
 schema = {
