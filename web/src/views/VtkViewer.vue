@@ -52,10 +52,11 @@ import {
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
 import vtkRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
+import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
+import '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
 
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
-import vtkConeSource from '@kitware/vtk.js/Filters/Sources/ConeSource';
 
 export default {
   name: 'VtkViewer',
@@ -91,25 +92,31 @@ export default {
         const genericRenderer = vtkRenderWindow.newInstance();
         genericRenderer.setContainer(vtkContainer.value);
         genericRenderer.resize();
+
+        const reader = vtkHttpDataSetReader.newInstance({ fetchGzip: true });
+
         const renderer = genericRenderer.getRenderer();
         const renderWindow = genericRenderer.getRenderWindow();
-        const coneSource = vtkConeSource.newInstance({ height: 1.0 });
 
         const mapper = vtkMapper.newInstance();
-        mapper.setInputConnection(coneSource.getOutputPort());
+        mapper.setInputConnection(reader.getOutputPort());
 
         const actor = vtkActor.newInstance();
         actor.setMapper(mapper);
 
-        renderer.addActor(actor);
-        renderer.resetCamera();
-        renderWindow.render();
+        reader.setUrl('https://kitware.github.io/vtk-js/data/cow.vtp')
+          .then(() => reader.loadData())
+          .then(() => {
+            renderer.addVolume(actor);
+            renderer.resetCamera();
+            renderWindow.render();
+          });
 
         context.value = {
           genericRenderer,
           renderWindow,
           renderer,
-          coneSource,
+          reader,
           actor,
           mapper,
         };
@@ -120,13 +127,13 @@ export default {
       if (context.value) {
         const {
           genericRenderer,
-          coneSource,
+          reader,
           actor,
           mapper,
         } = context.value;
         actor.delete();
         mapper.delete();
-        coneSource.delete();
+        reader.delete();
         genericRenderer.delete();
         context.value = null;
       }
@@ -154,7 +161,7 @@ export default {
 }
 
 .viewercontainer {
-  height: 40%;
+  height: 900px;
   width: 100%;
 }
 
