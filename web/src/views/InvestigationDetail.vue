@@ -205,6 +205,7 @@ export default defineComponent({
       zoomLevel,
       xCoord,
       yCoord,
+      bounds,
     } = useGeoJS(map);
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
@@ -265,7 +266,7 @@ export default defineComponent({
       pinFeature.getData().forEach((pin: object) => {
         if (!pinFeature) return;
         const pinObject = pin as Pin;
-        const { x, y } = postGisToPoint(pinObject.location) || { x: 0, y: 0 };
+        const { x, y } = postGisToPoint(pinObject.location);
         const newScreenCoords = pinFeature.featureGcsToDisplay(x, y);
         const note = pinNotes.value.find((pinNote) => pinNote.id === pinObject.id);
         const {
@@ -312,6 +313,14 @@ export default defineComponent({
     watch([xCoord, yCoord, zoomLevel], () => {
       showHidePinsForZoomLevel(zoomLevel.value);
       movePinNoteCards();
+    });
+
+    watch(zoomLevel, (newZoom) => {
+      store.commit.setZoomLevel(newZoom);
+    });
+
+    watch(bounds, (newBounds) => {
+      store.commit.setBounds(newBounds);
     });
 
     function drawMap(dataset: Dataset | null) {
@@ -563,7 +572,7 @@ export default defineComponent({
         image.src = url;
         image.crossOrigin = 'use-credentials';
         const imageMetadata = (await store.state.axiosInstance.get(`${urlRoot}/datasets/tile_source/${dataset.id}/info/metadata`)).data;
-        const ul = postGisToPoint(pin.location) || { x: 0, y: 0 };
+        const ul = postGisToPoint(pin.location);
         const lr = {
           x: ul.x + (imageMetadata.sizeX || 0),
           y: ul.y + (imageMetadata.sizeY || 0),
@@ -627,7 +636,7 @@ export default defineComponent({
       if (!pinFeature) {
         pinFeature = featureLayer.createFeature('point');
         pinFeature.data(selectedPins.value);
-        pinFeature.position((pin: Pin) => (postGisToPoint(pin.location) || { x: 0, y: 0 }));
+        pinFeature.position((pin: Pin) => postGisToPoint(pin.location));
         pinFeature.style({
           radius: 10,
           strokeColor: 'white',
@@ -665,6 +674,7 @@ export default defineComponent({
     onMounted(async () => {
       await store.dispatch.fetchCurrentInvestigation(props.investigation);
       drawMap(store.state.rootDataset);
+      store.commit.setBounds(bounds.value);
       createPinNotes();
       selectPinsForRootDataset();
       loaded.value = true;

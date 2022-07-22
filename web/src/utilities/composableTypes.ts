@@ -4,6 +4,13 @@ export interface GeoPosition {
     z?: number;
 }
 
+export interface GeoBounds {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 interface MouseButtons {
     left: boolean;
     right: boolean;
