@@ -1,14 +1,41 @@
-import { Dataset } from '@/generatedTypes/AtlascopeTypes';
-import { GeoJSLayer, GeoJSFeature } from './composableTypes';
+import { Dataset, DetectedStructure } from '@/generatedTypes/AtlascopeTypes';
+import { computed } from '@vue/composition-api';
+import { GeoJSLayer } from './composableTypes';
+import store from '../store';
 
-function visualizeAvgColor(
+const defaultStructureColors = {
+  nucleus: 'green',
+  gland: 'red',
+};
+
+function visualizeDetectedStructures(
   data: Dataset,
   featureLayer: GeoJSLayer,
+  color: string,
+  structures: DetectedStructure[],
 ) {
-  const grid: GeoJSFeature = featureLayer.createFeature('grid');
-  grid.data(new Array(1000).fill(1));
-  grid.draw();
-  console.log(grid);
+  const structuresPoints = featureLayer.createFeature('point');
+  const centroids = structures.map(
+    (struct) => {
+      const centroidString = struct.centroid.match(/\(([0-9|.|\s])+\)/);
+      if (!centroidString) return { x: undefined, y: undefined };
+      const centroid = centroidString[0].slice(1, -1).split(' ');
+      return {
+        x: centroid[0],
+        y: centroid[1],
+      };
+    },
+  );
+  structuresPoints.data(
+    centroids,
+  );
+  // structuresPoints.position((pin: Pin) => postGisToPoint(pin.location));
+  structuresPoints.style({
+    radius: 2,
+    strokeColor: color,
+    fillColor: color,
+  });
+  structuresPoints.draw();
 }
 
 export default function visualize(
@@ -18,7 +45,23 @@ export default function visualize(
   if (!featureLayer) {
     return;
   }
-  if (data.dataset_type === 'average_color') {
-    visualizeAvgColor(data, featureLayer);
+  if (data.dataset_type === 'nucleus_detection' || data.dataset_type === 'gland_detection') {
+    const detectedStructures = computed(() => store.state.detectedStuctures);
+    const structureColor: string = defaultStructureColors[
+      data.dataset_type.replace('_detection', '') as keyof typeof defaultStructureColors
+    ];
+    if (detectedStructures.value.length < 1) {
+      store.dispatch.fetchDetectedStructures().then(
+        () => visualizeDetectedStructures(
+          data, featureLayer, structureColor,
+          detectedStructures.value.filter((struct) => struct.detection_dataset === data.id),
+        ),
+      );
+    } else {
+      visualizeDetectedStructures(
+        data, featureLayer, structureColor,
+        detectedStructures.value.filter((struct) => struct.detection_dataset === data.id),
+      );
+    }
   }
 }

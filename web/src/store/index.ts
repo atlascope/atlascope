@@ -4,7 +4,7 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail,
+  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure,
 } from '../generatedTypes/AtlascopeTypes';
 import { GeoBounds } from '../utilities/composableTypes';
 
@@ -35,6 +35,7 @@ export interface State {
     inBoundsPins: Pin[];
     selectedPins: Pin[];
     selectedVisualizations: Dataset[];
+    detectedStuctures: DetectedStructure[];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
@@ -68,6 +69,7 @@ const {
     inBoundsPins: [],
     selectedPins: [],
     selectedVisualizations: [],
+    detectedStuctures: [],
     showEmbeddings: true,
     datasetEmbeddings: [],
     datasetTileMetadata: {},
@@ -122,6 +124,9 @@ const {
     },
     setShowEmbeddings(state, show: boolean) {
       state.showEmbeddings = show;
+    },
+    setDetectedStructures(state, structs) {
+      state.detectedStuctures = structs;
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       if (obj.datasetId) state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
@@ -242,6 +247,14 @@ const {
       if (state.axiosInstance && state.currentInvestigation) {
         const pins = (await state.axiosInstance.get(`/investigations/${state.currentInvestigation.id}/pins`)).data;
         commit.setCurrentPins(pins);
+      }
+    },
+    async fetchDetectedStructures(context) {
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance) {
+        commit.setDetectedStructures(
+          (await state.axiosInstance.get('/detected-structures')).data,
+        );
       }
     },
     unsetCurrentInvestigation(context) {
