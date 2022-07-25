@@ -131,7 +131,9 @@ import {
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
-import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
+import {
+  Dataset, Pin, Tour, Waypoint,
+} from '../generatedTypes/AtlascopeTypes';
 import type { DatasetEmbedding } from '../generatedTypes/AtlascopeTypes';
 
 interface RootDatasetEmbedding {
@@ -201,6 +203,7 @@ export default defineComponent({
       createLayer,
       geoEvents,
       geoAnnotations,
+      geoTransition,
       zoomLevel,
       xCoord,
       yCoord,
@@ -221,6 +224,8 @@ export default defineComponent({
     let selectionLayer: GeoJSLayer | undefined;
     let featureLayer: GeoJSLayer | undefined;
     let pinFeature: GeoJSFeature | undefined;
+    let tourPointsFeature: GeoJSFeature | undefined;
+    let tourLineFeature: GeoJSFeature | undefined;
     /* eslint-disable */
     let nonTiledOverlayFeature: any;
     /* eslint-enable */
@@ -525,6 +530,8 @@ export default defineComponent({
     });
 
     const selectedPins: Ref<Pin[]> = computed(() => store.state.selectedPins);
+    const selectedTour: Ref<Tour> = computed(() => store.state.selectedTour);
+    const selectedWaypoint: Ref<Waypoint> = computed(() => store.state.selectedWaypoint);
     // Create note cards for any pins without a child dataset.
     function createPinNotes() {
       const noteOnlyPins = store.state.currentPins.filter(
@@ -663,6 +670,69 @@ export default defineComponent({
         pinFeature.draw();
       }
       showHidePinsForZoomLevel(zoomLevel.value);
+    });
+
+    watch(selectedTour, () => {
+      if (!featureLayer) {
+        featureLayer = createLayer(
+          'feature',
+          { features: ['point', 'line', 'polygon', 'quad.image'] },
+        );
+      }
+      if (!featureLayer) {
+        return;
+      }
+      if (!tourPointsFeature) {
+        tourPointsFeature = featureLayer.createFeature('point');
+        tourPointsFeature.data(selectedTour.value.waypoints);
+        tourPointsFeature.position(
+          (waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)),
+        );
+
+        tourPointsFeature.style({
+          radius: 10,
+          strokeColor: 'blue',
+          fillColor: 'blue',
+        });
+        tourPointsFeature.draw();
+      } else {
+        tourPointsFeature.data(selectedTour.value.waypoints);
+        tourPointsFeature.position(
+          (waypoints: Waypoint) => (postGisToPoint(waypoints.location as string)),
+        );
+
+        tourPointsFeature.draw();
+      }
+      if (!tourLineFeature) {
+        tourLineFeature = featureLayer.createFeature('line');
+        tourLineFeature.data(
+          [
+            selectedTour.value.waypoints.map(
+              (element) => postGisToPoint(element.location as string),
+            ),
+          ],
+        );
+        tourLineFeature.style({
+          strokeWidth: 5,
+          strokeColor: 'blue',
+        });
+        tourLineFeature.draw();
+      } else {
+        tourLineFeature.data(
+          [
+            selectedTour.value.waypoints.map(
+              (element) => postGisToPoint(element.location as string),
+            ),
+          ],
+        );
+        tourLineFeature.draw();
+      }
+    }, { deep: true });
+
+    watch(selectedWaypoint, () => {
+      geoTransition(postGisToPoint(selectedWaypoint.value.location as string),
+        2000,
+        selectedWaypoint.value.zoom);
     });
 
     onMounted(async () => {
