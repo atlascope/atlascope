@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.gis.db import models as geo_models
+from django.contrib.postgres.indexes import GistIndex
 from django.db import models
 from rest_framework import serializers
 
+from atlascope.core.fields import CubeDistance, CubeField
 from atlascope.core.models.dataset import Dataset
 
 NUCLEUS_ATTRIBUTES = [
@@ -103,6 +105,10 @@ class DetectedNucleus(models.Model):
     centroid = geo_models.PointField()
     weighted_centroid = geo_models.PointField()
     bounding_box = geo_models.PolygonField()
+    fingerprint = CubeField()
+
+    class Meta:
+        indexes = [GistIndex(fields=['fingerprint'])]
 
 
 for attribute in NUCLEUS_ATTRIBUTES:
@@ -112,10 +118,27 @@ for attribute in NUCLEUS_ATTRIBUTES:
     )
 
 
+def similar_nuclei(nucleus, queryset=None):
+    """Return a queryset of nuclei ordered by similarity."""
+    if queryset is None:
+        queryset = DetectedNucleus.objects.all()
+    return queryset.annotate(
+        dissimilarity=CubeDistance('fingerprint', nucleus.fingerprint)
+    ).order_by('dissimilarity')
+
+
 class DetectedNucleusSerializer(serializers.ModelSerializer):
+    fingerprint = serializers.ListField(
+        child=serializers.FloatField(), min_length=100, max_length=100, read_only=True
+    )
+
     class Meta:
         model = DetectedNucleus
         fields = '__all__'
+
+
+class SimilarNucleusSerializer(DetectedNucleusSerializer):
+    dissimilarity = serializers.FloatField(read_only=True, required=False)
 
 
 @admin.register(DetectedNucleus)
