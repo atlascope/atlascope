@@ -42,11 +42,11 @@ export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
     }
     return null;
   };
-  const createFeature = (featureType: string): any => {
+  const createFeature = (featureType: string, opts?: any): any => {
     if (!['feature', 'annotation'].includes(type.value)) {
       return undefined;
     }
-    const newFeature = layer.value.createFeature('point');
+    const newFeature = layer.value.createFeature(featureType, opts);
     return useGeoJSFeature(newFeature, featureType);
   };
   return {

@@ -608,7 +608,7 @@ export default defineComponent({
       if (!featureLayer) {
         featureLayer = createLayer(
           'feature',
-          { features: ['point', 'line', 'polygon', 'quad.image'] },
+          { features: ['grid', 'point', 'line', 'polygon', 'quad.image'] },
         );
       }
       if (!featureLayer) {

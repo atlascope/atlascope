@@ -1,6 +1,6 @@
 import { Dataset, DetectedStructure } from '@/generatedTypes/AtlascopeTypes';
 import { computed } from '@vue/composition-api';
-import { GeoJSLayer } from './composableTypes';
+import { GeoJSLayer, GeoJSFeature } from './composableTypes';
 import store from '../store';
 
 const defaultStructureColors = {
@@ -8,12 +8,53 @@ const defaultStructureColors = {
   gland: 'red',
 };
 
+// function transpose(array: Array<Array<number>>) {
+//   return array[0].map(
+//     (_: number, colIndex: number) => array.map((row: Array<number>) => row[colIndex]),
+//   );
+// }
+
+// function flipXAxis(array: Array<Array<number>>) {
+//   return array.map(
+//     (subArray) => subArray.reverse(),
+//   );
+// }
+
 function visualizeDetectedStructures(
   data: Dataset,
   featureLayer: GeoJSLayer,
   color: string,
   structures: DetectedStructure[],
 ) {
+  // If we want to visualize the gland mask
+  // in the future, we can get this grid working
+
+  // if (!data?.metadata) return false;
+  // let structureMask: Array<Array<number>> = [];
+  // let numStructures;
+  // Object.entries(data.metadata).forEach(
+  //   ([key, value]) => {
+  //     if (key.includes('num_')) numStructures = value;
+  //     if (key.includes('_mask')) structureMask = value;
+  //   },
+  // );
+  // const grid: GeoJSFeature = featureLayer.createFeature('grid', {
+  //   grid: {
+  //     gridWidth: structureMask[0].length,
+  //     gridHeight: structureMask.length,
+  //     x0: 0,
+  //     y0: 0,
+  //     dx: 1,
+  //     dy: 1,
+  //   },
+  // });
+  // console.log(numStructures, 'detected.');
+  // grid.data(structureMask.flat());
+  // // .map(
+  // //   (value) => (value === 0 ? undefined : value),
+  // // ));
+  // grid.draw();
+
   const structuresPoints = featureLayer.createFeature('point');
   const centroids = structures.map(
     (struct) => {
@@ -36,6 +77,7 @@ function visualizeDetectedStructures(
     fillColor: color,
   });
   structuresPoints.draw();
+  return true;
 }
 
 export default function visualize(
