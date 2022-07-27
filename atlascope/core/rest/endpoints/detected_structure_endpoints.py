@@ -10,6 +10,7 @@ class DetectedStructureViewSet(
     GenericViewSet,
 ):
     serializer_class = DetectedStructureSerializer
+    pagination_class = None
 
     def get_queryset(self):
         detection_dataset_id = self.request.query_params.get('detection_dataset')

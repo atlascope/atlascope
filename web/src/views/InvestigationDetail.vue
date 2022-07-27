@@ -233,12 +233,6 @@ export default defineComponent({
       () => store.state.selectedVisualizations,
     );
 
-    function selectPinsForRootDataset() {
-      store.dispatch.updateSelectedPins(store.state.currentPins.filter(
-        (pin: Pin) => pin.parent === rootDataset.value?.id,
-      ));
-    }
-
     function getSelectedFrameStyle(): BandSpec[] {
       return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
         frame: frame.frame,
@@ -614,7 +608,7 @@ export default defineComponent({
       if (!featureLayer) {
         featureLayer = createLayer(
           'feature',
-          { features: ['grid', 'point', 'line', 'polygon', 'quad.image'] },
+          { features: ['point', 'line', 'polygon', 'quad.image'] },
         );
       }
       if (!featureLayer) {
@@ -671,6 +665,9 @@ export default defineComponent({
     });
 
     watch(selectedVisualizations, () => {
+      if (!featureLayer) {
+        return;
+      }
       selectedVisualizations.value.forEach(
         (visDataset) => visualize(visDataset, featureLayer),
       );
@@ -681,7 +678,6 @@ export default defineComponent({
       drawMap(store.state.rootDataset);
       store.commit.setBounds(bounds.value);
       createPinNotes();
-      selectPinsForRootDataset();
       loaded.value = true;
     });
 

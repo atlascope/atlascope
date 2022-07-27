@@ -19,12 +19,22 @@ from .utils import save_output_dataset
 schema = {
     "type": "object",
     "required": [],
-    "properties": {},
+    "properties": {
+        "gland_map_path": {
+            "type": 'string',
+            "title": 'Path to gland map',
+            "default": 'atlascope/core/management/populate/inputs/gland_map.jpg',
+        }
+    },
 }
 
 
 @shared_task
-def run(job_id: str, original_dataset_id: str):
+def run(
+    job_id: str,
+    original_dataset_id: str,
+    gland_map_path=schema["properties"]["gland_map_path"]["default"],
+):
     from atlascope.core.models import Job
 
     original_dataset = Dataset.objects.get(id=original_dataset_id)
@@ -40,9 +50,7 @@ def run(job_id: str, original_dataset_id: str):
         )
 
     try:
-        input_image = skimage.io.imread(
-            io.BytesIO(original_dataset.content.read()),
-        )
+        input_image = skimage.io.imread(io.BytesIO(open(gland_map_path, 'rb').read()))
         glands, gland_mask = detect_nuclei(input_image)
 
         detection_dataset = save_output_dataset(
