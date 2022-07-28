@@ -340,6 +340,9 @@ export interface DetectedStructure {
   /** Size perimeter */
   size_perimeter: number;
 
+  /** Structure type  */
+  structure_type: string;
+
   /** Detection dataset */
   detection_dataset: number;
 }

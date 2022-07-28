@@ -71,6 +71,7 @@ def run(
             }
             DetectedStructure.objects.create(
                 detection_dataset=detection_dataset,
+                structure_type='gland',
                 label_integer=gland['Label'],
                 centroid=Point(
                     x=gland['Identifier.CentroidX'],

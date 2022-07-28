@@ -103,6 +103,7 @@ class DetectedStructure(models.Model):
     centroid = geo_models.PointField()
     weighted_centroid = geo_models.PointField()
     bounding_box = geo_models.PolygonField()
+    structure_type = models.CharField(max_length=10, default="nucleus")
 
 
 for attribute in STRUCTURE_ATTRIBUTES:
