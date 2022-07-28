@@ -5,7 +5,7 @@ import { createDirectStore } from 'direct-vuex';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { nucleiToNearestGlandDistances, NucleusGlandDistance } from '@/utilities/utiltyFunctions';
 import {
-  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure,
+  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure, Tour, Waypoint,
 } from '../generatedTypes/AtlascopeTypes';
 import { GeoBounds } from '../utilities/composableTypes';
 
@@ -47,6 +47,9 @@ export interface State {
     jobTypes: JobDetail[];
     currentBounds: GeoBounds;
     zoomLevel: number;
+    tours: Tour[];
+    selectedTour: Tour;
+    selectedWaypoint: Waypoint;
 }
 
 interface TileMetadataForDataset {
@@ -87,6 +90,9 @@ const {
       left: 0,
     },
     zoomLevel: 0,
+    tours: [],
+    selectedTour: {} as Tour,
+    selectedWaypoint: {},
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -121,6 +127,15 @@ const {
     },
     setSelectedVisualizations(state, visualizations) {
       state.selectedVisualizations = visualizations;
+    },
+    setTours(state, tours: Tour[]) {
+      state.tours = tours;
+    },
+    setSelectedTour(state, tours: Tour) {
+      state.selectedTour = tours;
+    },
+    setSelectedWaypoint(state, waypoint: Waypoint) {
+      state.selectedWaypoint = waypoint;
     },
     setDatasetEmbeddings(state, embeddings: DatasetEmbedding[]) {
       state.datasetEmbeddings = embeddings;
@@ -241,6 +256,7 @@ const {
           });
 
           await dispatch.fetchInvestigationPins();
+          await dispatch.fetchInvestigationTours();
         }
       } else {
         commit.setCurrentInvestigation(null);
@@ -259,6 +275,13 @@ const {
         commit.setDetectedStructures(
           (await state.axiosInstance.get('/detected-structures')).data,
         );
+      }
+    },
+    async fetchInvestigationTours(context) {
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance && state.currentInvestigation) {
+        const tours = (await state.axiosInstance.get(`/investigations/${state.currentInvestigation.id}/tours`)).data;
+        commit.setTours(tours);
       }
     },
     unsetCurrentInvestigation(context) {
