@@ -1,3 +1,5 @@
+import { DetectedStructure } from '../generatedTypes/AtlascopeTypes';
+
 export interface Point {
   x: number;
   y: number;
@@ -48,4 +50,49 @@ export function opacityForZoomLevel(currentZoom: number, maxZoom: number): numbe
     return 0;
   }
   return maxOpacity - (0.4 * diff);
+}
+
+export function centroidStringToCoords(input: string): Array<number> {
+  const centroidString = input.match(/\(([0-9|.|\s])+\)/);
+  if (!centroidString) return [-1, -1];
+  const centroid = centroidString[0].slice(1, -1).split(' ').map(
+    (val: string) => parseFloat(val),
+  );
+  return centroid;
+}
+
+export function nucleiToNearestGlandDistances(structures: DetectedStructure[]) {
+  const retArray: Array<object> = [];
+  const nuclei = structures.filter(
+    (struct: DetectedStructure) => struct.structure_type === 'nucleus',
+  );
+  const glands = structures.filter(
+    (struct: DetectedStructure) => struct.structure_type === 'gland',
+  );
+
+  nuclei.forEach(
+    (nucleus) => {
+      let minDistance: number;
+      let nearestId: number | undefined;
+      let minDistanceLine: Array<Array<number>> = [];
+      const [x1, y1] = centroidStringToCoords(nucleus.centroid);
+      glands.forEach(
+        (gland) => {
+          const [x2, y2] = centroidStringToCoords(gland.centroid);
+          const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+          if (!minDistance || distance < minDistance) {
+            minDistance = distance;
+            nearestId = gland.id;
+            minDistanceLine = [[x1, y1], [x2, y2]];
+          }
+        },
+      );
+      retArray.push({
+        nucleus: nucleus.id,
+        gland: nearestId,
+        line: minDistanceLine,
+      });
+    },
+  );
+  return retArray;
 }

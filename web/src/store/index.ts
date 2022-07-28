@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
+import { nucleiToNearestGlandDistances } from '@/utilities/utiltyFunctions';
 import {
   Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure,
 } from '../generatedTypes/AtlascopeTypes';
@@ -36,6 +37,7 @@ export interface State {
     selectedPins: Pin[];
     selectedVisualizations: Dataset[];
     detectedStuctures: DetectedStructure[];
+    nucleiToNearestGlandDistances: [];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
@@ -70,6 +72,7 @@ const {
     selectedPins: [],
     selectedVisualizations: [],
     detectedStuctures: [],
+    nucleiToNearestGlandDistances: [],
     showEmbeddings: true,
     datasetEmbeddings: [],
     datasetTileMetadata: {},
@@ -127,6 +130,7 @@ const {
     },
     setDetectedStructures(state, structs) {
       state.detectedStuctures = structs;
+      state.nucleiToNearestGlandDistances = nucleiToNearestGlandDistances(structs);
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       if (obj.datasetId) state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;

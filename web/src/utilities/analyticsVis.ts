@@ -1,24 +1,35 @@
 import { Dataset, DetectedStructure } from '@/generatedTypes/AtlascopeTypes';
 import { computed } from '@vue/composition-api';
-import { GeoJSLayer, GeoJSFeature } from './composableTypes';
+import geo from 'geojs';
+import { GeoJSLayer } from './composableTypes';
 import store from '../store';
+import { centroidStringToCoords } from './utiltyFunctions';
+
+interface StructurePoint {
+  x: number;
+  y: number;
+  color: string;
+  struct: DetectedStructure;
+}
 
 const defaultStructureColors = {
   nucleus: 'green',
   gland: 'red',
 };
 
-// function transpose(array: Array<Array<number>>) {
-//   return array[0].map(
-//     (_: number, colIndex: number) => array.map((row: Array<number>) => row[colIndex]),
-//   );
-// }
+function drawLines(target: StructurePoint) {
+  const retArray: Array<Array<Array<number>>> = [];
+  const computedLines = computed(() => store.state.nucleiToNearestGlandDistances);
 
-// function flipXAxis(array: Array<Array<number>>) {
-//   return array.map(
-//     (subArray) => subArray.reverse(),
-//   );
-// }
+  computedLines.value.forEach(
+    (computedLine) => {
+      if (computedLine[target.struct.structure_type] === target.struct.id) {
+        retArray.push(computedLine.line);
+      }
+    },
+  );
+  return retArray;
+}
 
 function visualizeDetectedStructures(
   data: Dataset,
@@ -26,57 +37,55 @@ function visualizeDetectedStructures(
   color: string,
   structures: DetectedStructure[],
 ) {
-  // If we want to visualize the gland mask
-  // in the future, we can get this grid working
-
-  // if (!data?.metadata) return false;
-  // let structureMask: Array<Array<number>> = [];
-  // let numStructures;
-  // Object.entries(data.metadata).forEach(
-  //   ([key, value]) => {
-  //     if (key.includes('num_')) numStructures = value;
-  //     if (key.includes('_mask')) structureMask = value;
-  //   },
-  // );
-  // const grid: GeoJSFeature = featureLayer.createFeature('grid', {
-  //   grid: {
-  //     gridWidth: structureMask[0].length,
-  //     gridHeight: structureMask.length,
-  //     x0: 0,
-  //     y0: 0,
-  //     dx: 1,
-  //     dy: 1,
-  //   },
-  // });
-  // console.log(numStructures, 'detected.');
-  // grid.data(structureMask.flat());
-  // // .map(
-  // //   (value) => (value === 0 ? undefined : value),
-  // // ));
-  // grid.draw();
-
   const structuresPoints = featureLayer.createFeature('point');
+  const distanceLines = featureLayer.createFeature('line', {
+    style: {
+      strokeWidth: 1,
+      strokeColor: 'yellow',
+    },
+  });
   const centroids = structures.map(
     (struct) => {
-      const centroidString = struct.centroid.match(/\(([0-9|.|\s])+\)/);
-      if (!centroidString) return { x: undefined, y: undefined };
-      const centroid = centroidString[0].slice(1, -1).split(' ');
+      const centroid = centroidStringToCoords(struct.centroid);
       return {
         x: centroid[0],
         y: centroid[1],
+        color,
+        struct,
       };
     },
   );
+  structuresPoints.style({
+    radius: 3,
+    strokeColor: (point: StructurePoint) => point.color,
+    fillColor: (point: StructurePoint) => point.color,
+  });
+  structuresPoints.addGeoEventHandler(geo.event.feature.mouseover, (event) => {
+    const newData = centroids.map(
+      (point) => {
+        if (point === event.data) return Object.assign(event.data, { color: 'yellow' });
+        return point;
+      },
+    );
+    structuresPoints.data(newData);
+    structuresPoints.draw();
+    distanceLines.data(drawLines(event.data));
+    distanceLines.draw();
+  });
+  structuresPoints.addGeoEventHandler(geo.event.feature.mouseout, (event) => {
+    const newData = centroids.map(
+      (point) => Object.assign(point, { color }),
+    );
+    structuresPoints.data(newData);
+    structuresPoints.draw();
+    distanceLines.data([]);
+    distanceLines.draw();
+  });
   structuresPoints.data(
     centroids,
   );
-  // structuresPoints.position((pin: Pin) => postGisToPoint(pin.location));
-  structuresPoints.style({
-    radius: 2,
-    strokeColor: color,
-    fillColor: color,
-  });
   structuresPoints.draw();
+
   return true;
 }
 
