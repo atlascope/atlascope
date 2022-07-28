@@ -668,6 +668,8 @@ export default defineComponent({
       if (!featureLayer) {
         return;
       }
+      featureLayer.layer.value.clear();
+      featureLayer.layer.value.draw();
       selectedVisualizations.value.forEach(
         (visDataset) => visualize(visDataset, featureLayer),
       );
