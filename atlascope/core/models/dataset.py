@@ -112,14 +112,14 @@ class DatasetSerializer(serializers.ModelSerializer):
             'origin',
             'pins',
             'locations',
-            'detected_nuclei',
+            'detected_structures',
         ]
 
     def to_representation(self, instance):
-        """Only include detected_nuclei field on nucleus_detection type Datasets."""
+        """Only include detected_structures field on structure detection type Datasets."""
         ret = super().to_representation(instance)
-        if ret['dataset_type'] != 'nucleus_detection':
-            del ret['detected_nuclei']
+        if ret['dataset_type'] not in ['nucleus_detection', 'gland_detection']:
+            del ret['detected_structures']
         return ret
 
 

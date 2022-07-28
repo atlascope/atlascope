@@ -5,6 +5,8 @@ import io
 from PIL import Image, ImageDraw
 from celery import shared_task
 import numpy as np
+import skimage.color
+import skimage.io
 
 from atlascope.core.models import Dataset
 
@@ -31,11 +33,14 @@ def run(job_id: str, original_dataset_id: str, n: int):
     job = Job.objects.get(id=job_id)
 
     try:
-        input_image = Image.open(io.BytesIO(original_dataset.content.read())).convert("RGB")
-        output_image = input_image.copy()
+        input_image = skimage.color.gray2rgba(
+            skimage.io.imread(
+                io.BytesIO(original_dataset.content.read()),
+            )
+        )
+        output_image = Image.fromarray(np.array(input_image, copy=True))
 
-        data = np.array(input_image)
-        data = np.apply_along_axis(lambda arr: arr[:-1], 2, data)
+        data = np.apply_along_axis(lambda arr: arr[:-1], 2, input_image)
         data = np.apply_along_axis(np.sum, 2, data)
         data = np.transpose(data)
 
@@ -67,6 +72,7 @@ def run(job_id: str, original_dataset_id: str, n: int):
                 f'Brightest {n} Pixels',
                 output_image,
                 {'pixel_locations': brightest},
+                dataset_type='brightest_pixels',
             )
         )
         job.complete = True

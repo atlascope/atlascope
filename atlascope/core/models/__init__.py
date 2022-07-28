@@ -1,6 +1,6 @@
 from .dataset import Dataset, DatasetCreateSerializer, DatasetSerializer, DatasetSubImageSerializer
 from .dataset_embedding import DatasetEmbedding, DatasetEmbeddingSerializer
-from .detected_nucleus import DetectedNucleus, DetectedNucleusSerializer
+from .detected_structure import DetectedStructure, DetectedStructureSerializer
 from .investigation import Investigation, InvestigationSerializer
 from .pin import DatasetPin, DatasetPinSerializer, NotePin, NotePinSerializer, Pin, PinSerializer
 from .tour import Tour, TourSerializer
@@ -19,8 +19,8 @@ __all__ = [
     DatasetSerializer,
     DatasetCreateSerializer,
     DatasetSubImageSerializer,
-    DetectedNucleus,
-    DetectedNucleusSerializer,
+    DetectedStructure,
+    DetectedStructureSerializer,
     Job,
     JobSpawnSerializer,
     JobDetailSerializer,

@@ -30,7 +30,9 @@
     {
         "name": "Analytics playground",
         "id": 1003,
-        "datasets": []
+        "datasets": [
+            "HTA9_1_BA_F_ROI04"
+        ]
     },
     {
         "name": "Vandy Importer demo",

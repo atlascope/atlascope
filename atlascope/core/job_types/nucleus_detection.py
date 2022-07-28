@@ -10,10 +10,10 @@ import skimage.color
 import skimage.io
 import skimage.measure
 
-from atlascope.core.models import Dataset, DetectedNucleus
-from atlascope.core.models.detected_nucleus import (
-    NUCLEUS_ATTRIBUTES,
-    nucleus_attribute_to_field_name,
+from atlascope.core.models import Dataset, DetectedStructure
+from atlascope.core.models.detected_structure import (
+    STRUCTURE_ATTRIBUTES,
+    structure_attribute_to_field_name,
 )
 
 from .utils import save_output_dataset
@@ -63,7 +63,7 @@ def detect_nuclei(input_image):
         input_image,
     )
 
-    return additional_features.to_dict("records")
+    return additional_features.to_dict("records"), im_nuclei_seg_mask
 
 
 @shared_task
@@ -86,7 +86,7 @@ def run(job_id: str, original_dataset_id: str):
         input_image = skimage.io.imread(
             io.BytesIO(original_dataset.content.read()),
         )
-        nuclei = detect_nuclei(input_image)
+        nuclei, nucleus_mask = detect_nuclei(input_image)
 
         detection_dataset = save_output_dataset(
             original_dataset,
@@ -95,15 +95,16 @@ def run(job_id: str, original_dataset_id: str):
             None,
             {
                 'num_nuclei': len(nuclei),
+                'nucleus_mask': nucleus_mask.tolist(),
             },
             dataset_type='nucleus_detection',
         )
         for nucleus in nuclei:
             additional_nucleus_attributes = {
-                nucleus_attribute_to_field_name(attribute): nucleus[attribute]
-                for attribute in NUCLEUS_ATTRIBUTES
+                structure_attribute_to_field_name(attribute): nucleus[attribute]
+                for attribute in STRUCTURE_ATTRIBUTES
             }
-            DetectedNucleus.objects.create(
+            DetectedStructure.objects.create(
                 detection_dataset=detection_dataset,
                 label_integer=nucleus['Label'],
                 centroid=Point(

@@ -1,8 +1,8 @@
 version: '3'
 services:
   postgres:
-    logging:
-      driver: none
+    # logging:
+    #   driver: none
     # Heroku uses PostGIS 2.5.5 and PostgreSQL 13.5
     # This is technically not a valid combination
     # according to PostGIS and is therefore not

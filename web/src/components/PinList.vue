@@ -55,7 +55,7 @@ import {
   computed, defineComponent, onMounted, Ref, ref, watch,
 } from '@vue/composition-api';
 import store from '../store';
-import { Pin } from '../generatedTypes/AtlascopeTypes';
+import { Dataset, Pin } from '../generatedTypes/AtlascopeTypes';
 import { Point, postGisToPoint } from '../utilities/utiltyFunctions';
 
 export default defineComponent({

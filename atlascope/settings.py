@@ -27,7 +27,7 @@ class AtlascopeMixin(ConfigMixin):
         'tile_overlay',
         'analytics',
         'subimage',
-        'nucleus_detection',
+        'structure_detection',
         'non_tiled_image',
     ]
 
