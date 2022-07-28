@@ -3,7 +3,7 @@ import { computed } from '@vue/composition-api';
 import geo from 'geojs';
 import { GeoJSLayer } from './composableTypes';
 import store from '../store';
-import { centroidStringToCoords } from './utiltyFunctions';
+import { centroidStringToCoords, NucleusGlandDistance } from './utiltyFunctions';
 
 interface StructurePoint {
   x: number;
@@ -23,7 +23,10 @@ function drawLines(target: StructurePoint) {
 
   computedLines.value.forEach(
     (computedLine) => {
-      if (computedLine[target.struct.structure_type] === target.struct.id) {
+      if (
+        computedLine[target.struct.structure_type as keyof NucleusGlandDistance]
+         === target.struct.id
+      ) {
         retArray.push(computedLine.line);
       }
     },
@@ -60,7 +63,7 @@ function visualizeDetectedStructures(
     strokeColor: (point: StructurePoint) => point.color,
     fillColor: (point: StructurePoint) => point.color,
   });
-  structuresPoints.addGeoEventHandler(geo.event.feature.mouseover, (event) => {
+  structuresPoints.addGeoEventHandler(geo.event.feature.mouseover, (event: typeof geo.event) => {
     const newData = centroids.map(
       (point) => {
         if (point === event.data) return Object.assign(event.data, { color: 'yellow' });
@@ -72,7 +75,7 @@ function visualizeDetectedStructures(
     distanceLines.data(drawLines(event.data));
     distanceLines.draw();
   });
-  structuresPoints.addGeoEventHandler(geo.event.feature.mouseout, (event) => {
+  structuresPoints.addGeoEventHandler(geo.event.feature.mouseout, () => {
     const newData = centroids.map(
       (point) => Object.assign(point, { color }),
     );

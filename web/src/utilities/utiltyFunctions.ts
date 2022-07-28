@@ -61,8 +61,16 @@ export function centroidStringToCoords(input: string): Array<number> {
   return centroid;
 }
 
-export function nucleiToNearestGlandDistances(structures: DetectedStructure[]) {
-  const retArray: Array<object> = [];
+export interface NucleusGlandDistance{
+  nucleus: number | undefined;
+  gland: number | undefined;
+  line: Array<Array<number>>;
+}
+
+export function nucleiToNearestGlandDistances(
+  structures: DetectedStructure[],
+): Array<NucleusGlandDistance> {
+  const retArray: Array<NucleusGlandDistance> = [];
   const nuclei = structures.filter(
     (struct: DetectedStructure) => struct.structure_type === 'nucleus',
   );

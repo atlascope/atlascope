@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
-import { nucleiToNearestGlandDistances } from '@/utilities/utiltyFunctions';
+import { nucleiToNearestGlandDistances, NucleusGlandDistance } from '@/utilities/utiltyFunctions';
 import {
   Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure,
 } from '../generatedTypes/AtlascopeTypes';
@@ -37,7 +37,7 @@ export interface State {
     selectedPins: Pin[];
     selectedVisualizations: Dataset[];
     detectedStuctures: DetectedStructure[];
-    nucleiToNearestGlandDistances: [];
+    nucleiToNearestGlandDistances: NucleusGlandDistance[];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
