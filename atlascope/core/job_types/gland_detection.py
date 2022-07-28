@@ -69,14 +69,17 @@ def run(
                 structure_attribute_to_field_name(attribute): gland[attribute]
                 for attribute in STRUCTURE_ATTRIBUTES
             }
+            # For small sample image, increase the coordinates of the
+            # centroids to better match the size of the image
+            centroid = Point(
+                x=gland['Identifier.CentroidX'] * 3,
+                y=gland['Identifier.CentroidY'] * 2.5,
+            )
             DetectedStructure.objects.create(
                 detection_dataset=detection_dataset,
                 structure_type='gland',
                 label_integer=gland['Label'],
-                centroid=Point(
-                    x=gland['Identifier.CentroidX'],
-                    y=gland['Identifier.CentroidY'],
-                ),
+                centroid=centroid,
                 weighted_centroid=Point(
                     x=gland['Identifier.WeightedCentroidX'],
                     y=gland['Identifier.WeightedCentroidY'],
