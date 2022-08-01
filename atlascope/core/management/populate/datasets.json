@@ -66,6 +66,16 @@
         "dataset_type": "non_tiled_image"
     },
     {
+        "name": "Cow Volume",
+        "id": 2009,
+        "description": "A 3D volume of a cow",
+        "metadata": {
+            "name": "cow.vtp",
+            "url": "https://data.kitware.com/api/v1/file/5afd936e8d777f15ebe1b4ea/download"
+        },
+        "dataset_type": "3d_volume"
+    },
+    {
         "name": "Human circulatory system",
         "id": 2988,
         "description": "A basic anatomical illustration of the circulatory system",

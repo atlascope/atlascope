@@ -194,7 +194,7 @@ const {
           const embeddings: DatasetEmbedding[] = (await state.axiosInstance.get(`/investigations/${investigationId}/embeddings`)).data;
           commit.setDatasetEmbeddings(embeddings);
 
-          const metadataPromises: Promise<{
+          const metadataPromises: Promise<void | {
             datasetId: number | undefined;
             result: AxiosResponse;
           }>[] = [];
@@ -233,10 +233,12 @@ const {
           });
           const metadataResponses = await Promise.all(metadataPromises);
           metadataResponses.forEach((resp) => {
-            commit.setTileMetadataForDataset({
-              datasetId: resp.datasetId,
-              tileMetadata: resp.result.data,
-            });
+            if (resp) {
+              commit.setTileMetadataForDataset({
+                datasetId: resp.datasetId,
+                tileMetadata: resp.result.data,
+              });
+            }
           });
 
           await dispatch.fetchInvestigationPins();

@@ -593,9 +593,11 @@ export default defineComponent({
     }
 
     function toggleDatasetPin(pin: Pin) {
+      console.log('toggle dataset pin');
       const childDataset: Dataset | undefined = store.state.currentDatasets.find(
         (dataset: Dataset) => dataset.id === pin.child,
       );
+      console.log(pin);
       if (!childDataset) return;
       switch (childDataset.dataset_type) {
         case 'non_tiled_image':
@@ -606,6 +608,9 @@ export default defineComponent({
               throw err;
             }
           });
+          break;
+        case '3d_volume':
+          console.log('3d_volume pin clicked');
           break;
         default:
           break;

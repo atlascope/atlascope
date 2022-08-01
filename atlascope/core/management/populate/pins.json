@@ -77,5 +77,15 @@
         "color": "red",
         "maximum_zoom": 5,
         "minimum_zoom": 2
+    },
+    {
+        "investigation": "Third Party Vis playground",
+        "parent": "Human skeletal system",
+        "id": 5099,
+        "location": [1000, 350],
+        "description": "Launch another visualization tool",
+        "child": "Cow Volume",
+        "color": "red",
+        "minimum_zoom": 5
     }
 ]
