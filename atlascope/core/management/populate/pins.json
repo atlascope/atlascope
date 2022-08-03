@@ -84,7 +84,7 @@
         "id": 5099,
         "location": [1000, 350],
         "description": "Launch another visualization tool",
-        "child": "Cow Volume",
+        "child": "Tooth",
         "color": "red",
         "minimum_zoom": 5
     }

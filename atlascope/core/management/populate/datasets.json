@@ -66,14 +66,15 @@
         "dataset_type": "non_tiled_image"
     },
     {
-        "name": "Cow Volume",
-        "id": 2009,
-        "description": "A 3D volume of a cow",
-        "metadata": {
-            "name": "cow.vtp",
-            "url": "https://data.kitware.com/api/v1/file/5afd936e8d777f15ebe1b4ea/download"
-        },
-        "dataset_type": "3d_volume"
+        "name": "Tooth",
+        "id": 2010,
+        "description": "A tooth",
+        "dataset_type": "3d_volume",
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1UIjb1cYrL8qIwH8i2uKU1CQLboeroCBL",
+            "sha256sum": "891837e8c4b3debb7aea3c04aa02acc55f3014c9bfdb0dd64c2d2b56fe991c4f"
+        }
     },
     {
         "name": "Human circulatory system",
