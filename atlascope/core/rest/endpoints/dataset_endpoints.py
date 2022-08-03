@@ -1,6 +1,10 @@
+import os
+
+from django.http import FileResponse, Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -16,6 +20,14 @@ from atlascope.core.models import (
 class ContentRenderer(BaseRenderer):
     media_type = 'image/png'
     format = 'png'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
+
+
+class PassthroughRenderer(BaseRenderer):
+    media_type = 'application/octet-stream'
+    format = ''
 
     def render(self, data, media_type=None, renderer_context=None):
         return data
@@ -57,3 +69,17 @@ class DatasetViewSet(
         subimage = original.subimage(**serializer.validated_data)
 
         return Response(DatasetSerializer(subimage).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['GET'], renderer_classes=(PassthroughRenderer,))
+    def download(self, request, pk):
+        dataset = self.get_object()
+        try:
+            path = dataset.content.path
+        except Exception:
+            raise ValidationError('Dataset has no content')
+        if os.path.exists(path):
+            response = FileResponse(open(path, 'rb'), content_type='application/octet-stream')
+            response['Content-Length'] = dataset.content.size
+            response['Content-Disposition'] = f'attachment; filename={dataset.content.name}'
+            return response
+        raise Http404
