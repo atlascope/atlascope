@@ -65,5 +65,7 @@ services:
     build:
       context: ./dev/pvw
       dockerfile: ./Dockerfile
+    environment:
+      - logger.level=WARN
     ports:
       - 9999:9999
