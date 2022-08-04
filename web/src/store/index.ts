@@ -162,6 +162,9 @@ const {
     subimageDatasets(state: State): Dataset[] {
       return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'subimage');
     },
+    nonTiledImageDatasets(state: State): Dataset[] {
+      return state.currentDatasets.filter((dataset) => dataset.dataset_type === 'non_tiled_image');
+    },
   },
   actions: {
     async fetchInvestigations(context) {
@@ -174,7 +177,12 @@ const {
       }
     },
     async fetchCurrentInvestigation(context, investigationId: string) {
-      const { commit, state, dispatch } = rootActionContext(context);
+      const {
+        commit,
+        state,
+        dispatch,
+        getters,
+      } = rootActionContext(context);
       if (state.axiosInstance) {
         const investigation = (await state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
@@ -198,7 +206,11 @@ const {
             datasetId: number | undefined;
             result: AxiosResponse;
           }>[] = [];
-          datasets.forEach((dataset) => {
+          [
+            ...getters.nonTiledImageDatasets,
+            ...getters.subimageDatasets,
+            ...getters.tilesourceDatasets,
+          ].forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
