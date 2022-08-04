@@ -592,12 +592,17 @@ export default defineComponent({
       }
     }
 
+    function toggle3DVolumePin(dataset: Dataset) {
+      const apiRoot = process.env.VUE_APP_API_ROOT;
+      const datasetUrl = `${apiRoot}/datasets/${dataset.id}/download`;
+      const glanceUrl = `http://localhost:9999/?name=${dataset.name}&url=${datasetUrl}`;
+      window.open(glanceUrl, '_blank');
+    }
+
     function toggleDatasetPin(pin: Pin) {
-      console.log('toggle dataset pin');
       const childDataset: Dataset | undefined = store.state.currentDatasets.find(
         (dataset: Dataset) => dataset.id === pin.child,
       );
-      console.log(pin);
       if (!childDataset) return;
       switch (childDataset.dataset_type) {
         case 'non_tiled_image':
@@ -610,7 +615,7 @@ export default defineComponent({
           });
           break;
         case '3d_volume':
-          console.log('3d_volume pin clicked');
+          toggle3DVolumePin(childDataset);
           break;
         default:
           break;
