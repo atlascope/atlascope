@@ -1,4 +1,4 @@
-import { Dataset, DetectedStructure } from '@/generatedTypes/AtlascopeTypes';
+import { DetectedStructure, VisOption } from '@/generatedTypes/AtlascopeTypes';
 import { computed } from '@vue/composition-api';
 import geo from 'geojs';
 import { GeoJSLayer } from './composableTypes';
@@ -34,22 +34,21 @@ function drawLines(target: StructurePoint) {
   return retArray;
 }
 
-function visualizeDetectedStructures(
-  data: Dataset,
-  featureLayer: GeoJSLayer,
-  color: string,
+export function visualizeDetectedStructures(
+  vis: VisOption,
+  visLayer: GeoJSLayer,
   structures: DetectedStructure[],
 ) {
-  const structuresPoints = featureLayer.createFeature('point');
-  const distanceLines = featureLayer.createFeature('line', {
-    style: {
-      strokeWidth: 1,
-      strokeColor: 'yellow',
-    },
-  });
-  const centroids = structures.map(
-    (structure) => {
-      const centroid = centroidStringToCoords(structure.centroid);
+  const filteredStructures = structures.filter(
+    (struct) => struct.detection_dataset === vis.data.id,
+  );
+  const structuresPoints = visLayer.createFeature('point');
+  const color = defaultStructureColors[
+    (vis.data.dataset_type?.replace('_detection', '') || 'nucleus') as keyof typeof defaultStructureColors
+  ];
+  const centroids = filteredStructures.map(
+    (struct) => {
+      const centroid = centroidStringToCoords(struct.centroid);
       return {
         x: centroid[0],
         y: centroid[1],
@@ -63,27 +62,35 @@ function visualizeDetectedStructures(
     strokeColor: (point: StructurePoint) => point.color,
     fillColor: (point: StructurePoint) => point.color,
   });
-  structuresPoints.addGeoEventHandler(geo.event.feature.mouseover, (event: typeof geo.event) => {
-    const newData = centroids.map(
-      (point) => {
-        if (point === event.data) return Object.assign(event.data, { color: 'yellow' });
-        return point;
+  if (vis.options.includes('show_distances_on_hover')) {
+    const distanceLines = visLayer.createFeature('line', {
+      style: {
+        strokeWidth: 1,
+        strokeColor: 'yellow',
       },
-    );
-    structuresPoints.data(newData);
-    structuresPoints.draw();
-    distanceLines.data(drawLines(event.data));
-    distanceLines.draw();
-  });
-  structuresPoints.addGeoEventHandler(geo.event.feature.mouseout, () => {
-    const newData = centroids.map(
-      (point) => Object.assign(point, { color }),
-    );
-    structuresPoints.data(newData);
-    structuresPoints.draw();
-    distanceLines.data([]);
-    distanceLines.draw();
-  });
+    });
+    structuresPoints.addGeoEventHandler(geo.event.feature.mouseover, (event: typeof geo.event) => {
+      const newData = centroids.map(
+        (point) => {
+          if (point === event.data) return Object.assign(event.data, { color: 'yellow' });
+          return point;
+        },
+      );
+      structuresPoints.data(newData);
+      structuresPoints.draw();
+      distanceLines.data(drawLines(event.data));
+      distanceLines.draw();
+    });
+    structuresPoints.addGeoEventHandler(geo.event.feature.mouseout, () => {
+      const newData = centroids.map(
+        (point) => Object.assign(point, { color }),
+      );
+      structuresPoints.data(newData);
+      structuresPoints.draw();
+      distanceLines.data([]);
+      distanceLines.draw();
+    });
+  }
   structuresPoints.data(
     centroids,
   );
@@ -92,30 +99,18 @@ function visualizeDetectedStructures(
   return true;
 }
 
-export default function visualize(
-  data: Dataset,
-  featureLayer: GeoJSLayer | undefined,
+export default async function visualize(
+  visList: VisOption[],
+  visLayer: GeoJSLayer,
 ) {
-  if (!featureLayer) {
-    return;
+  const detectedStructures = computed(() => store.state.detectedStuctures);
+  if (detectedStructures.value.length < 1) {
+    await store.dispatch.fetchDetectedStructures();
   }
-  if (data.dataset_type === 'nucleus_detection' || data.dataset_type === 'gland_detection') {
-    const detectedStructures = computed(() => store.state.detectedStuctures);
-    const structureColor: string = defaultStructureColors[
-      data.dataset_type.replace('_detection', '') as keyof typeof defaultStructureColors
-    ];
-    if (detectedStructures.value.length < 1) {
-      store.dispatch.fetchDetectedStructures().then(
-        () => visualizeDetectedStructures(
-          data, featureLayer, structureColor,
-          detectedStructures.value.filter((structure) => structure.detection_dataset === data.id),
-        ),
-      );
-    } else {
-      visualizeDetectedStructures(
-        data, featureLayer, structureColor,
-        detectedStructures.value.filter((structure) => structure.detection_dataset === data.id),
-      );
-    }
-  }
+
+  visList.forEach(
+    (visOption) => {
+      visOption.visFunc(visOption, visLayer, detectedStructures.value);
+    },
+  );
 }
