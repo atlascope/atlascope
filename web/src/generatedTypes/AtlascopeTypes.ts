@@ -452,6 +452,15 @@ export interface Pin {
   child?: number;
 }
 
+export interface VisOption {
+  value: string,
+  text: string,
+  data: Dataset,
+  visFunc: Function,
+  options: string[],
+  availableOptions: object[],
+}
+
 export interface Waypoint {
   /** ID */
   id?: number;

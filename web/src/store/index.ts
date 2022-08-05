@@ -168,6 +168,23 @@ const {
     setZoomLevel(state, zoomLevel: number) {
       state.zoomLevel = zoomLevel;
     },
+    setVisualizationLayer(state, layer: GeoJSLayer | undefined) {
+      state.visualizationLayer = layer;
+    },
+    updateVisualizationsShown(state, visOption: VisOption) {
+      if (state.visualizationsShown.map((vis) => vis.value).includes(visOption.value)) {
+        state.visualizationsShown = state.visualizationsShown.filter(
+          (vis) => vis.value !== visOption.value,
+        );
+      } else {
+        state.visualizationsShown.push(visOption);
+      }
+    },
+    updateVisualizationOption(state, visOption: VisOption) {
+      state.visualizationsShown[
+        state.visualizationsShown.findIndex((vis) => vis.value === visOption.value)
+      ] = visOption;
+    },
   },
   getters: {
     tilesourceDatasets(state: State): Dataset[] {
