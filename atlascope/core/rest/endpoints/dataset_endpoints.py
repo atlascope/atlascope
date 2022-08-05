@@ -75,7 +75,7 @@ class DatasetViewSet(
         dataset = self.get_object()
         try:
             path = dataset.content.path
-        except Exception:
+        except (AttributeError, ValueError):
             raise ValidationError('Dataset has no content')
         if os.path.exists(path):
             response = FileResponse(open(path, 'rb'), content_type='application/octet-stream')
