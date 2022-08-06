@@ -87,18 +87,25 @@ export default defineComponent({
     function visOptions(dataset: Dataset) {
       const availableVisualizations = [];
       if (dataset.dataset_type?.includes('_detection')) {
+        const availableOptions = [
+          {
+            value: 'show_distances_on_hover',
+            text: 'Show distances on hover',
+          },
+        ];
+        if (dataset.dataset_type === 'nucleus_detection') {
+          availableOptions.push({
+            value: 'color_by_nearest_gland',
+            text: 'Color by nearest gland',
+          });
+        }
         availableVisualizations.push({
           value: `dataset_${dataset.id}_show_centroids`,
           text: 'Centroid locations',
           data: dataset,
           visFunc: visualizeDetectedStructures,
           options: [],
-          availableOptions: [
-            {
-              value: 'show_distances_on_hover',
-              text: 'Show distances on hover',
-            },
-          ],
+          availableOptions,
         });
       }
       return availableVisualizations;
@@ -128,7 +135,7 @@ export default defineComponent({
       updateVisualizationOption(copy);
       updateVis();
     }
-    watch(visualizationsShown, updateVis, { deep: true });
+    watch(visualizationsShown, updateVis);
 
     return {
       rootDataset,
