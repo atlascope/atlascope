@@ -15,6 +15,7 @@
     "@vue/composition-api": "^1.0.0-rc.2",
     "axios": "^0.21.1",
     "direct-vuex": "^0.12.1",
+    "distinct-colors": "^3.0.0",
     "geojs": "^1.4.3",
     "swagger-typescript-api": "^9.3.1",
     "vue": "^2.6.11",
