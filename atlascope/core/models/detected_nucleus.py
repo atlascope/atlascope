@@ -128,13 +128,9 @@ def similar_nuclei(nucleus, queryset=None):
 
 
 class DetectedNucleusSerializer(serializers.ModelSerializer):
-    fingerprint = serializers.ListField(
-        child=serializers.FloatField(), min_length=100, max_length=100, read_only=True
-    )
-
     class Meta:
         model = DetectedNucleus
-        fields = '__all__'
+        exclude = ['fingerprint']
 
 
 class SimilarNucleusSerializer(DetectedNucleusSerializer):
