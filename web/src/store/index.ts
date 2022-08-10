@@ -143,9 +143,9 @@ const {
     setShowEmbeddings(state, show: boolean) {
       state.showEmbeddings = show;
     },
-    setDetectedStructures(state, structs) {
-      state.detectedStuctures = structs;
-      state.nucleiToNearestGlandDistances = nucleiToNearestGlandDistances(structs);
+    setDetectedStructures(state, structures) {
+      state.detectedStuctures = structures;
+      state.nucleiToNearestGlandDistances = nucleiToNearestGlandDistances(structures);
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       if (obj.datasetId) state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
