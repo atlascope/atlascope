@@ -6,7 +6,7 @@ export default function useGeoJSFeature(geoJSFeature: any, featureType: string) 
   const feature = ref(geoJSFeature);
   const type = ref(featureType);
   const getType = () => type.value;
-  const data = (newData: object[]) => {
+  const data = (newData: any[]) => {
     if (typeof feature.value.data === 'function') {
       feature.value.data(newData);
     }
