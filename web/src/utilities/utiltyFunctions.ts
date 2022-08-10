@@ -69,10 +69,10 @@ export function nucleiToNearestGlandDistances(
 ): Array<NucleusGlandDistance> {
   const retArray: Array<NucleusGlandDistance> = [];
   const nuclei = structures.filter(
-    (struct: DetectedStructure) => struct.structure_type === 'nucleus',
+    (structure: DetectedStructure) => structure.structure_type === 'nucleus',
   );
   const glands = structures.filter(
-    (struct: DetectedStructure) => struct.structure_type === 'gland',
+    (structure: DetectedStructure) => structure.structure_type === 'gland',
   );
 
   nuclei.forEach(
