@@ -188,7 +188,9 @@ const {
       }
     },
     async fetchCurrentInvestigation(context, investigationId: string) {
-      const { commit, state, dispatch } = rootActionContext(context);
+      const {
+        commit, state, getters, dispatch,
+      } = rootActionContext(context);
       if (state.axiosInstance) {
         const investigation = (await state.axiosInstance.get(`/investigations/${investigationId}`)).data;
         commit.setCurrentInvestigation(investigation);
@@ -212,9 +214,7 @@ const {
             datasetId: number | undefined;
             result: AxiosResponse;
           }>[] = [];
-          datasets.filter(
-            (dataset) => dataset.dataset_type === 'tile_source',
-          ).forEach((dataset) => {
+          getters.tilesourceDatasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
