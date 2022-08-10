@@ -7,7 +7,7 @@ from rest_framework import serializers
 from atlascope.core.fields import CubeDistance, CubeField
 from atlascope.core.models.dataset import Dataset
 
-NUCLEUS_ATTRIBUTES = [
+STRUCTURE_ATTRIBUTES = [
     'Nucleus.Gradient.Canny.Mean',
     'Nucleus.Gradient.Canny.Sum',
     'Nucleus.Gradient.Mag.HistEnergy',
@@ -90,30 +90,31 @@ NUCLEUS_ATTRIBUTES = [
 ]
 
 
-def nucleus_attribute_to_field_name(attribute: str):
+def structure_attribute_to_field_name(attribute: str):
     return attribute.replace('.', '_').lower().replace('nucleus_', '').replace('orientation_', '')
 
 
-class DetectedNucleus(models.Model):
+class DetectedStructure(models.Model):
     detection_dataset = models.ForeignKey(
         Dataset,
         null=False,
         on_delete=models.CASCADE,
-        related_name='detected_nuclei',
+        related_name='detected_structures',
     )
     label_integer = models.IntegerField()
     centroid = geo_models.PointField()
     weighted_centroid = geo_models.PointField()
     bounding_box = geo_models.PolygonField()
+    structure_type = models.CharField(max_length=10, default="nucleus")
     fingerprint = CubeField()
 
     class Meta:
         indexes = [GistIndex(fields=['fingerprint'])]
 
 
-for attribute in NUCLEUS_ATTRIBUTES:
-    DetectedNucleus.add_to_class(
-        nucleus_attribute_to_field_name(attribute),
+for attribute in STRUCTURE_ATTRIBUTES:
+    DetectedStructure.add_to_class(
+        structure_attribute_to_field_name(attribute),
         models.FloatField(),
     )
 
@@ -127,16 +128,16 @@ def similar_nuclei(nucleus, queryset=None):
     ).order_by('dissimilarity')
 
 
-class DetectedNucleusSerializer(serializers.ModelSerializer):
+class DetectedStructureSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DetectedNucleus
+        model = DetectedStructure
         exclude = ['fingerprint']
 
 
-class SimilarNucleusSerializer(DetectedNucleusSerializer):
+class SimilarNucleusSerializer(DetectedStructureSerializer):
     dissimilarity = serializers.FloatField(read_only=True, required=False)
 
 
-@admin.register(DetectedNucleus)
-class DetectedNucleusAdmin(admin.ModelAdmin):
+@admin.register(DetectedStructure)
+class DetectedStructureAdmin(admin.ModelAdmin):
     list_display = ('id', 'detection_dataset')
