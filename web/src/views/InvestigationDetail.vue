@@ -134,6 +134,7 @@ import {
   radiusForZoomLevel,
   opacityForZoomLevel,
 } from '../utilities/utiltyFunctions';
+import visualize from '../utilities/analyticsVis';
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
@@ -244,12 +245,10 @@ export default defineComponent({
     let rootDatasetLayer: GeoJSLayer;
     const pinNotes: Ref<PinNote[]> = ref([]);
     const frames: Ref<TiffFrame[]> = computed(() => store.state.rootDatasetFrames);
-
-    function selectPinsForRootDataset() {
-      store.dispatch.updateSelectedPins(store.state.currentPins.filter(
-        (pin: Pin) => pin.parent === rootDataset.value?.id,
-      ));
-    }
+    const selectedVisualizations:
+    Ref<Array<Dataset>> = computed(
+      () => store.state.selectedVisualizations,
+    );
 
     function getSelectedFrameStyle(): BandSpec[] {
       return frames.value.filter((frame: TiffFrame) => frame.displayed).map((frame: TiffFrame) => ({
@@ -657,7 +656,7 @@ export default defineComponent({
       if (!featureLayer) {
         featureLayer = createLayer(
           'feature',
-          { features: ['point', 'line', 'polygon', 'quad.image'] },
+          { features: ['grid', 'point', 'line', 'polygon', 'quad.image'] },
         );
       }
       if (!featureLayer) {
@@ -713,6 +712,16 @@ export default defineComponent({
       showHidePinsForZoomLevel(zoomLevel.value);
     });
 
+    watch(selectedVisualizations, () => {
+      if (!featureLayer) {
+        return;
+      }
+      featureLayer.layer.value.clear();
+      featureLayer.layer.value.draw();
+      selectedVisualizations.value.forEach(
+        (visDataset) => visualize(visDataset, featureLayer),
+      );
+    });
     watch(selectedTour, () => {
       if (!featureLayer) {
         featureLayer = createLayer(
@@ -781,7 +790,6 @@ export default defineComponent({
       drawMap(store.state.rootDataset);
       store.commit.setBounds(bounds.value);
       createPinNotes();
-      selectPinsForRootDataset();
       loaded.value = true;
     });
 
