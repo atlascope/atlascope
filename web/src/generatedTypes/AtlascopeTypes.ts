@@ -29,7 +29,7 @@ export interface Dataset {
   metadata?: object | null;
 
   /** Dataset type */
-  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage" | "non_tiled_image";
+  dataset_type?: string;
 
   /** Source dataset */
   source_dataset?: number | null;
@@ -40,6 +40,7 @@ export interface Dataset {
   origin: number[];
   pins: number[];
   locations: string[];
+  detected_structures: number[];
 }
 
 export interface DatasetCreate {
@@ -50,11 +51,11 @@ export interface DatasetCreate {
   description?: string;
 
   /** Dataset type */
-  dataset_type?: "tile_source" | "tile_overlay" | "analytics" | "subimage" | "non_tiled_image";
+  dataset_type?: string;
 
   /**
    * Importer
-   * The importer module to invoke.            Must be one of ['UploadImporter', 'VandyImporter'].
+   * The importer module to invoke.            Must be one of ['UploadImporter', 'VandyImporter', 'GoogleDriveImporter'].
    */
   importer?: string;
 
@@ -80,6 +81,270 @@ export interface DatasetSubImage {
 
   /** Investigation */
   investigation: string;
+}
+
+export interface DetectedStructure {
+  /** ID */
+  id?: number;
+
+  /**
+   * Label integer
+   * @min -2147483648
+   * @max 2147483647
+   */
+  label_integer: number;
+
+  /** Centroid */
+  centroid: string;
+
+  /** Weighted centroid */
+  weighted_centroid: string;
+
+  /** Bounding box */
+  bounding_box: string;
+
+  /** Gradient canny mean */
+  gradient_canny_mean: number;
+
+  /** Gradient canny sum */
+  gradient_canny_sum: number;
+
+  /** Gradient mag histenergy */
+  gradient_mag_histenergy: number;
+
+  /** Gradient mag histentropy */
+  gradient_mag_histentropy: number;
+
+  /** Gradient mag kurtosis */
+  gradient_mag_kurtosis: number;
+
+  /** Gradient mag mean */
+  gradient_mag_mean: number;
+
+  /** Gradient mag skewness */
+  gradient_mag_skewness: number;
+
+  /** Gradient mag std */
+  gradient_mag_std: number;
+
+  /** Haralick asm mean */
+  haralick_asm_mean: number;
+
+  /** Haralick asm range */
+  haralick_asm_range: number;
+
+  /** Haralick contrast mean */
+  haralick_contrast_mean: number;
+
+  /** Haralick contrast range */
+  haralick_contrast_range: number;
+
+  /** Haralick correlation mean */
+  haralick_correlation_mean: number;
+
+  /** Haralick correlation range */
+  haralick_correlation_range: number;
+
+  /** Haralick differenceentropy mean */
+  haralick_differenceentropy_mean: number;
+
+  /** Haralick differenceentropy range */
+  haralick_differenceentropy_range: number;
+
+  /** Haralick differencevariance mean */
+  haralick_differencevariance_mean: number;
+
+  /** Haralick differencevariance range */
+  haralick_differencevariance_range: number;
+
+  /** Haralick entropy mean */
+  haralick_entropy_mean: number;
+
+  /** Haralick entropy range */
+  haralick_entropy_range: number;
+
+  /** Haralick idm mean */
+  haralick_idm_mean: number;
+
+  /** Haralick idm range */
+  haralick_idm_range: number;
+
+  /** Haralick imc1 mean */
+  haralick_imc1_mean: number;
+
+  /** Haralick imc1 range */
+  haralick_imc1_range: number;
+
+  /** Haralick imc2 mean */
+  haralick_imc2_mean: number;
+
+  /** Haralick imc2 range */
+  haralick_imc2_range: number;
+
+  /** Haralick sumaverage mean */
+  haralick_sumaverage_mean: number;
+
+  /** Haralick sumaverage range */
+  haralick_sumaverage_range: number;
+
+  /** Haralick sumentropy mean */
+  haralick_sumentropy_mean: number;
+
+  /** Haralick sumentropy range */
+  haralick_sumentropy_range: number;
+
+  /** Haralick sumofsquares mean */
+  haralick_sumofsquares_mean: number;
+
+  /** Haralick sumofsquares range */
+  haralick_sumofsquares_range: number;
+
+  /** Haralick sumvariance mean */
+  haralick_sumvariance_mean: number;
+
+  /** Haralick sumvariance range */
+  haralick_sumvariance_range: number;
+
+  /** Intensity histenergy */
+  intensity_histenergy: number;
+
+  /** Intensity histentropy */
+  intensity_histentropy: number;
+
+  /** Intensity iqr */
+  intensity_iqr: number;
+
+  /** Intensity kurtosis */
+  intensity_kurtosis: number;
+
+  /** Intensity mad */
+  intensity_mad: number;
+
+  /** Intensity max */
+  intensity_max: number;
+
+  /** Intensity mean */
+  intensity_mean: number;
+
+  /** Intensity meanmediandiff */
+  intensity_meanmediandiff: number;
+
+  /** Intensity median */
+  intensity_median: number;
+
+  /** Intensity min */
+  intensity_min: number;
+
+  /** Intensity skewness */
+  intensity_skewness: number;
+
+  /** Intensity std */
+  intensity_std: number;
+
+  /** Orientation */
+  orientation: number;
+
+  /** Shape circularity */
+  shape_circularity: number;
+
+  /** Shape eccentricity */
+  shape_eccentricity: number;
+
+  /** Shape equivalentdiameter */
+  shape_equivalentdiameter: number;
+
+  /** Shape extent */
+  shape_extent: number;
+
+  /** Shape fsd1 */
+  shape_fsd1: number;
+
+  /** Shape fsd2 */
+  shape_fsd2: number;
+
+  /** Shape fsd3 */
+  shape_fsd3: number;
+
+  /** Shape fsd4 */
+  shape_fsd4: number;
+
+  /** Shape fsd5 */
+  shape_fsd5: number;
+
+  /** Shape fsd6 */
+  shape_fsd6: number;
+
+  /** Shape fractaldimension */
+  shape_fractaldimension: number;
+
+  /** Shape humoments1 */
+  shape_humoments1: number;
+
+  /** Shape humoments2 */
+  shape_humoments2: number;
+
+  /** Shape humoments3 */
+  shape_humoments3: number;
+
+  /** Shape humoments4 */
+  shape_humoments4: number;
+
+  /** Shape humoments5 */
+  shape_humoments5: number;
+
+  /** Shape humoments6 */
+  shape_humoments6: number;
+
+  /** Shape humoments7 */
+  shape_humoments7: number;
+
+  /** Shape minormajoraxisratio */
+  shape_minormajoraxisratio: number;
+
+  /** Shape solidity */
+  shape_solidity: number;
+
+  /** Shape weightedhumoments1 */
+  shape_weightedhumoments1: number;
+
+  /** Shape weightedhumoments2 */
+  shape_weightedhumoments2: number;
+
+  /** Shape weightedhumoments3 */
+  shape_weightedhumoments3: number;
+
+  /** Shape weightedhumoments4 */
+  shape_weightedhumoments4: number;
+
+  /** Shape weightedhumoments5 */
+  shape_weightedhumoments5: number;
+
+  /** Shape weightedhumoments6 */
+  shape_weightedhumoments6: number;
+
+  /** Shape weightedhumoments7 */
+  shape_weightedhumoments7: number;
+
+  /** Size area */
+  size_area: number;
+
+  /** Size convexhullarea */
+  size_convexhullarea: number;
+
+  /** Size majoraxislength */
+  size_majoraxislength: number;
+
+  /** Size minoraxislength */
+  size_minoraxislength: number;
+
+  /** Size perimeter */
+  size_perimeter: number;
+
+  /** Structure type  */
+  structure_type: string;
+
+  /** Detection dataset */
+  detection_dataset: number;
 }
 
 export interface Investigation {
@@ -236,43 +501,7 @@ export interface DatasetsListParams {
   offset?: number;
 }
 
-export interface DatasetsTileSourceBandParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** The band number to use. */
-  band?: number;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceBandsParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceFramesParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceHistogramParams {
+export interface DatasetsTileSourceDataHistogramParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -287,29 +516,7 @@ export interface DatasetsTileSourceHistogramParams {
   id: number;
 }
 
-export interface DatasetsTileSourceMetadataParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceMetadataInternalParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourcePixelParams {
+export interface DatasetsTileSourceDataPixelParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -347,7 +554,7 @@ export interface DatasetsTileSourcePixelParams {
   id: number;
 }
 
-export interface DatasetsTileSourceRegionJpegParams {
+export interface DatasetsTileSourceRegionParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -390,84 +597,14 @@ export interface DatasetsTileSourceRegionJpegParams {
   /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
   style?: string;
 
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceRegionPngParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** left */
-  left: number;
-
-  /** right */
-  right: number;
-
-  /** top */
-  top: number;
-
-  /** bottom */
-  bottom: number;
-
-  /** The projection/units of the region coordinates. */
-  units?: string;
-
-  /** The color palette to map the band values (named Matplotlib colormaps or palettable palettes). `cmap` alias supported. */
-  palette?: string;
-
-  /** The band number to use. */
-  band?: number;
-
-  /** The minimum value for the color mapping. */
-  min?: number;
-
-  /** The maximum value for the color mapping. */
-  max?: number;
-
-  /** The value to map as no data (often made transparent). */
-  nodata?: number;
-
-  /** This is either ``linear`` (the default) or ``discrete``. If a palette is specified, ``linear`` uses a piecewise linear interpolation, and ``discrete`` uses exact colors from the palette with the range of the data mapped into the specified number of colors (e.g., a palette with two colors will split exactly halfway between the min and max values). */
-  scheme?: string;
-
-  /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
-  style?: string;
+  /** Image data format (png | jpeg | tiff) */
+  fmt: string;
 
   /** A unique integer value identifying this dataset. */
   id: number;
 }
 
-export interface DatasetsTileSourceRegionTifParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** left */
-  left: number;
-
-  /** right */
-  right: number;
-
-  /** top */
-  top: number;
-
-  /** bottom */
-  bottom: number;
-
-  /** The projection/units of the region coordinates. */
-  units?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceThumbnailJpegParams {
+export interface DatasetsTileSourceThumbnailParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -501,22 +638,88 @@ export interface DatasetsTileSourceThumbnailJpegParams {
   /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
   style?: string;
 
+  /** Image format (png | jpeg) */
+  fmt: string;
+
   /** A unique integer value identifying this dataset. */
   id: number;
 }
 
-export interface DatasetsTileSourceThumbnailPngParams {
+export interface DatasetsTileSourceInfoBandParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
   /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
   source?: string;
 
-  /** maximum height in pixels. */
-  max_height?: number;
+  /** The band number to use. */
+  band?: number;
 
-  /** maximum width in pixels. */
-  max_width?: number;
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceInfoBandsParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
+
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceInfoFramesParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
+
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceInfoMetadataParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
+
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceInfoMetadataInternalParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
+
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceTilesMetadataReadParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
+
+  /** A unique integer value identifying this dataset. */
+  id: number;
+}
+
+export interface DatasetsTileSourceTilesReadParams {
+  /** The projection in which to open the image (try `EPSG:3857`). */
+  projection?: string;
+
+  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
+  source?: string;
 
   /** The color palette to map the band values (named Matplotlib colormaps or palettable palettes). `cmap` alias supported. */
   palette?: string;
@@ -539,89 +742,8 @@ export interface DatasetsTileSourceThumbnailPngParams {
   /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
   style?: string;
 
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceTilesTilesMetadataParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-}
-
-export interface DatasetsTileSourceTileJpegParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** The color palette to map the band values (named Matplotlib colormaps or palettable palettes). `cmap` alias supported. */
-  palette?: string;
-
-  /** The band number to use. */
-  band?: number;
-
-  /** The minimum value for the color mapping. */
-  min?: number;
-
-  /** The maximum value for the color mapping. */
-  max?: number;
-
-  /** The value to map as no data (often made transparent). */
-  nodata?: number;
-
-  /** This is either ``linear`` (the default) or ``discrete``. If a palette is specified, ``linear`` uses a piecewise linear interpolation, and ``discrete`` uses exact colors from the palette with the range of the data mapped into the specified number of colors (e.g., a palette with two colors will split exactly halfway between the min and max values). */
-  scheme?: string;
-
-  /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
-  style?: string;
-
-  /** A unique integer value identifying this dataset. */
-  id: number;
-
-  /** The 0-based X position of the tile on the specified Z level. */
-  x: number;
-
-  /** The 0-based Y position of the tile on the specified Z level. */
-  y: number;
-
-  /** The Z level of the tile. May range from [0, levels], where 0 is the lowest resolution, single tile for the whole source. */
-  z: number;
-}
-
-export interface DatasetsTileSourceTilePngParams {
-  /** The projection in which to open the image (try `EPSG:3857`). */
-  projection?: string;
-
-  /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
-  source?: string;
-
-  /** The color palette to map the band values (named Matplotlib colormaps or palettable palettes). `cmap` alias supported. */
-  palette?: string;
-
-  /** The band number to use. */
-  band?: number;
-
-  /** The minimum value for the color mapping. */
-  min?: number;
-
-  /** The maximum value for the color mapping. */
-  max?: number;
-
-  /** The value to map as no data (often made transparent). */
-  nodata?: number;
-
-  /** This is either ``linear`` (the default) or ``discrete``. If a palette is specified, ``linear`` uses a piecewise linear interpolation, and ``discrete`` uses exact colors from the palette with the range of the data mapped into the specified number of colors (e.g., a palette with two colors will split exactly halfway between the min and max values). */
-  scheme?: string;
-
-  /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
-  style?: string;
+  /** Image format (png | jpeg) */
+  fmt: string;
 
   /** A unique integer value identifying this dataset. */
   id: number;
@@ -654,6 +776,14 @@ export interface DatasetsTileSourceTilesTileCornersParams {
 
   /** The Z level of the tile. May range from [0, levels], where 0 is the lowest resolution, single tile for the whole source. */
   z: number;
+}
+
+export interface DetectedStructuresListParams {
+  /** Number of results to return per page. */
+  limit?: number;
+
+  /** The initial index from which to return the results. */
+  offset?: number;
 }
 
 export interface InvestigationsListParams {
@@ -712,57 +842,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceBand
-   * @summary Returns bands information.
-   * @request GET:/datasets/tile_source/{id}/info/band
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceBand {
-    export type RequestParams = { id: number };
-    export type RequestQuery = { projection?: string; source?: string; band?: number };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceBands
-   * @summary Returns bands information.
-   * @request GET:/datasets/tile_source/{id}/info/bands
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceBands {
-    export type RequestParams = { id: number };
-    export type RequestQuery = { projection?: string; source?: string };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceFrames
-   * @summary Retrieve all channels/bands for each frame. This is used to generate a UI to control how the image is displayed.
-   * @request GET:/datasets/tile_source/{id}/frames
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceFrames {
-    export type RequestParams = { id: number };
-    export type RequestQuery = { projection?: string; source?: string };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceHistogram
+   * @name DatasetsTileSourceDataHistogram
    * @summary Returns histogram
    * @request GET:/datasets/tile_source/{id}/data/histogram
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceHistogram {
+  export namespace DatasetsTileSourceDataHistogram {
     export type RequestParams = { id: number };
     export type RequestQuery = {
       projection?: string;
@@ -779,42 +864,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceMetadata
-   * @summary Returns tile metadata.
-   * @request GET:/datasets/tile_source/{id}/info/metadata
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceMetadata {
-    export type RequestParams = { id: number };
-    export type RequestQuery = { projection?: string; source?: string };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceMetadataInternal
-   * @summary Returns additional known metadata about the tile source.
-   * @request GET:/datasets/tile_source/{id}/info/metadata_internal
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceMetadataInternal {
-    export type RequestParams = { id: number };
-    export type RequestQuery = { projection?: string; source?: string };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourcePixel
+   * @name DatasetsTileSourceDataPixel
    * @summary Returns single pixel.
    * @request GET:/datasets/tile_source/{id}/data/pixel
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourcePixel {
+  export namespace DatasetsTileSourceDataPixel {
     export type RequestParams = { id: number };
     export type RequestQuery = {
       projection?: string;
@@ -836,13 +891,13 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceRegionJpeg
+   * @name DatasetsTileSourceRegion
    * @summary Returns region tile binary.
-   * @request GET:/datasets/tile_source/{id}/data/region.jpeg
+   * @request GET:/datasets/tile_source/{id}/data/region.{fmt}
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceRegionJpeg {
-    export type RequestParams = { id: number };
+  export namespace DatasetsTileSourceRegion {
+    export type RequestParams = { fmt: string; id: number };
     export type RequestQuery = {
       projection?: string;
       source?: string;
@@ -866,66 +921,13 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceRegionPng
-   * @summary Returns region tile binary.
-   * @request GET:/datasets/tile_source/{id}/data/region.png
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceRegionPng {
-    export type RequestParams = { id: number };
-    export type RequestQuery = {
-      projection?: string;
-      source?: string;
-      left: number;
-      right: number;
-      top: number;
-      bottom: number;
-      units?: string;
-      palette?: string;
-      band?: number;
-      min?: number;
-      max?: number;
-      nodata?: number;
-      scheme?: string;
-      style?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceRegionTif
-   * @summary Returns region tile binary.
-   * @request GET:/datasets/tile_source/{id}/data/region.tif
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceRegionTif {
-    export type RequestParams = { id: number };
-    export type RequestQuery = {
-      projection?: string;
-      source?: string;
-      left: number;
-      right: number;
-      top: number;
-      bottom: number;
-      units?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceThumbnailJpeg
+   * @name DatasetsTileSourceThumbnail
    * @summary Returns thumbnail of full image.
-   * @request GET:/datasets/tile_source/{id}/data/thumbnail.jpeg
+   * @request GET:/datasets/tile_source/{id}/data/thumbnail.{fmt}
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceThumbnailJpeg {
-    export type RequestParams = { id: number };
+  export namespace DatasetsTileSourceThumbnail {
+    export type RequestParams = { fmt: string; id: number };
     export type RequestQuery = {
       projection?: string;
       source?: string;
@@ -946,26 +948,14 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceThumbnailPng
-   * @summary Returns thumbnail of full image.
-   * @request GET:/datasets/tile_source/{id}/data/thumbnail.png
+   * @name DatasetsTileSourceInfoBand
+   * @summary Returns bands information.
+   * @request GET:/datasets/tile_source/{id}/info/band
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceThumbnailPng {
+  export namespace DatasetsTileSourceInfoBand {
     export type RequestParams = { id: number };
-    export type RequestQuery = {
-      projection?: string;
-      source?: string;
-      max_height?: number;
-      max_width?: number;
-      palette?: string;
-      band?: number;
-      min?: number;
-      max?: number;
-      nodata?: number;
-      scheme?: string;
-      style?: string;
-    };
+    export type RequestQuery = { projection?: string; source?: string; band?: number };
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = Dataset;
@@ -973,12 +963,72 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceTiffdump
+   * @name DatasetsTileSourceInfoBands
+   * @summary Returns bands information.
+   * @request GET:/datasets/tile_source/{id}/info/bands
+   * @response `200` `Dataset`
+   */
+  export namespace DatasetsTileSourceInfoBands {
+    export type RequestParams = { id: number };
+    export type RequestQuery = { projection?: string; source?: string };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsTileSourceInfoFrames
+   * @summary Retrieve all channels/bands for each frame. This is used to generate a UI to control how the image is displayed.
+   * @request GET:/datasets/tile_source/{id}/info/frames
+   * @response `200` `Dataset`
+   */
+  export namespace DatasetsTileSourceInfoFrames {
+    export type RequestParams = { id: number };
+    export type RequestQuery = { projection?: string; source?: string };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsTileSourceInfoMetadata
+   * @summary Returns tile metadata.
+   * @request GET:/datasets/tile_source/{id}/info/metadata
+   * @response `200` `Dataset`
+   */
+  export namespace DatasetsTileSourceInfoMetadata {
+    export type RequestParams = { id: number };
+    export type RequestQuery = { projection?: string; source?: string };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsTileSourceInfoMetadataInternal
+   * @summary Returns additional known metadata about the tile source.
+   * @request GET:/datasets/tile_source/{id}/info/metadata_internal
+   * @response `200` `Dataset`
+   */
+  export namespace DatasetsTileSourceInfoMetadataInternal {
+    export type RequestParams = { id: number };
+    export type RequestQuery = { projection?: string; source?: string };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
+   * @name DatasetsTileSourceInfoTiffdump
    * @summary Returns tifftools tiffdump JSON. This will raise a `ValidationError` if the image is not a Tiff.
    * @request GET:/datasets/tile_source/{id}/info/tiffdump
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceTiffdump {
+  export namespace DatasetsTileSourceInfoTiffdump {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -988,12 +1038,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceTilesTilesMetadata
+   * @name DatasetsTileSourceTilesMetadataRead
    * @summary Returns tile metadata.
    * @request GET:/datasets/tile_source/{id}/tiles/metadata
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceTilesTilesMetadata {
+  export namespace DatasetsTileSourceTilesMetadataRead {
     export type RequestParams = { id: number };
     export type RequestQuery = { projection?: string; source?: string };
     export type RequestBody = never;
@@ -1003,38 +1053,13 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceTileJpeg
+   * @name DatasetsTileSourceTilesRead
    * @summary Returns tile image binary.
-   * @request GET:/datasets/tile_source/{id}/tiles/{z}/{x}/{y}.jpeg
+   * @request GET:/datasets/tile_source/{id}/tiles/{z}/{x}/{y}.{fmt}
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceTileJpeg {
-    export type RequestParams = { id: number; x: number; y: number; z: number };
-    export type RequestQuery = {
-      projection?: string;
-      source?: string;
-      palette?: string;
-      band?: number;
-      min?: number;
-      max?: number;
-      nodata?: number;
-      scheme?: string;
-      style?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = Dataset;
-  }
-  /**
-   * No description
-   * @tags datasets
-   * @name DatasetsTileSourceTilePng
-   * @summary Returns tile image binary.
-   * @request GET:/datasets/tile_source/{id}/tiles/{z}/{x}/{y}.png
-   * @response `200` `Dataset`
-   */
-  export namespace DatasetsTileSourceTilePng {
-    export type RequestParams = { id: number; x: number; y: number; z: number };
+  export namespace DatasetsTileSourceTilesRead {
+    export type RequestParams = { fmt: string; id: number; x: number; y: number; z: number };
     export type RequestQuery = {
       projection?: string;
       source?: string;
@@ -1095,6 +1120,42 @@ export namespace Datasets {
   }
 }
 
+export namespace DetectedStructures {
+  /**
+   * No description
+   * @tags detected-structures
+   * @name DetectedStructuresList
+   * @request GET:/detected-structures
+   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (DetectedStructure)[] }`
+   */
+  export namespace DetectedStructuresList {
+    export type RequestParams = {};
+    export type RequestQuery = { limit?: number; offset?: number };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = {
+      count: number;
+      next?: string | null;
+      previous?: string | null;
+      results: DetectedStructure[];
+    };
+  }
+  /**
+   * No description
+   * @tags detected-structures
+   * @name DetectedStructuresRead
+   * @request GET:/detected-structures/{id}
+   * @response `200` `DetectedStructure`
+   */
+  export namespace DetectedStructuresRead {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DetectedStructure;
+  }
+}
+
 export namespace Investigations {
   /**
    * No description
@@ -1132,11 +1193,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsEmbeddings
+   * @name InvestigationsEmbeddingsRead
    * @request GET:/investigations/{id}/embeddings
    * @response `200` `(DatasetEmbedding)[]`
    */
-  export namespace InvestigationsEmbeddings {
+  export namespace InvestigationsEmbeddingsRead {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -1160,11 +1221,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsPins
+   * @name InvestigationsPinsRead
    * @request GET:/investigations/{id}/pins
    * @response `200` `(Pin)[]`
    */
-  export namespace InvestigationsPins {
+  export namespace InvestigationsPinsRead {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
