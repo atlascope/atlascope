@@ -9,7 +9,7 @@ interface StructurePoint {
   x: number;
   y: number;
   color: string;
-  struct: DetectedStructure;
+  structure: DetectedStructure;
 }
 
 const defaultStructureColors = {
@@ -24,8 +24,8 @@ function drawLines(target: StructurePoint) {
   computedLines.value.forEach(
     (computedLine) => {
       if (
-        computedLine[target.struct.structure_type as keyof NucleusGlandDistance]
-         === target.struct.id
+        computedLine[target.structure.structure_type as keyof NucleusGlandDistance]
+         === target.structure.id
       ) {
         retArray.push(computedLine.line);
       }
@@ -48,13 +48,13 @@ function visualizeDetectedStructures(
     },
   });
   const centroids = structures.map(
-    (struct) => {
-      const centroid = centroidStringToCoords(struct.centroid);
+    (structure) => {
+      const centroid = centroidStringToCoords(structure.centroid);
       return {
         x: centroid[0],
         y: centroid[1],
         color,
-        struct,
+        structure,
       };
     },
   );
@@ -108,13 +108,13 @@ export default function visualize(
       store.dispatch.fetchDetectedStructures().then(
         () => visualizeDetectedStructures(
           data, featureLayer, structureColor,
-          detectedStructures.value.filter((struct) => struct.detection_dataset === data.id),
+          detectedStructures.value.filter((structure) => structure.detection_dataset === data.id),
         ),
       );
     } else {
       visualizeDetectedStructures(
         data, featureLayer, structureColor,
-        detectedStructures.value.filter((struct) => struct.detection_dataset === data.id),
+        detectedStructures.value.filter((structure) => structure.detection_dataset === data.id),
       );
     }
   }
