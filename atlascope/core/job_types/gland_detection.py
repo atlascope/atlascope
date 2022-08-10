@@ -13,27 +13,48 @@ from atlascope.core.models.detected_structure import (
     structure_attribute_to_field_name,
 )
 
-from .nucleus_detection import detect_nuclei
 from .utils import save_output_dataset
 
 schema = {
     "type": "object",
     "required": [],
-    "properties": {
-        "gland_map_path": {
-            "type": 'string',
-            "title": 'Path to gland map',
-            "default": 'atlascope/core/management/populate/inputs/gland_map.jpg',
-        }
-    },
+    "properties": {},
 }
+
+NUM_GLANDS_TO_GENERATE = 20
+
+
+def detect_glands(input_image):
+    glands = []
+    y = input_image.shape[0]
+    x = input_image.shape[1]
+    for n in range(NUM_GLANDS_TO_GENERATE):
+        dx = 5
+        dy = int(NUM_GLANDS_TO_GENERATE / dx)
+        centroid = [
+            ((n % dx) + 1) * (x / (dx + 2)),
+            ((n % dy) + 1) * (y / (dy + 2)),
+        ]
+        gland = {
+            'Label': n,
+            'Identifier.CentroidX': centroid[0],
+            'Identifier.CentroidY': centroid[1],
+            'Identifier.WeightedCentroidX': centroid[0],
+            'Identifier.WeightedCentroidY': centroid[1],
+            'Identifier.Xmin': 0,
+            'Identifier.Xmax': 0,
+            'Identifier.Ymin': 0,
+            'Identifier.Ymax': 0,
+        }
+        gland.update({attribute: 0 for attribute in STRUCTURE_ATTRIBUTES})
+        glands.append(gland)
+    return glands
 
 
 @shared_task
 def run(
     job_id: str,
     original_dataset_id: str,
-    gland_map_path=schema["properties"]["gland_map_path"]["default"],
 ):
     from atlascope.core.models import Job
 
@@ -50,8 +71,10 @@ def run(
         )
 
     try:
-        input_image = skimage.io.imread(io.BytesIO(open(gland_map_path, 'rb').read()))
-        glands = detect_nuclei(input_image)
+        input_image = skimage.io.imread(
+            io.BytesIO(original_dataset.content.read()),
+        )
+        glands = detect_glands(input_image)
 
         detection_dataset = save_output_dataset(
             original_dataset,
@@ -68,17 +91,14 @@ def run(
                 structure_attribute_to_field_name(attribute): gland[attribute]
                 for attribute in STRUCTURE_ATTRIBUTES
             }
-            # For small sample image, increase the coordinates of the
-            # centroids to better match the size of the image
-            centroid = Point(
-                x=gland['Identifier.CentroidX'] * 3,
-                y=gland['Identifier.CentroidY'] * 2.5,
-            )
             DetectedStructure.objects.create(
                 detection_dataset=detection_dataset,
                 structure_type='gland',
                 label_integer=gland['Label'],
-                centroid=centroid,
+                centroid=Point(
+                    x=gland['Identifier.CentroidX'],
+                    y=gland['Identifier.CentroidY'],
+                ),
                 weighted_centroid=Point(
                     x=gland['Identifier.WeightedCentroidX'],
                     y=gland['Identifier.WeightedCentroidY'],
