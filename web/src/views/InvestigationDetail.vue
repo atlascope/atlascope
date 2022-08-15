@@ -44,32 +44,12 @@
             ref="map"
             class="map"
           />
-          <v-menu
-            v-model="externalVisualizationMenu"
-            :position-x="externalVisualizationMenuX"
-            :position-y="externalVisualizationMenuY"
-            absolute
-            offset-y
-            :close-on-click="false"
-          >
-            <v-list>
-              <v-list-item
-                :href="externalGlanceLink"
-                target="_blank"
-              >
-                <v-list-item-title>
-                  Open with Paraview Glance
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title
-                  @click="externalVisualizationMenu = false"
-                >
-                  Cancel
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+          <investigation-detail-3-d-vis-menu
+            :visible="externalVisualizationMenu"
+            :dataset="externalVisualizationMenuDataset"
+            :positionx="externalVisualizationMenuX"
+            :positiony="externalVisualizationMenuY"
+          />
           <v-card
             v-for="note in pinNotes"
             :key="note.id"
@@ -145,7 +125,6 @@ import {
   computed,
   watch,
   Ref,
-  nextTick,
 } from '@vue/composition-api';
 import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
@@ -158,6 +137,7 @@ import {
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
+import InvestigationDetail3DVisMenu from '../components/InvestigationDetail3DVisMenu.vue';
 import {
   Dataset, Pin, Tour, Waypoint,
 } from '../generatedTypes/AtlascopeTypes';
@@ -211,6 +191,7 @@ export default defineComponent({
   components: {
     InvestigationSidebar,
     InvestigationDetailFrameMenu,
+    InvestigationDetail3DVisMenu,
   },
 
   props: {
@@ -243,15 +224,6 @@ export default defineComponent({
     const externalVisualizationMenuX = ref(0);
     const externalVisualizationMenuY = ref(0);
     const externalVisualizationMenuDataset: Ref<Dataset | null> = ref(null);
-    const externalGlanceLink = computed(() => {
-      if (!externalVisualizationMenuDataset.value) {
-        return '';
-      }
-      const dataset = externalVisualizationMenuDataset.value;
-      const apiRoot = process.env.VUE_APP_API_ROOT;
-      const datasetUrl = `${apiRoot}/datasets/${dataset.id}/download`;
-      return `http://localhost:9999/?name=${dataset.name}&url=${datasetUrl}`;
-    });
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
@@ -633,17 +605,15 @@ export default defineComponent({
     }
 
     function toggle3DVolumePin(pin: Pin, dataset: Dataset) {
-      nextTick(() => {
-        if (!pinFeature) {
-          throw new Error('Pin feature must exist before pins can be clicked.');
-        }
-        const { x, y } = postGisToPoint(pin.location);
-        const newMenuCoordinates = pinFeature.featureGcsToDisplay(x, y);
-        externalVisualizationMenu.value = !externalVisualizationMenu.value;
-        externalVisualizationMenuX.value = newMenuCoordinates.x;
-        externalVisualizationMenuY.value = newMenuCoordinates.y;
-        externalVisualizationMenuDataset.value = dataset;
-      });
+      if (!pinFeature) {
+        throw new Error('Pin feature must exist before pins can be clicked.');
+      }
+      const { x, y } = postGisToPoint(pin.location);
+      const newMenuCoordinates = pinFeature.featureGcsToDisplay(x, y);
+      externalVisualizationMenu.value = !externalVisualizationMenu.value;
+      externalVisualizationMenuX.value = newMenuCoordinates.x;
+      externalVisualizationMenuY.value = newMenuCoordinates.y;
+      externalVisualizationMenuDataset.value = dataset;
     }
 
     function toggleDatasetPin(pin: Pin) {
@@ -815,7 +785,7 @@ export default defineComponent({
       externalVisualizationMenu,
       externalVisualizationMenuX,
       externalVisualizationMenuY,
-      externalGlanceLink,
+      externalVisualizationMenuDataset,
     };
   },
 });
