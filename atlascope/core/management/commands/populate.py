@@ -109,7 +109,6 @@ def populate_investigations(specs):
         datasets = [Dataset.objects.get(name=name) for name in spec["datasets"]]
         # Only use datasets whose content saved properly
         datasets = [dataset for dataset in datasets if dataset.content]
-        # datasets = [dataset for dataset in datasets if dataset.content]
         del spec["datasets"]
 
         # Build and save investigation objects.
