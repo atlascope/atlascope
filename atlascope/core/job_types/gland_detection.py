@@ -7,6 +7,7 @@ import skimage.color
 import skimage.io
 import skimage.measure
 
+from atlascope.core.fields import Cube
 from atlascope.core.models import Dataset, DetectedStructure
 from atlascope.core.models.detected_structure import (
     STRUCTURE_ATTRIBUTES,
@@ -113,6 +114,7 @@ def run(
                         (gland['Identifier.Xmin'], gland['Identifier.Ymin']),
                     ]
                 ),
+                fingerprint=Cube([-9999] * 100),
                 **additional_gland_attributes,
             )
 
