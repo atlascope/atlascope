@@ -3,8 +3,9 @@ import Vuex from 'vuex';
 import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
+import { nucleiToNearestGlandDistances, NucleusGlandDistance } from '@/utilities/utiltyFunctions';
 import {
-  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, Tour, Waypoint,
+  Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure, Tour, Waypoint,
 } from '../generatedTypes/AtlascopeTypes';
 import { GeoBounds } from '../utilities/composableTypes';
 
@@ -34,6 +35,9 @@ export interface State {
     currentPins: Pin[];
     inBoundsPins: Pin[];
     selectedPins: Pin[];
+    selectedVisualizations: Dataset[];
+    detectedStuctures: DetectedStructure[];
+    nucleiToNearestGlandDistances: NucleusGlandDistance[];
     datasetEmbeddings: DatasetEmbedding[];
     showEmbeddings: boolean;
     datasetTileMetadata: { [key: string]: TileMetadata };
@@ -69,6 +73,9 @@ const {
     currentPins: [],
     inBoundsPins: [],
     selectedPins: [],
+    selectedVisualizations: [],
+    detectedStuctures: [],
+    nucleiToNearestGlandDistances: [],
     showEmbeddings: true,
     datasetEmbeddings: [],
     datasetTileMetadata: {},
@@ -118,6 +125,9 @@ const {
     setSelectedPins(state, pins: Pin[]) {
       state.selectedPins = pins;
     },
+    setSelectedVisualizations(state, visualizations) {
+      state.selectedVisualizations = visualizations;
+    },
     setTours(state, tours: Tour[]) {
       state.tours = tours;
     },
@@ -132,6 +142,10 @@ const {
     },
     setShowEmbeddings(state, show: boolean) {
       state.showEmbeddings = show;
+    },
+    setDetectedStructures(state, structures) {
+      state.detectedStuctures = structures;
+      state.nucleiToNearestGlandDistances = nucleiToNearestGlandDistances(structures);
     },
     setTileMetadataForDataset(state, obj: TileMetadataForDataset) {
       if (obj.datasetId) state.datasetTileMetadata[obj.datasetId] = obj.tileMetadata;
@@ -206,11 +220,7 @@ const {
             datasetId: number | undefined;
             result: AxiosResponse;
           }>[] = [];
-          [
-            ...getters.nonTiledImageDatasets,
-            ...getters.subimageDatasets,
-            ...getters.tilesourceDatasets,
-          ].forEach((dataset) => {
+          getters.tilesourceDatasets.forEach((dataset) => {
             const promise = state.axiosInstance?.get(
               `/datasets/tile_source/${dataset.id}/tiles/metadata`).then(
               (result: AxiosResponse) => ({
@@ -267,6 +277,14 @@ const {
         commit.setCurrentPins(pins);
       }
     },
+    async fetchDetectedStructures(context) {
+      const { commit, state } = rootActionContext(context);
+      if (state.axiosInstance) {
+        commit.setDetectedStructures(
+          (await state.axiosInstance.get('/detected-structures')).data,
+        );
+      }
+    },
     async fetchInvestigationTours(context) {
       const { commit, state } = rootActionContext(context);
       if (state.axiosInstance && state.currentInvestigation) {
@@ -286,7 +304,26 @@ const {
     },
     updateSelectedPins(context, pins: Pin[]) {
       const { commit } = rootActionContext(context);
-      commit.setSelectedPins(pins);
+      const circlePinDatasetTypes = [
+        'tile_overlay',
+        'non_tiled_image',
+      ];
+      const isVisualization: Array<boolean | Dataset> = pins.map((pin: Pin) => {
+        const childDataset: Dataset | undefined = store.state.currentDatasets.find(
+          (dataset: Dataset) => dataset.id === pin.child,
+        );
+        if (childDataset
+          && childDataset?.dataset_type
+          && !circlePinDatasetTypes.includes(childDataset.dataset_type)) {
+          return childDataset;
+        }
+        return false;
+      });
+      const circlePins = pins.filter((pin: Pin, index: number) => !isVisualization[index]);
+      const visualizations = isVisualization.filter((vis) => vis !== false);
+
+      commit.setSelectedPins(circlePins);
+      commit.setSelectedVisualizations(visualizations);
     },
     updateFrames(context, frames: TiffFrame[]) {
       const { commit } = rootActionContext(context);

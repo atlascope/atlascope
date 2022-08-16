@@ -7,24 +7,25 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from atlascope.core.models import DetectedNucleus, DetectedNucleusSerializer
-from atlascope.core.models.detected_nucleus import SimilarNucleusSerializer, similar_nuclei
+from atlascope.core.models import DetectedStructure, DetectedStructureSerializer
+from atlascope.core.models.detected_structure import SimilarNucleusSerializer, similar_nuclei
 
 
-class DetectedNucleusViewSet(
+class DetectedStructureViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
-    serializer_class = DetectedNucleusSerializer
+    serializer_class = DetectedStructureSerializer
+    pagination_class = None
 
     def get_queryset(self):
         detection_dataset_id = self.request.query_params.get('detection_dataset')
         if detection_dataset_id:
-            return DetectedNucleus.objects.filter(
+            return DetectedStructure.objects.filter(
                 detection_dataset__id=detection_dataset_id,
             )
-        return DetectedNucleus.objects.all()
+        return DetectedStructure.objects.all()
 
     @action(detail=True, methods=['get'])
     def similar(self, request, pk=None):

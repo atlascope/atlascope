@@ -1,3 +1,5 @@
+import { DetectedStructure } from '../generatedTypes/AtlascopeTypes';
+
 export interface Point {
   x: number;
   y: number;
@@ -45,4 +47,63 @@ export function opacityForZoomLevel(currentZoom: number, maxZoom: number): numbe
     return maxPinOpacity;
   }
   return Math.max(0, maxPinOpacity - 0.4 * (currentZoom - maxZoom));
+}
+
+export function centroidStringToCoords(input: string): Array<number> {
+  const centroidString = input.match(/\(([0-9|.|\s])+\)/);
+  if (!centroidString) {
+    return [-1, -1];
+  }
+  const centroid = centroidString[0].slice(1, -1).split(' ').map(
+    (val: string) => parseFloat(val),
+  );
+  return centroid;
+}
+
+export interface NucleusGlandDistance{
+  nucleus: number | undefined;
+  gland: number | undefined;
+  line: Point[];
+}
+
+export function nucleiToNearestGlandDistances(
+  structures: DetectedStructure[],
+): Array<NucleusGlandDistance> {
+  const retArray: Array<NucleusGlandDistance> = [];
+  const nuclei = structures.filter(
+    (structure: DetectedStructure) => structure.structure_type === 'nucleus',
+  );
+  const glands = structures.filter(
+    (structure: DetectedStructure) => structure.structure_type === 'gland',
+  );
+
+  nuclei.forEach(
+    (nucleus) => {
+      let minDistance: number;
+      let nearestId: number | undefined;
+      let minDistanceLine: Point[] = [];
+      const [x1, y1] = centroidStringToCoords(nucleus.centroid);
+      glands.forEach(
+        (gland) => {
+          const [x2, y2] = centroidStringToCoords(gland.centroid);
+          const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+          if (!minDistance || distance < minDistance) {
+            minDistance = distance;
+            nearestId = gland.id;
+            minDistanceLine = [{
+              x: x1, y: y1,
+            }, {
+              x: x2, y: y2,
+            }];
+          }
+        },
+      );
+      retArray.push({
+        nucleus: nucleus.id,
+        gland: nearestId,
+        line: minDistanceLine,
+      });
+    },
+  );
+  return retArray;
 }

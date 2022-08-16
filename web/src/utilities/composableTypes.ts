@@ -29,7 +29,7 @@ export interface GeoJSLayer {
   getType: () => string;
   drawLayer: () => void;
   updateLayerUrl: (url: string) => void;
-  createFeature: (featureType: string) => GeoJSFeature;
+  createFeature: (featureType: string, opts?: any) => GeoJSFeature;
   annotations: () => any[];
   removeAnnotation: (annotation: any) => void;
   removeAllAnnotations: () => void;
@@ -40,7 +40,7 @@ export interface GeoJSLayer {
 
 export interface GeoJSFeature {
   getType: () => string;
-  data: (newData: object[]) => void;
+  data: (newData: any[]) => void;
   getData: () => object[];
   position: (newPosition: Function) => void;
   style: (newStyle: object | string, newValue?: string | Function) => void;
