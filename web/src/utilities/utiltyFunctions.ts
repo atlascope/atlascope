@@ -51,7 +51,9 @@ export function opacityForZoomLevel(currentZoom: number, maxZoom: number): numbe
 
 export function centroidStringToCoords(input: string): Array<number> {
   const centroidString = input.match(/\(([0-9|.|\s])+\)/);
-  if (!centroidString) return [-1, -1];
+  if (!centroidString) {
+    return [-1, -1];
+  }
   const centroid = centroidString[0].slice(1, -1).split(' ').map(
     (val: string) => parseFloat(val),
   );
