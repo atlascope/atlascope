@@ -122,7 +122,7 @@ for attribute in STRUCTURE_ATTRIBUTES:
 def similar_nuclei(nucleus, queryset=None):
     """Return a queryset of nuclei ordered by similarity."""
     if queryset is None:
-        queryset = DetectedNucleus.objects.all()
+        queryset = DetectedStructure.objects.filter(structure_type='nucleus')
     return queryset.annotate(
         dissimilarity=CubeDistance('fingerprint', nucleus.fingerprint)
     ).order_by('dissimilarity')

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from atlascope.core.models import DetectedStructure, DetectedStructureSerializer
-from atlascope.core.models.detected_nucleus import SimilarNucleusSerializer, similar_nuclei
+from atlascope.core.models.detected_structure import SimilarNucleusSerializer, similar_nuclei
 
 
 class DetectedStructureViewSet(
