@@ -66,6 +66,17 @@
         "dataset_type": "non_tiled_image"
     },
     {
+        "name": "Tooth.nrrd",
+        "id": 2010,
+        "description": "A tooth",
+        "dataset_type": "3d_volume",
+        "importer": {
+            "importer": "GoogleDriveImporter",
+            "file_id": "1UIjb1cYrL8qIwH8i2uKU1CQLboeroCBL",
+            "sha256sum": "891837e8c4b3debb7aea3c04aa02acc55f3014c9bfdb0dd64c2d2b56fe991c4f"
+        }
+    },
+    {
         "name": "Human circulatory system",
         "id": 2988,
         "description": "A basic anatomical illustration of the circulatory system",

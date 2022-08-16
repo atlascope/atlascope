@@ -73,5 +73,13 @@
             "Red Tile",
             "Green Tile"
         ]
+    },
+    {
+        "name": "Third Party Vis playground",
+        "id": 1099,
+        "datasets": [
+            "Human skeletal system",
+            "Tooth.nrrd"
+        ]
     }
 ]

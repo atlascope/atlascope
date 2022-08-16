@@ -44,6 +44,12 @@
             ref="map"
             class="map"
           />
+          <investigation-detail-3-d-vis-menu
+            :visible="externalVisualizationMenu"
+            :dataset="externalVisualizationMenuDataset"
+            :positionx="externalVisualizationMenuX"
+            :positiony="externalVisualizationMenuY"
+          />
           <v-card
             v-for="note in pinNotes"
             :key="note.id"
@@ -131,6 +137,7 @@ import {
 import store, { TiffFrame } from '../store';
 import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
+import InvestigationDetail3DVisMenu from '../components/InvestigationDetail3DVisMenu.vue';
 import {
   Dataset, Pin, Tour, Waypoint,
 } from '../generatedTypes/AtlascopeTypes';
@@ -184,6 +191,7 @@ export default defineComponent({
   components: {
     InvestigationSidebar,
     InvestigationDetailFrameMenu,
+    InvestigationDetail3DVisMenu,
   },
 
   props: {
@@ -212,6 +220,10 @@ export default defineComponent({
     const loaded = ref(false);
     const sidebarCollapsed = ref(true);
     const hoverText = ref('');
+    const externalVisualizationMenu = ref(false);
+    const externalVisualizationMenuX = ref(0);
+    const externalVisualizationMenuY = ref(0);
+    const externalVisualizationMenuDataset: Ref<Dataset | null> = ref(null);
 
     function toggleSidebar() {
       sidebarCollapsed.value = !sidebarCollapsed.value;
@@ -606,6 +618,18 @@ export default defineComponent({
       }
     }
 
+    function toggle3DVolumePin(pin: Pin, dataset: Dataset) {
+      if (!pinFeature) {
+        throw new Error('Pin feature must exist before pins can be clicked.');
+      }
+      const { x, y } = postGisToPoint(pin.location);
+      const newMenuCoordinates = pinFeature.featureGcsToDisplay(x, y);
+      externalVisualizationMenu.value = !externalVisualizationMenu.value;
+      externalVisualizationMenuX.value = newMenuCoordinates.x;
+      externalVisualizationMenuY.value = newMenuCoordinates.y;
+      externalVisualizationMenuDataset.value = dataset;
+    }
+
     function toggleDatasetPin(pin: Pin) {
       const childDataset: Dataset | undefined = store.state.currentDatasets.find(
         (dataset: Dataset) => dataset.id === pin.child,
@@ -620,6 +644,9 @@ export default defineComponent({
               throw err;
             }
           });
+          break;
+        case '3d_volume':
+          toggle3DVolumePin(pin, childDataset);
           break;
         default:
           break;
@@ -769,6 +796,10 @@ export default defineComponent({
       selectedPins,
       pinNotes,
       store,
+      externalVisualizationMenu,
+      externalVisualizationMenuX,
+      externalVisualizationMenuY,
+      externalVisualizationMenuDataset,
     };
   },
 });

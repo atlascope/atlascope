@@ -60,3 +60,12 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 9005:9005
+
+  myglance:
+    build:
+      context: ./dev/pvw
+      dockerfile: ./Dockerfile
+    environment:
+      - logger.level=WARN
+    ports:
+      - 9999:9999
