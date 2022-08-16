@@ -63,7 +63,7 @@ export function centroidStringToCoords(input: string): Array<number> {
 export interface NucleusGlandDistance{
   nucleus: number | undefined;
   gland: number | undefined;
-  line: Array<Array<number>>;
+  line: Point[];
 }
 
 export function nucleiToNearestGlandDistances(
@@ -81,7 +81,7 @@ export function nucleiToNearestGlandDistances(
     (nucleus) => {
       let minDistance: number;
       let nearestId: number | undefined;
-      let minDistanceLine: Array<Array<number>> = [];
+      let minDistanceLine: Point[] = [];
       const [x1, y1] = centroidStringToCoords(nucleus.centroid);
       glands.forEach(
         (gland) => {
@@ -90,7 +90,11 @@ export function nucleiToNearestGlandDistances(
           if (!minDistance || distance < minDistance) {
             minDistance = distance;
             nearestId = gland.id;
-            minDistanceLine = [[x1, y1], [x2, y2]];
+            minDistanceLine = [{
+              x: x1, y: y1,
+            }, {
+              x: x2, y: y2,
+            }];
           }
         },
       );

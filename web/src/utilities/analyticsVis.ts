@@ -3,7 +3,7 @@ import { computed } from '@vue/composition-api';
 import geo from 'geojs';
 import { GeoJSLayer } from './composableTypes';
 import store from '../store';
-import { centroidStringToCoords, NucleusGlandDistance } from './utiltyFunctions';
+import { centroidStringToCoords, NucleusGlandDistance, Point } from './utiltyFunctions';
 
 interface StructurePoint {
   x: number;
@@ -18,7 +18,7 @@ const defaultStructureColors = {
 };
 
 function drawLines(target: StructurePoint) {
-  const retArray: Array<Array<Array<number>>> = [];
+  const retArray: Point[][] = [];
   const computedLines = computed(() => store.state.nucleiToNearestGlandDistances);
 
   computedLines.value.forEach(
