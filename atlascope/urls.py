@@ -11,6 +11,7 @@ from atlascope.core.rest.endpoints import (
     InvestigationViewSet,
     JobViewSet,
     PinViewSet,
+    get_similar_nuclei,
 )
 
 # OpenAPI generation
@@ -37,6 +38,7 @@ urlpatterns = [
     path('api/docs/redoc/', schema_view.with_ui('redoc'), name='docs-redoc'),
     path('api/docs/swagger/', schema_view.with_ui('swagger'), name='docs-swagger'),
     path('api/v1/', include('atlascope.core.rest.endpoints.tile_endpoints')),
+    path('api/v1/similar-nuclei/<int:dataset>/<str:x>/<str:y>/', get_similar_nuclei),
 ]
 
 if settings.DEBUG:
