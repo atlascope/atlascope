@@ -80,7 +80,10 @@
               mdi-chevron-right
             </v-icon>
           </v-btn>
-          <investigation-sidebar v-if="!sidebarCollapsed" />
+          <investigation-sidebar
+            v-if="!sidebarCollapsed"
+            :similar-nuclei="similarNuclei"
+          />
         </v-sheet>
       </v-col>
     </v-row>
@@ -866,6 +869,7 @@ export default defineComponent({
       externalVisualizationMenuX,
       externalVisualizationMenuY,
       externalVisualizationMenuDataset,
+      similarNuclei,
     };
   },
 });
