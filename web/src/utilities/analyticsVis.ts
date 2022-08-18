@@ -1,10 +1,11 @@
-import { DetectedStructure, VisOption } from '@/generatedTypes/AtlascopeTypes';
+import { DetectedStructure } from '@/generatedTypes/AtlascopeTypes';
 import { computed } from '@vue/composition-api';
 import geo from 'geojs';
 import distinctColors from 'distinct-colors';
 import { GeoJSLayer } from './composableTypes';
 import store from '../store';
-import { centroidStringToCoords, NucleusGlandDistance, Point } from './utiltyFunctions';
+import { centroidStringToCoords, NucleusGlandDistance } from './utiltyFunctions';
+import { VisOption } from './visualizationTypes';
 
 interface StructurePoint {
   x: number;
@@ -19,7 +20,7 @@ const defaultStructureColors = {
 };
 
 const colors = distinctColors({
-  count: 50,
+  count: 20,
   chromaMin: 40,
   chromaMax: 80,
   lightMin: 40,
@@ -34,31 +35,31 @@ export function visualizeDetectedStructures(
   structures: DetectedStructure[],
 ) {
   const filteredStructures = structures.filter(
-    (struct) => struct.detection_dataset === vis.data.id,
+    (structure) => structure.detection_dataset === vis.data.id,
   );
   const structuresPoints = visLayer.createFeature('point');
   const defaultColor = defaultStructureColors[
     vis.data.dataset_type?.replace('_detection', '') as keyof typeof defaultStructureColors
   ];
   const computedLines = computed(() => store.state.nucleiToNearestGlandDistances);
-  const allGlands = structures.filter((struct) => struct.structure_type === 'gland').map((struct) => struct.id);
+  const allGlands = structures.filter((structure) => structure.structure_type === 'gland').map((struct) => struct.id);
 
   const centroids = filteredStructures.map(
-    (struct) => {
-      const centroid = centroidStringToCoords(struct.centroid);
+    (structure) => {
+      const centroid = centroidStringToCoords(structure.centroid);
       let distanceLines;
       let customColor;
       if (vis.options.includes('color_by_nearest_gland')) {
         const nearestGland = computedLines.value.find(
-          (distance) => distance.nucleus === struct.id,
+          (distance) => distance.nucleus === structure.id,
         )?.gland;
         customColor = colors[allGlands.indexOf(nearestGland) % colors.length];
       }
       if (vis.options.includes('show_distances_on_hover')) {
         distanceLines = computedLines.value.filter(
           (comp: NucleusGlandDistance) => comp[
-            struct.structure_type as keyof NucleusGlandDistance
-          ] === struct.id,
+            structure.structure_type as keyof NucleusGlandDistance
+          ] === structure.id,
         ).map(
           (comp: NucleusGlandDistance) => comp.line,
         );
@@ -69,7 +70,8 @@ export function visualizeDetectedStructures(
         y: centroid[1],
         distanceLines,
         color: customColor || defaultColor,
-        struct,
+        originalColor: customColor || defaultColor,
+        structure,
       };
     },
   );
@@ -100,7 +102,7 @@ export function visualizeDetectedStructures(
     });
     structuresPoints.addGeoEventHandler(geo.event.feature.mouseout, () => {
       const newData = centroids.map(
-        (point) => Object.assign(point, { color: defaultColor }),
+        (point) => Object.assign(point, { color: point.originalColor }),
       );
       structuresPoints.data(newData);
       structuresPoints.draw();
