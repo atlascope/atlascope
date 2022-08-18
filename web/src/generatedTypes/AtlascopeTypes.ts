@@ -26,7 +26,9 @@ export interface Dataset {
   content?: string | null;
 
   /** Metadata */
-  metadata?: object | null;
+  metadata?: {
+    origin: string
+  } | null;
 
   /** Dataset type */
   dataset_type?: string;
