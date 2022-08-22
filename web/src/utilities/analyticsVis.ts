@@ -1,7 +1,7 @@
 import { DetectedStructure } from '@/generatedTypes/AtlascopeTypes';
 import { computed } from '@vue/composition-api';
 import geo from 'geojs';
-import distinctColors from 'distinct-colors';
+import { schemeCategory10 } from 'd3-scale-chromatic';
 import { GeoJSLayer } from './composableTypes';
 import store from '../store';
 import { centroidStringToCoords, NucleusGlandDistance } from './utiltyFunctions';
@@ -19,15 +19,7 @@ const defaultStructureColors = {
   gland: 'red',
 };
 
-const colors = distinctColors({
-  count: 20,
-  chromaMin: 40,
-  chromaMax: 80,
-  lightMin: 40,
-  lightMax: 80,
-}).map(
-  (color) => color.hex(),
-);
+const colors = schemeCategory10
 
 export function visualizeDetectedStructures(
   vis: VisOption,
