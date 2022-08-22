@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { Dataset, VisOption } from '@/generatedTypes/AtlascopeTypes';
+import { Dataset, Pin, VisOption } from '@/generatedTypes/AtlascopeTypes';
 import visualize, { visualizeDetectedStructures } from '@/utilities/analyticsVis';
 import {
   computed, defineComponent, watch,
@@ -51,7 +51,7 @@ import store from '../store';
 export default defineComponent({
   props: {
     pin: {
-      type: Object,
+      type: Object as () => Pin,
       required: true,
     },
     active: {
