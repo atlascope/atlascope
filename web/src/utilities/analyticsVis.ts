@@ -19,7 +19,7 @@ const defaultStructureColors = {
   gland: 'red',
 };
 
-const colors = schemeCategory10
+const colors = schemeCategory10;
 
 export function visualizeDetectedStructures(
   vis: VisOption,

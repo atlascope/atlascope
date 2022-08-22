@@ -41,11 +41,12 @@
 </template>
 
 <script lang="ts">
-import { Dataset, Pin, VisOption } from '@/generatedTypes/AtlascopeTypes';
+import { Dataset, Pin } from '@/generatedTypes/AtlascopeTypes';
 import visualize, { visualizeDetectedStructures } from '@/utilities/analyticsVis';
 import {
   computed, defineComponent, watch,
 } from '@vue/composition-api';
+import { VisOption } from '../utilities/visualizationTypes';
 import store from '../store';
 
 export default defineComponent({
