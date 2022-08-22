@@ -26,7 +26,9 @@ export interface Dataset {
   content?: string | null;
 
   /** Metadata */
-  metadata?: object | null;
+  metadata?: {
+    origin: string
+  } | null;
 
   /** Dataset type */
   dataset_type?: string;
@@ -51,7 +53,14 @@ export interface DatasetCreate {
   description?: string;
 
   /** Dataset type */
-  dataset_type?: string;
+  dataset_type?:
+    | "tile_source"
+    | "tile_overlay"
+    | "analytics"
+    | "subimage"
+    | "structure_detection"
+    | "non_tiled_image"
+    | "3d_volume";
 
   /**
    * Importer
@@ -102,6 +111,9 @@ export interface DetectedStructure {
 
   /** Bounding box */
   bounding_box: string;
+
+  /** Structure type */
+  structure_type?: string;
 
   /** Gradient canny mean */
   gradient_canny_mean: number;
@@ -339,9 +351,6 @@ export interface DetectedStructure {
 
   /** Size perimeter */
   size_perimeter: number;
-
-  /** Structure type  */
-  structure_type: string;
 
   /** Detection dataset */
   detection_dataset: number;
@@ -611,8 +620,8 @@ export interface DatasetsTileSourceThumbnailParams {
   /** The source to use when opening the image. Use the `large-image/sources` endpoint to list the available sources. */
   source?: string;
 
-  /** left */
-  left: number;
+  /** maximum height in pixels. */
+  max_height?: number;
 
   /** maximum width in pixels. */
   max_width?: number;
@@ -776,14 +785,6 @@ export interface DatasetsTileSourceTilesTileCornersParams {
 
   /** The Z level of the tile. May range from [0, levels], where 0 is the lowest resolution, single tile for the whole source. */
   z: number;
-}
-
-export interface DetectedStructuresListParams {
-  /** Number of results to return per page. */
-  limit?: number;
-
-  /** The initial index from which to return the results. */
-  offset?: number;
 }
 
 export interface InvestigationsListParams {
@@ -1107,6 +1108,20 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
+   * @name DatasetsDownload
+   * @request GET:/datasets/{id}/download
+   * @response `200` `Dataset`
+   */
+  export namespace DatasetsDownload {
+    export type RequestParams = { id: number };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = Dataset;
+  }
+  /**
+   * No description
+   * @tags datasets
    * @name DatasetsSubimage
    * @request POST:/datasets/{id}/subimage
    * @response `201` `DatasetSubImage`
@@ -1126,19 +1141,14 @@ export namespace DetectedStructures {
    * @tags detected-structures
    * @name DetectedStructuresList
    * @request GET:/detected-structures
-   * @response `200` `{ count: number, next?: string | null, previous?: string | null, results: (DetectedStructure)[] }`
+   * @response `200` `(DetectedStructure)[]`
    */
   export namespace DetectedStructuresList {
     export type RequestParams = {};
-    export type RequestQuery = { limit?: number; offset?: number };
+    export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = {
-      count: number;
-      next?: string | null;
-      previous?: string | null;
-      results: DetectedStructure[];
-    };
+    export type ResponseBody = DetectedStructure[];
   }
   /**
    * No description
@@ -1148,6 +1158,34 @@ export namespace DetectedStructures {
    * @response `200` `DetectedStructure`
    */
   export namespace DetectedStructuresRead {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DetectedStructure;
+  }
+  /**
+   * No description
+   * @tags detected-structures
+   * @name DetectedStructuresFingerprint
+   * @request GET:/detected-structures/{id}/fingerprint
+   * @response `200` `DetectedStructure`
+   */
+  export namespace DetectedStructuresFingerprint {
+    export type RequestParams = { id: string };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = DetectedStructure;
+  }
+  /**
+   * No description
+   * @tags detected-structures
+   * @name DetectedStructuresSimilar
+   * @request GET:/detected-structures/{id}/similar
+   * @response `200` `DetectedStructure`
+   */
+  export namespace DetectedStructuresSimilar {
     export type RequestParams = { id: string };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -1235,11 +1273,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsTours
+   * @name InvestigationsToursRead
    * @request GET:/investigations/{id}/tours
    * @response `200` `(Tour)[]`
    */
-  export namespace InvestigationsTours {
+  export namespace InvestigationsToursRead {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
