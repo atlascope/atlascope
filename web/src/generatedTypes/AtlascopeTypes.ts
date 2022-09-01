@@ -26,12 +26,17 @@ export interface Dataset {
   content?: string | null;
 
   /** Metadata */
-  metadata?: {
-    origin: string
-  } | null;
+  metadata?: object | null;
 
   /** Dataset type */
-  dataset_type?: string;
+  dataset_type?:
+    | "tile_source"
+    | "tile_overlay"
+    | "analytics"
+    | "subimage"
+    | "structure_detection"
+    | "non_tiled_image"
+    | "3d_volume";
 
   /** Source dataset */
   source_dataset?: number | null;
@@ -474,6 +479,9 @@ export interface Waypoint {
    * @max 2147483647
    */
   zoom?: number | null;
+
+  /** Description */
+  description?: string | null;
 }
 
 export interface Tour {
@@ -483,6 +491,9 @@ export interface Tour {
 
   /** Name */
   name?: string;
+
+  /** Description */
+  description?: string | null;
 
   /** Investigation */
   investigation: number;
@@ -606,7 +617,7 @@ export interface DatasetsTileSourceRegionParams {
   /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
   style?: string;
 
-  /** Image data format (png | jpeg | tiff) */
+  /** Image format (jpeg | png | tiff | tiled | jfif | bmp | dib | pcx | eps | gif | jpeg2000 | icns | ico | mpo | palm | pdf | ppm | sgi | tga | webp | xbm | jpg | jp2 | tif) */
   fmt: string;
 
   /** A unique integer value identifying this dataset. */
@@ -647,7 +658,7 @@ export interface DatasetsTileSourceThumbnailParams {
   /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
   style?: string;
 
-  /** Image format (png | jpeg) */
+  /** Image format (jpeg | png | tiff | tiled | jfif | bmp | dib | pcx | eps | gif | jpeg2000 | icns | ico | mpo | palm | pdf | ppm | sgi | tga | webp | xbm | jpg | jp2 | tif) */
   fmt: string;
 
   /** A unique integer value identifying this dataset. */
@@ -751,7 +762,7 @@ export interface DatasetsTileSourceTilesReadParams {
   /** Encoded string of JSON style following https://girder.github.io/large_image/tilesource_options.html#style */
   style?: string;
 
-  /** Image format (png | jpeg) */
+  /** Image format (jpeg | png | tiff | tiled | jfif | bmp | dib | pcx | eps | gif | jpeg2000 | icns | ico | mpo | palm | pdf | ppm | sgi | tga | webp | xbm | jpg | jp2 | tif) */
   fmt: string;
 
   /** A unique integer value identifying this dataset. */
