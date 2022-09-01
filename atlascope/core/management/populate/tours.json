@@ -72,8 +72,9 @@
             "description": "The first feature of this tour is the ability to embed one dataset in another. Here we have the human muscular system and when you navigate to the next waypoint you will zoom into the dataset embedded in the left shoulder."
         },
         {
-            "location": [1201, 501],
-            "zoom": 10
+            "location": [1205, 505],
+            "zoom": 10,
+            "description": "The next feature to explore is pins. In order to cut unnecesary clutter these pins do not show until you are at an appropriate zoom level. Click the Red pin to see a note attached. Next click the Blue pin to see an image overlay relevant to the investigation."
         }
     ]
 }
