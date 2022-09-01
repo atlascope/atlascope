@@ -61,7 +61,7 @@
     ]
 },
 {
-    "investigation": "One Tour to Rule Them All",
+    "investigation": "Features Tour",
     "id": 6002,
     "name": "Feature Tour",
     "description": "This tour will serve to highlight the most notable features of the Atlascope application. Here we are using preloaded datasets but we also have the ability to import a dataset from an outside source.",
@@ -70,6 +70,10 @@
             "location": [1200, 500],
             "zoom": 1,
             "description": "The first feature of this tour is the ability to embed one dataset in another. Here we have the human muscular system and when you navigate to the next waypoint you will zoom into the dataset embedded in the left shoulder."
+        },
+        {
+            "location": [1201, 501],
+            "zoom": 10
         }
     ]
 }

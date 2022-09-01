@@ -21,7 +21,7 @@
         "child_bounding_box": [600, 500, 200, 200]
     },
     {
-        "investigation": "One Tour to Rule Them All",
+        "investigation": "Features Tour",
         "id": 3003,
         "parent": "Human muscular system",
         "child": "HTA9_1_BA_F_ROI02",
