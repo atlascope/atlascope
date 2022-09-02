@@ -723,7 +723,7 @@ export interface DatasetsTileSourceInfoMetadataInternalParams {
   id: number;
 }
 
-export interface DatasetsTileSourceTilesMetadataReadParams {
+export interface DatasetsTileSourceTilesTilesMetadataParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -734,7 +734,7 @@ export interface DatasetsTileSourceTilesMetadataReadParams {
   id: number;
 }
 
-export interface DatasetsTileSourceTilesReadParams {
+export interface DatasetsTileSourceTileParams {
   /** The projection in which to open the image (try `EPSG:3857`). */
   projection?: string;
 
@@ -1050,12 +1050,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceTilesMetadataRead
+   * @name DatasetsTileSourceTilesTilesMetadata
    * @summary Returns tile metadata.
    * @request GET:/datasets/tile_source/{id}/tiles/metadata
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceTilesMetadataRead {
+  export namespace DatasetsTileSourceTilesTilesMetadata {
     export type RequestParams = { id: number };
     export type RequestQuery = { projection?: string; source?: string };
     export type RequestBody = never;
@@ -1065,12 +1065,12 @@ export namespace Datasets {
   /**
    * No description
    * @tags datasets
-   * @name DatasetsTileSourceTilesRead
+   * @name DatasetsTileSourceTile
    * @summary Returns tile image binary.
    * @request GET:/datasets/tile_source/{id}/tiles/{z}/{x}/{y}.{fmt}
    * @response `200` `Dataset`
    */
-  export namespace DatasetsTileSourceTilesRead {
+  export namespace DatasetsTileSourceTile {
     export type RequestParams = { fmt: string; id: number; x: number; y: number; z: number };
     export type RequestQuery = {
       projection?: string;
@@ -1242,11 +1242,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsEmbeddingsRead
+   * @name InvestigationsEmbeddings
    * @request GET:/investigations/{id}/embeddings
    * @response `200` `(DatasetEmbedding)[]`
    */
-  export namespace InvestigationsEmbeddingsRead {
+  export namespace InvestigationsEmbeddings {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -1270,11 +1270,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsPinsRead
+   * @name InvestigationsPins
    * @request GET:/investigations/{id}/pins
    * @response `200` `(Pin)[]`
    */
-  export namespace InvestigationsPinsRead {
+  export namespace InvestigationsPins {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
@@ -1284,11 +1284,11 @@ export namespace Investigations {
   /**
    * No description
    * @tags investigations
-   * @name InvestigationsToursRead
+   * @name InvestigationsTours
    * @request GET:/investigations/{id}/tours
    * @response `200` `(Tour)[]`
    */
-  export namespace InvestigationsToursRead {
+  export namespace InvestigationsTours {
     export type RequestParams = { id: number };
     export type RequestQuery = {};
     export type RequestBody = never;
