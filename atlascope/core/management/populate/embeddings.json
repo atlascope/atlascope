@@ -24,7 +24,7 @@
         "investigation": "Features Tour",
         "id": 3003,
         "parent": "Human muscular system",
-        "child": "HTA9_1_BA_F_ROI02",
+        "child": "HTA9_1_BA_F_ROI04",
         "child_bounding_box": [1200, 500, 1205, 505]
     }
 ]
