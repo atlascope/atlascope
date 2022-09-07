@@ -516,32 +516,31 @@ export default defineComponent({
         'feature',
         { features: ['marker'] },
       ) as ReturnType<typeof useGeoJSLayer>;
-      layer.addGeoEventHandler(geoEvents.mouseclick, (event: MouseClickEvent['mouse']) => {
+      layer.addGeoEventHandler(geoEvents.mouseclick, async (event: MouseClickEvent['mouse']) => {
         const { x, y } = event.geo;
         if (!rootDataset.value) {
           return;
         }
         const url = `/similar-nuclei/${rootDataset.value.id}/${x}/${y}/`;
-        axios.get(url).then((resp) => {
-          similarNuclei.value = colorSimilarNuclei(resp.data);
-          layer.clearFeatures();
-          const feature = layer.createFeature('marker') as ReturnType<typeof useGeoJSFeature>;
-          feature.data(similarNuclei.value);
-          feature.position((nucleus: DetectedStructureWithColor) => (
-            postGisToPoint(nucleus.centroid)
-          ));
-          feature.style({
-            symbol: 64,
-            symbolValue: 1 / 3,
-            rotation: -Math.PI / 2,
-            radius: 30,
-            strokeWidth: 0,
-            strokeColor: 'blue',
-            fillColor: (nucleus: DetectedStructureWithColor) => nucleus.color,
-            rotateWithMap: false,
-          });
-          feature.draw();
+        const resp = await axios.get(url);
+        similarNuclei.value = colorSimilarNuclei(resp.data);
+        layer.clearFeatures();
+        const feature = layer.createFeature('marker') as ReturnType<typeof useGeoJSFeature>;
+        feature.data(similarNuclei.value);
+        feature.position((nucleus: DetectedStructureWithColor) => (
+          postGisToPoint(nucleus.centroid)
+        ));
+        feature.style({
+          symbol: 64,
+          symbolValue: 1 / 3,
+          rotation: -Math.PI / 2,
+          radius: 30,
+          strokeWidth: 0,
+          strokeColor: 'blue',
+          fillColor: (nucleus: DetectedStructureWithColor) => nucleus.color,
+          rotateWithMap: false,
         });
+        feature.draw();
       });
       layer.drawLayer();
     }
