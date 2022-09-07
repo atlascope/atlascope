@@ -4,10 +4,11 @@ import { createDirectStore } from 'direct-vuex';
 
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { nucleiToNearestGlandDistances, NucleusGlandDistance } from '@/utilities/utiltyFunctions';
+import { VisOption } from '@/utilities/visualizationTypes';
 import {
   Investigation, Dataset, Pin, DatasetEmbedding, JobDetail, DetectedStructure, Tour, Waypoint,
 } from '../generatedTypes/AtlascopeTypes';
-import { GeoBounds } from '../utilities/composableTypes';
+import { GeoBounds, GeoJSLayer } from '../utilities/composableTypes';
 
 Vue.use(Vuex);
 
@@ -23,7 +24,7 @@ export interface TileMetadata {
   size_x: number;
   size_y: number;
   tile_size: number;
-  additional_metadata: any;
+  additional_metadata: object;
 }
 
 export interface State {
@@ -50,6 +51,8 @@ export interface State {
     tours: Tour[];
     selectedTour: Tour;
     selectedWaypoint: Waypoint;
+    visualizationsShown: VisOption[];
+    visualizationLayer: GeoJSLayer | undefined;
 }
 
 interface TileMetadataForDataset {
@@ -93,6 +96,8 @@ const {
     tours: [],
     selectedTour: {} as Tour,
     selectedWaypoint: {},
+    visualizationsShown: [],
+    visualizationLayer: undefined,
   } as State,
   mutations: {
     setInvestigations(state, investigations: Investigation[]) {
@@ -167,6 +172,23 @@ const {
     },
     setZoomLevel(state, zoomLevel: number) {
       state.zoomLevel = zoomLevel;
+    },
+    setVisualizationLayer(state, layer: GeoJSLayer | undefined) {
+      state.visualizationLayer = layer;
+    },
+    updateVisualizationsShown(state, visOption: VisOption) {
+      if (state.visualizationsShown.map((vis) => vis.value).includes(visOption.value)) {
+        state.visualizationsShown = state.visualizationsShown.filter(
+          (vis) => vis.value !== visOption.value,
+        );
+      } else {
+        state.visualizationsShown.push(visOption);
+      }
+    },
+    updateVisualizationOption(state, visOption: VisOption) {
+      state.visualizationsShown[
+        state.visualizationsShown.findIndex((vis) => vis.value === visOption.value)
+      ] = visOption;
     },
   },
   getters: {
