@@ -39,7 +39,7 @@
         Similar Nuclei
       </v-tab>
       <v-tab-item>
-        <similar-nuclei-pane :similar-nuclei="similarNuclei" />
+        <SimilarNucleiPane :similar-nuclei="similarNuclei" />
       </v-tab-item>
     </v-tabs>
   </v-sheet>
