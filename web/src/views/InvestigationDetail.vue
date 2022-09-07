@@ -130,6 +130,7 @@ import {
   Ref,
   inject,
 } from '@vue/composition-api';
+import { schemeCategory10 } from 'd3-scale-chromatic';
 import type { AxiosInstance } from 'axios';
 import useGeoJSLayer from '../utilities/useGeoJSLayer';
 import useGeoJSFeature from '../utilities/useGeoJSFeature';
@@ -502,7 +503,7 @@ export default defineComponent({
     const similarNuclei: Ref<Array<DetectedStructureWithColor>> = ref([]);
     const axios = inject('axios') as AxiosInstance;
     function colorSimilarNuclei(nuclei: Array<DetectedStructure>) {
-      const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+      const colors = schemeCategory10;
       const nucleiWithColor: Array<DetectedStructureWithColor> = [];
       for (let i = 0; i < nuclei.length; i += 1) {
         const nucleus = nuclei[i];
