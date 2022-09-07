@@ -22,6 +22,7 @@ export interface MouseClickEvent {
     mouse: {
         buttonsDown: MouseButtons;
         page: GeoPosition;
+        geo: GeoPosition;
     };
 }
 

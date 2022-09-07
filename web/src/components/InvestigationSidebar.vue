@@ -35,6 +35,12 @@
       <v-tab-item>
         <job-pane />
       </v-tab-item>
+      <v-tab>
+        Similar Nuclei
+      </v-tab>
+      <v-tab-item>
+        <SimilarNucleiPane :similar-nuclei="similarNuclei" />
+      </v-tab-item>
     </v-tabs>
   </v-sheet>
 </template>
@@ -49,16 +55,31 @@
 import {
   defineComponent, computed,
 } from '@vue/composition-api';
+import type {
+  PropType,
+} from '@vue/composition-api';
+
 import store from '../store';
 import PinList from './PinList.vue';
 import JobPane from './JobPane.vue';
 import TourList from './TourList.vue';
+import SimilarNucleiPane from './SimilarNucleiPane.vue';
+import type {
+  DetectedStructureWithColor,
+} from '../views/InvestigationDetail.vue';
 
 export default defineComponent({
   components: {
     PinList,
     JobPane,
     TourList,
+    SimilarNucleiPane,
+  },
+  props: {
+    similarNuclei: {
+      type: Array as PropType<Array<DetectedStructureWithColor>>,
+      required: true,
+    },
   },
 
   setup() {

@@ -1,9 +1,12 @@
 from PIL import Image
+from django.contrib.gis.db.models.functions import GeometryDistance
+from django.contrib.gis.geos import GEOSGeometry
+from django.db.models import Q
 from django.http import HttpResponse
 from matplotlib import cm
 import numpy as np
 from rest_framework import mixins
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -58,3 +61,17 @@ class DetectedStructureViewSet(
         # save image to buffer
         image.save(response, format='PNG')
         return response
+
+
+@api_view()
+def get_similar_nuclei(request, dataset: int, x: str, y: str):
+    # return 5 most similar nuclei to the nucleus located at x,y
+    queryset = DetectedStructure.objects.filter(structure_type="nucleus").filter(
+        Q(detection_dataset=dataset) | Q(detection_dataset__source_dataset=dataset)
+    )
+    nucleus = queryset.order_by(
+        GeometryDistance('centroid', GEOSGeometry(f'POINT({float(x)} {float(y)})', srid=4326))
+    ).first()
+    queryset = similar_nuclei(nucleus, queryset)[:6]
+    serializer = SimilarNucleusSerializer(queryset, many=True)
+    return Response(serializer.data)

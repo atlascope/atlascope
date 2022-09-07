@@ -80,7 +80,10 @@
               mdi-chevron-right
             </v-icon>
           </v-btn>
-          <investigation-sidebar v-if="!sidebarCollapsed" />
+          <investigation-sidebar
+            v-if="!sidebarCollapsed"
+            :similar-nuclei="similarNuclei"
+          />
         </v-sheet>
       </v-col>
     </v-row>
@@ -125,7 +128,12 @@ import {
   computed,
   watch,
   Ref,
+  inject,
 } from '@vue/composition-api';
+import { schemeCategory10 } from 'd3-scale-chromatic';
+import type { AxiosInstance } from 'axios';
+import useGeoJSLayer from '../utilities/useGeoJSLayer';
+import useGeoJSFeature from '../utilities/useGeoJSFeature';
 import { MouseClickEvent, GeoJSLayer, GeoJSFeature } from '../utilities/composableTypes';
 import useGeoJS from '../utilities/useGeoJS';
 import {
@@ -139,7 +147,7 @@ import InvestigationSidebar from '../components/InvestigationSidebar.vue';
 import InvestigationDetailFrameMenu from '../components/InvestigationDetailFrameMenu.vue';
 import InvestigationDetail3DVisMenu from '../components/InvestigationDetail3DVisMenu.vue';
 import {
-  Dataset, Pin, Tour, Waypoint,
+  Dataset, Pin, Tour, Waypoint, DetectedStructure,
 } from '../generatedTypes/AtlascopeTypes';
 import type { DatasetEmbedding } from '../generatedTypes/AtlascopeTypes';
 
@@ -183,6 +191,10 @@ interface BandSpec {
 
 interface TileLayerStyleDict {
   bands: BandSpec[];
+}
+
+export interface DetectedStructureWithColor extends DetectedStructure {
+  color: string;
 }
 
 export default defineComponent({
@@ -488,8 +500,56 @@ export default defineComponent({
       clampBoundsX(false);
     }
 
+    const similarNuclei: Ref<Array<DetectedStructureWithColor>> = ref([]);
+    const axios = inject('axios') as AxiosInstance;
+    function colorSimilarNuclei(nuclei: Array<DetectedStructure>) {
+      const colors = schemeCategory10;
+      const nucleiWithColor: Array<DetectedStructureWithColor> = [];
+      for (let i = 0; i < nuclei.length; i += 1) {
+        const nucleus = nuclei[i];
+        const nucleusWithColor = { ...nucleus, color: colors[i] };
+        nucleiWithColor.push(nucleusWithColor);
+      }
+      return nucleiWithColor;
+    }
+    function setupSimilarNuclei() {
+      const layer = createLayer(
+        'feature',
+        { features: ['marker'] },
+      ) as ReturnType<typeof useGeoJSLayer>;
+      layer.addGeoEventHandler(geoEvents.mouseclick, async (event: MouseClickEvent['mouse']) => {
+        const { x, y } = event.geo;
+        if (!rootDataset.value) {
+          return;
+        }
+        const url = `/similar-nuclei/${rootDataset.value.id}/${x}/${y}/`;
+        const resp = await axios.get(url);
+        similarNuclei.value = colorSimilarNuclei(resp.data);
+        layer.clearFeatures();
+        const feature = layer.createFeature('marker') as ReturnType<typeof useGeoJSFeature>;
+        feature.data(similarNuclei.value);
+        feature.position((nucleus: DetectedStructureWithColor) => (
+          postGisToPoint(nucleus.centroid)
+        ));
+        feature.style({
+          symbol: 64,
+          symbolValue: 1 / 3,
+          rotation: -Math.PI / 2,
+          radius: 30,
+          strokeWidth: 0,
+          strokeColor: 'blue',
+          fillColor: (nucleus: DetectedStructureWithColor) => nucleus.color,
+          rotateWithMap: false,
+        });
+        feature.draw();
+      });
+      layer.drawLayer();
+    }
+
     watch(rootDataset, (newValue) => {
       drawMap(newValue);
+      setupSimilarNuclei();
+      similarNuclei.value = [];
     });
 
     watch(showEmbeddings, () => {
@@ -782,6 +842,7 @@ export default defineComponent({
       drawMap(store.state.rootDataset);
       store.commit.setBounds(bounds.value);
       createPinNotes();
+      setupSimilarNuclei();
       loaded.value = true;
       await store.dispatch.fetchDetectedStructures();
       setVisualizationLayer();
@@ -802,6 +863,7 @@ export default defineComponent({
       externalVisualizationMenuX,
       externalVisualizationMenuY,
       externalVisualizationMenuDataset,
+      similarNuclei,
     };
   },
 });
