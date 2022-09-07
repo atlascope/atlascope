@@ -82,7 +82,7 @@ export default defineComponent({
     },
   },
 
-  setup(props) {
+  setup() {
     const metadataFields = [
       'id',
       'owner',

@@ -45,7 +45,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup() {
     const baseUrl = ref(process.env.VUE_APP_API_ROOT as string);
     return { baseUrl };
   },
