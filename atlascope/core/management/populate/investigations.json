@@ -90,7 +90,8 @@
         "datasets": [
             "Human muscular system",
             "HTA9_1_BA_F_ROI04",
-            "Blue Tile"
+            "Blue Tile",
+            "Tooth.nrrd"
         ]
     }
 ]

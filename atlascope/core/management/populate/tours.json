@@ -77,14 +77,19 @@
             "description": "The next feature to explore is pins. In order to cut unnecesary clutter these pins do not show until you are at an appropriate zoom level. Click the Red pin to see a note attached. Next change the dataset to 'HTA9_1_BA_F_ROI04' and click the Blue pin to see an image overlay relevant to the investigation."
         },
         {
-            "location": [1202, 506],
+            "location": [1202, 508],
             "zoom": 9,
             "description": "Next let's take a look at some potential job results. Under the 'Pins' tab select the 'Results of Detected Nuclei Job' option. Also take a look at the 'Results of Detected Glands Job' then come back to this dataset"
         },
         {
-            "location": [1209, 507],
+            "location": [1210, 507],
             "zoom": 10,
             "description": "Now that we have seen the basic functionality of Pins lets check out something more advanced. When you click on the Green Pin it will open a new tab and show 3rd party visulation. When you ar done close the tab and continue the tour."
+        },
+        {
+            "location": [1212, 510],
+            "zoom": 10,
+            "description": "Lastly lets checkout Similar Nuclei Detection. Switch to the dataset to 'HTA9_1_BA_F_ROI04' and select the 'Similar Nuclei' tab. Next click on the dataset slide and you will see a list of the Similar Nuclei detected in this slide. "
         }
     ]
 }
