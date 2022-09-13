@@ -26,17 +26,12 @@ export interface Dataset {
   content?: string | null;
 
   /** Metadata */
-  metadata?: object | null;
+  metadata?: {
+    origin: string
+  } | null;
 
   /** Dataset type */
-  dataset_type?:
-    | "tile_source"
-    | "tile_overlay"
-    | "analytics"
-    | "subimage"
-    | "structure_detection"
-    | "non_tiled_image"
-    | "3d_volume";
+  dataset_type?: string;
 
   /** Source dataset */
   source_dataset?: number | null;

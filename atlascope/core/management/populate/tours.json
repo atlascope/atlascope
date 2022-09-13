@@ -74,7 +74,17 @@
         {
             "location": [1205, 505],
             "zoom": 10,
-            "description": "The next feature to explore is pins. In order to cut unnecesary clutter these pins do not show until you are at an appropriate zoom level. Click the Red pin to see a note attached. Next click the Blue pin to see an image overlay relevant to the investigation."
+            "description": "The next feature to explore is pins. In order to cut unnecesary clutter these pins do not show until you are at an appropriate zoom level. Click the Red pin to see a note attached. Next change the dataset to 'HTA9_1_BA_F_ROI04' and click the Blue pin to see an image overlay relevant to the investigation."
+        },
+        {
+            "location": [1202, 506],
+            "zoom": 9,
+            "description": "Next let's take a look at some potential job results. Under the 'Pins' tab select the 'Results of Detected Nuclei Job' option. Also take a look at the 'Results of Detected Glands Job' then come back to this dataset"
+        },
+        {
+            "location": [1209, 507],
+            "zoom": 10,
+            "description": "Now that we have seen the basic functionality of Pins lets check out something more advanced. When you click on the Green Pin it will open a new tab and show 3rd party visulation. When you ar done close the tab and continue the tour."
         }
     ]
 }
