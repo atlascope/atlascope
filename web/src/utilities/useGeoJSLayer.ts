@@ -49,6 +49,9 @@ export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
     const newFeature = layer.value.createFeature(featureType, opts);
     return useGeoJSFeature(newFeature, featureType);
   };
+  const clearFeatures = () => {
+    layer.value.features([]);
+  };
   return {
     layer,
     getType,
@@ -60,5 +63,6 @@ export default function useGeoJSLayer(geoJSLayer: any, layerType: string) {
     removeAllAnnotations,
     addGeoEventHandler,
     mode,
+    clearFeatures,
   };
 }
