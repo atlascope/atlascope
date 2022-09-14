@@ -329,6 +329,7 @@ const {
       const circlePinDatasetTypes = [
         'tile_overlay',
         'non_tiled_image',
+        '3d_volume',
       ];
       const isVisualization: Array<boolean | Dataset> = pins.map((pin: Pin) => {
         const childDataset: Dataset | undefined = store.state.currentDatasets.find(
