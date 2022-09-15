@@ -8,6 +8,7 @@ from atlascope.core.models.waypoint import Waypoint
 class Tour(models.Model):
     name = models.CharField(max_length=255, default='My Tour')
     waypoints = models.ManyToManyField('Waypoint', through='TourWaypoints')
+    description = models.TextField(max_length=5000, blank=True, null=True)
     investigation = models.ForeignKey(
         'Investigation',
         on_delete=models.CASCADE,

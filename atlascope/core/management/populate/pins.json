@@ -87,5 +87,33 @@
         "child": "Tooth.nrrd",
         "color": "red",
         "minimum_zoom": 5
+    },
+    {
+        "investigation":"Features Tour",
+        "parent": "Human muscular system",
+        "id": 5009,
+        "location": [1202, 502],
+        "note": "A pin with minimum zoom level",
+        "color": "red",
+        "minimum_zoom": 8
+    },
+    {
+        "investigation":"Features Tour",
+        "parent": "HTA9_1_BA_F_ROI04",
+        "id": 5010,
+        "location": [3300, 1100],
+        "description": "An overlay of a blue image",
+        "color": "blue",
+        "child": "Blue Tile"
+    },
+    {
+        "investigation":"Features Tour",
+        "parent": "Human muscular system",
+        "id": 5011,
+        "location": [1201, 501],
+        "description": "Launch another visualization tool",
+        "child": "Tooth.nrrd",
+        "color": "green",
+        "minimum_zoom": 8
     }
 ]

@@ -10,5 +10,17 @@
         "id": 4003,
         "investigation": "Analytics playground",
         "original_dataset": "HTA9_1_BA_F_ROI04"
+    },
+    {
+        "job_type": "nucleus_detection",
+        "id": 4004,
+        "investigation": "Features Tour",
+        "original_dataset": "HTA9_1_BA_F_ROI04"
+    },
+    {
+        "job_type": "gland_detection",
+        "id": 4005,
+        "investigation": "Features Tour",
+        "original_dataset": "HTA9_1_BA_F_ROI04"
     }
 ]
